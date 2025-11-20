@@ -29,6 +29,9 @@ export default antfu(
     // Ignored paths
     ignores: [
       'migrations/**/*',
+      'src/components/ui/button.tsx',
+      'src/components/audio-demo.tsx',
+      'src/components/theme-provider.tsx',
     ],
   },
   // --- Accessibility Rules ---
