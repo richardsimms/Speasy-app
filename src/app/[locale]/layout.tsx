@@ -80,14 +80,6 @@ export default async function RootLayout(props: {
                   </li>
                   <li>
                     <Link
-                      href="/counter/"
-                      className="border-none text-gray-700 hover:text-gray-900"
-                    >
-                      {t('counter_link')}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
                       href="/portfolio/"
                       className="border-none text-gray-700 hover:text-gray-900"
                     >

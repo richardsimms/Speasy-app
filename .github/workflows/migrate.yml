@@ -1,0 +1,52 @@
+name: Database Migration
+
+on:
+  # Manual trigger from GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to run migrations for
+        required: true
+        default: production
+        type: choice
+        options:
+          - production
+          - staging
+  # Trigger after successful Vercel deployment (via webhook)
+  # You'll need to configure this webhook in Vercel: Settings > Git > Deploy Hooks
+  repository_dispatch:
+    types: [vercel-deployment-success]
+  # Alternative: Trigger on push to main (if you want automatic migrations)
+  # Uncomment the following if you prefer automatic migrations:
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - 'migrations/**'
+
+jobs:
+  migrate:
+    name: Run Database Migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js environment
+        uses: ./.github/actions/setup-project
+        with:
+          node-version: 22.x
+
+      - name: Run database migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npm run db:migrate
+
+      - name: Verify migration success
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          echo "✅ Database migrations completed successfully"
+          # Optional: Add verification logic here
+          # For example, check if specific tables exist

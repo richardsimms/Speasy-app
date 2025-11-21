@@ -1,0 +1,23 @@
+# Speasy
+
+> Speasy turns newsletters and saved articles into personal podcast-style audio you can listen to. Built with Next.js 15 App Router, React 19, TypeScript, Tailwind CSS, Supabase Auth, Stripe billing, and a PWA service worker for offline playback. Production site: https://www.speasy.app
+
+- PWA support is enabled: service worker `public/sw.js`, manifest `public/manifest.json`, offline fallback `public/offline.html`.
+- Base URL defaults to `https://speasy.app` (see `app/sitemap.ts` and `app/layout.tsx`), and remote image patterns allow `**.speasy.app` (see `next.config.mjs`).
+- Contact: hello@speasy.app
+
+
+
+## API
+
+- Next.js App Router server routes and server actions (no separate FastAPI/Express service). See `docs/api.md`.
+- Stripe webhooks update Supabase on subscription events. See `docs/stripe-integration.md` and `docs/webhook-security.md`.
+- Sitemap generator: `app/sitemap.ts` uses `NEXT_PUBLIC_BASE_URL` (defaults to `https://speasy.app`).
+
+## Examples
+
+- Landing page: https://speasy.app/
+- Dashboard: https://speasy.app/dashboard
+- Unsubscribe flow: https://speasy.app/unsubscribe/:token (see `app/unsubscribe/[token]/page.tsx`)
+- Blog: https://speasy.app/blog/ (content in `blog/`)
+

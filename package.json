@@ -41,6 +41,7 @@
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.4",
     "@sentry/nextjs": "^10.25.0",
+    "@supabase/supabase-js": "^2.84.0",
     "@t3-oss/env-nextjs": "^0.13.8",
     "@vercel/analytics": "^1.5.0",
     "class-variance-authority": "^0.7.1",
@@ -56,6 +57,7 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.66.0",
+    "svix": "^1.81.0",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.1.12"
   },

@@ -40,14 +40,21 @@ export default async function middleware(
   request: NextRequest,
   event: NextFetchEvent,
 ) {
-  // Verify the request with Arcjet
-  // Use `process.env` instead of Env to reduce bundle size in middleware
-  if (process.env.ARCJET_KEY) {
+  // Skip Clerk middleware for webhook routes (they need to be public)
+  const isWebhookRoute = request.nextUrl.pathname.startsWith('/api/webhooks');
+
+  // Verify the request with Arcjet (skip for webhooks)
+  if (!isWebhookRoute && process.env.ARCJET_KEY) {
     const decision = await aj.protect(request);
 
     if (decision.isDenied()) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+  }
+
+  // For webhook routes, skip Clerk middleware and i18n routing
+  if (isWebhookRoute) {
+    return NextResponse.next();
   }
 
   // Clerk keyless mode doesn't work with i18n, this is why we need to run the middleware conditionally
@@ -69,6 +76,12 @@ export default async function middleware(
     })(request, event);
   }
 
+  // For API routes that use Clerk (like /api/users/sync), we need Clerk middleware to run
+  // but we don't need to protect them - they handle auth internally
+  if (request.nextUrl.pathname.startsWith('/api')) {
+    return clerkMiddleware()(request, event);
+  }
+
   return handleI18nRouting(request);
 }
 
@@ -76,6 +89,7 @@ export const config = {
   // Match all pathnames except for
   // - … if they start with `/_next`, `/_vercel` or `monitoring`
   // - … the ones containing a dot (e.g. `favicon.ico`)
+  // Note: We include /api routes so Clerk middleware can run for routes using currentUser()
   matcher: '/((?!_next|_vercel|monitoring|.*\\..*).*)',
   runtime: 'nodejs',
 };

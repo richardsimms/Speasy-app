@@ -1,16 +1,19 @@
 import { currentUser } from '@clerk/nextjs/server';
 import { getTranslations } from 'next-intl/server';
-import { Sponsors } from './Sponsors';
+import { SyncUserButton } from '@/components/SyncUserButton';
 
 export const Hello = async () => {
   const t = await getTranslations('Dashboard');
   const user = await currentUser();
 
+  // Use first name if available, otherwise fall back to email
+  const displayName = user?.firstName ?? user?.primaryEmailAddress?.emailAddress ?? '';
+
   return (
     <>
       <p>
         {`👋 `}
-        {t('hello_message', { email: user?.primaryEmailAddress?.emailAddress ?? '' })}
+        {t('hello_message', { name: displayName })}
       </p>
       <p>
         {t.rich('alternative_message', {
@@ -24,7 +27,7 @@ export const Hello = async () => {
           ),
         })}
       </p>
-      <Sponsors />
+      <SyncUserButton />
     </>
   );
 };
