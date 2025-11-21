@@ -14,6 +14,7 @@ export const Env = createEnv({
     STRIPE_PRICE_ID: z.string().min(1).optional(),
     DISCORD_WEBHOOK_URL: z.string().url().optional(),
     OPENAI_KEY: z.string().min(1).optional(),
+    UNSPLASH_ACCESS_KEY: z.string().min(1).optional(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().optional(),
@@ -43,6 +44,7 @@ export const Env = createEnv({
     STRIPE_PRICE_ID: process.env.STRIPE_PRICE_ID,
     DISCORD_WEBHOOK_URL: process.env.DISCORD_WEBHOOK_URL,
     OPENAI_KEY: process.env.OPENAI_KEY,
+    UNSPLASH_ACCESS_KEY: process.env.UNSPLASH_ACCESS_KEY,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
