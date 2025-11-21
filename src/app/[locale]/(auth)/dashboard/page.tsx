@@ -1,7 +1,11 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { DashboardContent } from '@/components/dashboard-content';
+import { Env } from '@/libs/Env';
 import { getSupabaseAdmin } from '@/libs/Supabase';
+
+// Force dynamic rendering since this page requires user-specific data
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
@@ -18,6 +22,22 @@ export async function generateMetadata(props: {
 }
 
 export default async function Dashboard() {
+  // Check if Supabase is configured before attempting to use it
+  if (!Env.SUPABASE_URL || !Env.SUPABASE_SERVICE_ROLE_KEY) {
+    return (
+      <div className="py-5 [&_p]:my-6">
+        <div className="mx-auto max-w-7xl px-4">
+          <h1 className="mb-12 text-4xl font-bold text-white">Your Content</h1>
+          <div className="py-20 text-center">
+            <p className="text-muted-foreground">
+              Content is not available. Please check your configuration.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const supabase = getSupabaseAdmin();
 
   // Fetch content items with categories and audio files
