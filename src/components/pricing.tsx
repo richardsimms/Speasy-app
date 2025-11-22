@@ -97,7 +97,7 @@ export function Pricing() {
                     transition={{ duration: 0.3, delay: 0.4 + index * 0.1 }}
                     className="flex items-start gap-3"
                   >
-                    <Check className="text-accent mt-0.5 h-5 w-5 flex-shrink-0" />
+                    <Check className="text-primary mt-0.5 h-5 w-5 flex-shrink-0" />
                     <span className="text-sm leading-relaxed">{feature}</span>
                   </motion.li>
                 ))}

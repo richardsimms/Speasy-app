@@ -14,8 +14,8 @@ export function Hero() {
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           className="bg-accent/10 border-accent/20 inline-flex items-center gap-2 rounded-full border px-4 py-2 backdrop-blur-sm"
         >
-          <Sparkles className="text-accent h-4 w-4" />
-          <span className="text-accent text-sm font-medium">Turn newsletters into podcasts</span>
+          <Sparkles className="text-primary h-4 w-4" />
+          <span className="text-primary text-sm font-medium">Turn newsletters into podcasts</span>
         </motion.div>
 
         <motion.h1
