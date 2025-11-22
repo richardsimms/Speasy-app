@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { GeistMono } from 'geist/font/mono';
+import { GeistSans } from 'geist/font/sans';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import Link from 'next/link';
@@ -55,7 +57,7 @@ export default async function RootLayout(props: {
   });
 
   return (
-    <html lang={locale}>
+    <html lang={locale} className={`${GeistSans.variable} ${GeistMono.variable} ${GeistSans.className}`}>
       <body className="font-sans antialiased">
         <NextIntlClientProvider>
           <PostHogProvider>
