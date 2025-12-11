@@ -1,15 +1,7 @@
 'use client';
 
-import {
-  ChevronRight,
-  Cpu,
-  DollarSign,
-  Home,
-  Palette,
-  Star,
-  Trophy,
-} from 'lucide-react';
-import { useState } from 'react';
+import { Cpu, DollarSign, Home, Palette, Star, Trophy } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/libs/utils';
 import { ContentGridCard } from './content-grid-card';
 
@@ -84,9 +76,33 @@ export function ContentGridDiscover({
   ];
 
   const [selectedTab, setSelectedTab] = useState<string>('for-you');
+  const [hoveredTab, setHoveredTab] = useState<string | null>(null);
+  const [indicatorStyle, setIndicatorStyle] = useState<{
+    left: number;
+    width: number;
+  }>({ left: 0, width: 0 });
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const selectedTabData = tabs.find(tab => tab.id === selectedTab);
   const displayedItems = selectedTabData?.items || [];
+
+  const updateIndicator = useCallback((tabId: string) => {
+    const button = tabRefs.current[tabId];
+    if (button) {
+      setIndicatorStyle({
+        left: button.offsetLeft,
+        width: button.offsetWidth,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateIndicator(selectedTab);
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [selectedTab, updateIndicator]);
 
   const handleTabKeyDown = (
     e: React.KeyboardEvent<HTMLButtonElement>,
@@ -153,108 +169,124 @@ export function ContentGridDiscover({
       <div
         role="tablist"
         aria-label="Content categories"
-        className="-mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mx-4 flex w-full max-w-full items-center overflow-x-auto px-4 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = selectedTab === tab.id;
-          const tabPanelId = `tabpanel-${tab.id}`;
+        <div className="relative inline-flex min-w-max items-center gap-8">
+          {/* Animated hover/active background */}
+          {indicatorStyle.width > 0 && (
+            <div
+              className="pointer-events-none absolute inset-y-0 rounded-lg border border-white/20 bg-white/10 transition-all duration-300 ease-out"
+              style={{
+                transform: `translateX(${indicatorStyle.left}px)`,
+                width: `${indicatorStyle.width}px`,
+              }}
+            />
+          )}
 
-          return (
-            <button
-              key={tab.id}
-              id={`tab-${tab.id}`}
-              type="button"
-              role="tab"
-              aria-selected={isActive}
-              aria-controls={tabPanelId}
-              tabIndex={isActive ? 0 : -1}
-              onClick={() => setSelectedTab(tab.id)}
-              onKeyDown={e => handleTabKeyDown(e, tab.id)}
-              style={{ touchAction: 'manipulation' }}
-              className={cn(
-                'flex items-center gap-2 rounded-lg px-4 py-3 font-medium transition-all whitespace-nowrap',
-                'min-h-[44px] min-w-[44px]',
-                'focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]',
-                'active:scale-95 active:bg-white/15',
-                isActive
-                  ? 'bg-white/10 text-white border border-white/20'
-                  : 'text-white/70 hover:text-white hover:bg-white/5',
-              )}
-            >
-              <Icon
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = selectedTab === tab.id;
+            const isHovered = hoveredTab === tab.id;
+            const tabPanelId = `tabpanel-${tab.id}`;
+
+            return (
+              <button
+                key={tab.id}
+                ref={(el) => {
+                  tabRefs.current[tab.id] = el;
+                }}
+                id={`tab-${tab.id}`}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                aria-controls={tabPanelId}
+                tabIndex={isActive ? 0 : -1}
+                onClick={() => {
+                  setSelectedTab(tab.id);
+                  updateIndicator(tab.id);
+                }}
+                onMouseEnter={() => {
+                  setHoveredTab(tab.id);
+                  updateIndicator(tab.id);
+                }}
+                onMouseLeave={() => {
+                  setHoveredTab(null);
+                  updateIndicator(selectedTab);
+                }}
+                onKeyDown={e => handleTabKeyDown(e, tab.id)}
+                style={{ touchAction: 'manipulation' }}
                 className={cn(
-                  'h-4 w-4 shrink-0',
-                  isActive ? 'text-white' : 'text-white/70',
+                  'relative z-10 inline-flex w-max shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-4 py-3 font-medium transition-colors',
+                  'min-h-[44px]',
+                  'focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]',
+                  'active:scale-95',
+                  isActive || isHovered ? 'text-white' : 'text-white/70',
                 )}
-              />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-
-        {/* Scroll indicator */}
-        <button
-          type="button"
-          aria-label="Scroll to see more categories"
-          className="ml-2 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-white/70 transition-colors hover:border-white/20 hover:text-white"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
+              >
+                <Icon
+                  className={cn(
+                    'h-4 w-4 shrink-0 transition-colors',
+                    isActive || isHovered ? 'text-white' : 'text-white/70',
+                  )}
+                />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Content Grid - Masonry Layout */}
-      {displayedItems.length === 0
-        ? (
-            <div
-              id={`tabpanel-${selectedTab}`}
-              role="tabpanel"
-              aria-labelledby={`tab-${selectedTab}`}
-              className="py-20 text-center"
-            >
-              <p className="text-muted-foreground">
-                No content available in this category. Check back soon!
-              </p>
-            </div>
-          )
-        : (
-            <div
-              id={`tabpanel-${selectedTab}`}
-              role="tabpanel"
-              aria-labelledby={`tab-${selectedTab}`}
-              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
-            >
-              {displayedItems.map((item, index) => {
-                // Perplexity-style pattern: 2 featured cards side-by-side (span 2 cols each), then 4 regular cards (1 col each)
-                // Pattern repeats every 6 items: [0-1: featured] [2-5: regular] | [6-7: featured] [8-11: regular]
-                const positionInPattern = index % 6;
-                const isFeatured = positionInPattern < 2; // First 2 items in each group of 6 are featured
+      {displayedItems.length === 0 && (
+        <div
+          id={`tabpanel-${selectedTab}`}
+          role="tabpanel"
+          aria-labelledby={`tab-${selectedTab}`}
+          className="py-20 text-center"
+        >
+          <p className="text-muted-foreground">
+            No content available in this category. Check back soon!
+          </p>
+        </div>
+      )}
+      {displayedItems.length > 0 && (
+        <div
+          id={`tabpanel-${selectedTab}`}
+          role="tabpanel"
+          aria-labelledby={`tab-${selectedTab}`}
+          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+        >
+          {displayedItems.map((item, index) => {
+            // Perplexity-style pattern: 2 featured cards side-by-side (span 2 cols each), then 4 regular cards (1 col each)
+            // Pattern repeats every 6 items: [0-1: featured] [2-5: regular] | [6-7: featured] [8-11: regular]
+            const positionInPattern = index % 6;
+            const isFeatured = positionInPattern < 2; // First 2 items in each group of 6 are featured
 
-                return (
-                  <div
-                    key={item.id}
-                    className={cn(
-                      'transition-all',
-                      isFeatured
-                        ? 'sm:col-span-2 lg:col-span-2'
-                        : 'sm:col-span-1 lg:col-span-1',
-                    )}
-                  >
-                    <ContentGridCard
-                      id={item.id}
-                      title={item.title}
-                      summary={item.summary}
-                      imageUrl={item.imageUrl}
-                      category={item.category}
-                      duration={item.duration}
-                      index={index}
-                      locale={locale}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          )}
+            return (
+              <div
+                key={item.id}
+                className={cn(
+                  'transition-all',
+                  isFeatured
+                    ? 'sm:col-span-2 lg:col-span-2'
+                    : 'sm:col-span-1 lg:col-span-1',
+                )}
+              >
+                <ContentGridCard
+                  id={item.id}
+                  title={item.title}
+                  summary={item.summary}
+                  imageUrl={item.imageUrl}
+                  category={item.category}
+                  duration={item.duration}
+                  index={index}
+                  locale={locale}
+                />
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
