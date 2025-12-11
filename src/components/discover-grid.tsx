@@ -211,20 +211,22 @@ export function DiscoverGrid({ categories, locale }: DiscoverGridProps) {
               id={`tabpanel-${selectedTab}`}
               role="tabpanel"
               aria-labelledby={`tab-${selectedTab}`}
-              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
             >
               {displayedItems.map((item, index) => {
-                // Masonry pattern: full (0), 3x side-by-side (1-3), full (4), 3x side-by-side (5-7), repeat...
-                // Pattern repeats every 4 items: 0,1,2,3 | 4,5,6,7 | 8,9,10,11
-                const positionInPattern = index % 4;
-                const isFullWidth = positionInPattern === 0;
+                // Perplexity-style pattern: 2 featured cards side-by-side (span 2 cols each), then 4 regular cards (1 col each)
+                // Pattern repeats every 6 items: [0-1: featured] [2-5: regular] | [6-7: featured] [8-11: regular]
+                const positionInPattern = index % 6;
+                const isFeatured = positionInPattern < 2; // First 2 items in each group of 6 are featured
 
                 return (
                   <div
                     key={item.id}
                     className={cn(
                       'transition-all',
-                      isFullWidth && 'sm:col-span-2 lg:col-span-3',
+                      isFeatured
+                        ? 'sm:col-span-2 lg:col-span-2'
+                        : 'sm:col-span-1 lg:col-span-1',
                     )}
                   >
                     <ContentGridCard
