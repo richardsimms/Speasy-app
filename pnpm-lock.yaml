@@ -53,6 +53,9 @@ importers:
       framer-motion:
         specifier: ^12.23.24
         version: 12.23.26(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      geist:
+        specifier: ^1.5.1
+        version: 1.5.1(next@16.0.8(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1))
       lucide-react:
         specifier: ^0.554.0
         version: 0.554.0(react@19.2.1)
@@ -5412,6 +5415,11 @@ packages:
   functions-have-names@1.2.3:
     resolution: {integrity: sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ==}
 
+  geist@1.5.1:
+    resolution: {integrity: sha512-mAHZxIsL2o3ZITFaBVFBnwyDOw+zNLYum6A6nIjpzCGIO8QtC3V76XF2RnZTyLx1wlDTmMDy8jg3Ib52MIjGvQ==}
+    peerDependencies:
+      next: '>=13.2.0'
+
   generator-function@2.0.1:
     resolution: {integrity: sha512-SFdFmIJi+ybC0vjlHN0ZGVGHc3lgE0DxPAT0djjVg+kjOnSqclqmj0KQ7ykTOLP6YxoqOvuAODGdcHJn+43q3g==}
     engines: {node: '>= 0.4'}
@@ -10186,7 +10194,7 @@ snapshots:
     dependencies:
       is-negated-glob: 1.0.0
 
-  '@hono/mcp@0.1.5(@modelcontextprotocol/sdk@1.24.3(zod@4.1.13))(hono@4.10.8)':
+  '@hono/mcp@0.1.5(@modelcontextprotocol/sdk@1.24.3(zod@3.25.76))(hono@4.10.8)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.24.3(zod@3.25.76)
       hono: 4.10.8
@@ -11642,7 +11650,7 @@ snapshots:
 
   '@spotlightjs/spotlight@4.7.2':
     dependencies:
-      '@hono/mcp': 0.1.5(@modelcontextprotocol/sdk@1.24.3(zod@4.1.13))(hono@4.10.8)
+      '@hono/mcp': 0.1.5(@modelcontextprotocol/sdk@1.24.3(zod@3.25.76))(hono@4.10.8)
       '@hono/node-server': 1.19.7(hono@4.10.8)
       '@jridgewell/trace-mapping': 0.3.31
       '@modelcontextprotocol/sdk': 1.24.3(zod@3.25.76)
@@ -14917,6 +14925,10 @@ snapshots:
       is-callable: 1.2.7
 
   functions-have-names@1.2.3: {}
+
+  geist@1.5.1(next@16.0.8(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)):
+    dependencies:
+      next: 16.0.8(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(@playwright/test@1.57.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
 
   generator-function@2.0.1: {}
 
