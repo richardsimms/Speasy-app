@@ -142,7 +142,7 @@ export function DiscoverGrid({ categories, locale }: DiscoverGridProps) {
       <div
         role="tablist"
         aria-label="Content categories"
-        className="flex items-center gap-3 overflow-x-auto pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mx-4 flex items-center gap-3 overflow-x-auto px-4 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {tabs.map((tab) => {
           const Icon = tab.icon;
