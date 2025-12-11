@@ -58,12 +58,11 @@ export default async function middleware(
   }
 
   // Clerk keyless mode doesn't work with i18n, this is why we need to run the middleware conditionally
-  if (
-    isAuthPage(request) || isProtectedRoute(request)
-  ) {
+  if (isAuthPage(request) || isProtectedRoute(request)) {
     return clerkMiddleware(async (auth, req) => {
       if (isProtectedRoute(req)) {
-        const locale = req.nextUrl.pathname.match(/(\/.*)\/dashboard/)?.at(1) ?? '';
+        const locale
+          = req.nextUrl.pathname.match(/(\/.*)\/dashboard/)?.at(1) ?? '';
 
         const signInUrl = new URL(`${locale}/sign-in`, req.url);
 
@@ -82,7 +81,14 @@ export default async function middleware(
     return clerkMiddleware()(request, event);
   }
 
-  return handleI18nRouting(request);
+  const response = handleI18nRouting(request);
+
+  // Add pathname to headers for layout detection
+  if (response) {
+    response.headers.set('x-pathname', request.nextUrl.pathname);
+  }
+
+  return response;
 }
 
 export const config = {

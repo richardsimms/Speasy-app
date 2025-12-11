@@ -1,4 +1,6 @@
 import { setRequestLocale } from 'next-intl/server';
+import { DashboardSidebar } from '@/components/dashboard-sidebar';
+// import { DashboardRightSidebar } from '@/components/dashboard-right-sidebar';
 
 export default async function DashboardLayout(props: {
   children: React.ReactNode;
@@ -8,8 +10,12 @@ export default async function DashboardLayout(props: {
   setRequestLocale(locale);
 
   return (
-    <>
-      {props.children}
-    </>
+    <div style={{ backgroundColor: '#100e12', minHeight: '100vh' }}>
+      <DashboardSidebar />
+      <main className="ml-0 min-h-screen md:ml-64">
+        {props.children}
+      </main>
+      {/* <DashboardRightSidebar /> */}
+    </div>
   );
 }

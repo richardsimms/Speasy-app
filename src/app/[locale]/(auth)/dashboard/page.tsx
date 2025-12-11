@@ -23,7 +23,20 @@ export async function generateMetadata(props: {
 
 export default async function Dashboard() {
   // Check if Supabase is configured before attempting to use it
-  if (!Env.SUPABASE_URL || !Env.SUPABASE_SERVICE_ROLE_KEY) {
+  const hasSupabaseUrl = !!Env.SUPABASE_URL;
+  const hasSupabaseKey = !!Env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!hasSupabaseUrl || !hasSupabaseKey) {
+    // Log for debugging (only in development)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Supabase configuration missing:', {
+        hasSupabaseUrl,
+        hasSupabaseKey,
+        supabaseUrl: Env.SUPABASE_URL ? 'set' : 'missing',
+        supabaseKey: Env.SUPABASE_SERVICE_ROLE_KEY ? 'set' : 'missing',
+      });
+    }
+
     return (
       <div className="py-5 [&_p]:my-6">
         <div className="mx-auto max-w-7xl px-4">
@@ -32,6 +45,14 @@ export default async function Dashboard() {
             <p className="text-muted-foreground">
               Content is not available. Please check your configuration.
             </p>
+            {process.env.NODE_ENV === 'development' && (
+              <p className="text-muted-foreground mt-4 text-sm">
+                Missing:
+                {' '}
+                {!hasSupabaseUrl && 'SUPABASE_URL '}
+                {!hasSupabaseKey && 'SUPABASE_SERVICE_ROLE_KEY'}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -51,10 +72,14 @@ export default async function Dashboard() {
       summary,
       image_url,
       created_at,
+      source_id,
       content_item_tags(
         categories(
           name
         )
+      ),
+      content_sources(
+        name
       ),
       audio_files(
         file_url,
@@ -94,12 +119,21 @@ export default async function Dashboard() {
       return;
     }
 
-    // Get category from tags, or default to "Uncategorized"
+    // Get category from tags, or fall back to content_sources.name, or default to "Uncategorized"
     // Handle both single tag and multiple tags
     let categoryName = 'Uncategorized';
     if (item.content_item_tags && item.content_item_tags.length > 0) {
       const firstTag = item.content_item_tags[0];
       categoryName = firstTag?.categories?.name || 'Uncategorized';
+    } else if (item.content_sources) {
+      // For uncategorized items, use the content_sources name as the category
+      // Handle both array and object formats (Supabase may return either)
+      const source = Array.isArray(item.content_sources)
+        ? item.content_sources[0]
+        : item.content_sources;
+      if (source?.name) {
+        categoryName = source.name;
+      }
     }
 
     const contentItem = {
@@ -119,9 +153,42 @@ export default async function Dashboard() {
     categoryMap.get(categoryName)!.push(contentItem);
   });
 
+  // Merge categories with the same name (case-insensitive) to avoid duplicate tabs
+  // Store both the normalized key and the original category name
+  const mergedCategoryMap = new Map<string, {
+    categoryName: string;
+    items: Array<{
+      id: string;
+      title: string;
+      summary: string | null;
+      audioUrl: string;
+      imageUrl: string | null;
+      category: string;
+      duration: number | null;
+      created_at: string;
+    }>;
+  }>();
+
+  categoryMap.forEach((items, categoryName) => {
+    // Use lowercase for merging, but keep the original name for display
+    const normalizedName = categoryName.toLowerCase();
+    const existing = mergedCategoryMap.get(normalizedName);
+
+    if (existing) {
+      // Merge items into existing category
+      existing.items.push(...items);
+    } else {
+      // Create new category entry
+      mergedCategoryMap.set(normalizedName, {
+        categoryName,
+        items: [...items],
+      });
+    }
+  });
+
   // Convert to array and sort categories
-  const categories = Array.from(categoryMap.entries())
-    .map(([categoryName, items]) => ({
+  const categories = Array.from(mergedCategoryMap.values())
+    .map(({ categoryName, items }) => ({
       categoryName,
       items: items.sort((a, b) =>
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
@@ -130,11 +197,8 @@ export default async function Dashboard() {
     .sort((a, b) => a.categoryName.localeCompare(b.categoryName));
 
   return (
-    <div className="py-5 [&_p]:my-6">
-      <div className="mx-auto max-w-7xl px-4">
-        <h1 className="mb-12 text-4xl font-bold text-white">Your Content</h1>
-        <DashboardContent categories={categories} />
-      </div>
+    <div className="p-4 md:p-8">
+      <DashboardContent categories={categories} />
     </div>
   );
 }

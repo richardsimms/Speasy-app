@@ -1,19 +1,26 @@
 'use client';
 
-import { ChevronRight, Cpu, DollarSign, Home, Palette, Star, Trophy } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import {
+  ChevronRight,
+  Cpu,
+  DollarSign,
+  Home,
+  Palette,
+  Star,
+  Trophy,
+} from 'lucide-react';
+import { useState } from 'react';
 import { cn } from '@/libs/utils';
-import { ContentAudioCard } from './content-audio-card';
+import { ContentGridCard } from './content-grid-card';
 
 type ContentItem = {
   id: string;
   title: string;
   summary: string | null;
-  audioUrl: string;
   imageUrl: string | null;
   category: string;
   duration: number | null;
-  created_at: string;
+  created_at?: string;
 };
 
 type CategoryGroup = {
@@ -21,18 +28,10 @@ type CategoryGroup = {
   items: ContentItem[];
 };
 
-type DashboardContentProps = {
+type DiscoverGridProps = {
   categories: CategoryGroup[];
+  locale: string;
 };
-
-const accentColors = [
-  'bg-blue-500',
-  'bg-orange-500',
-  'bg-purple-500',
-  'bg-green-500',
-  'bg-pink-500',
-  'bg-cyan-500',
-];
 
 // Map category names to icons
 const getCategoryIcon = (categoryName: string) => {
@@ -43,7 +42,11 @@ const getCategoryIcon = (categoryName: string) => {
   if (name.includes('business') || name.includes('finance')) {
     return DollarSign;
   }
-  if (name.includes('design') || name.includes('arts') || name.includes('culture')) {
+  if (
+    name.includes('design')
+    || name.includes('arts')
+    || name.includes('culture')
+  ) {
     return Palette;
   }
   if (name.includes('sport')) {
@@ -52,13 +55,17 @@ const getCategoryIcon = (categoryName: string) => {
   return Star;
 };
 
-export function DashboardContent({ categories }: DashboardContentProps) {
+export function DiscoverGrid({ categories, locale }: DiscoverGridProps) {
   // Get all items for "For You" (all content)
   const allItems = categories.flatMap(cat => cat.items);
 
   // Get "Top" items (most recent, limit to 20)
   const topItems = [...allItems]
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .sort(
+      (a, b) =>
+        new Date(b.created_at ?? 0).getTime()
+          - new Date(a.created_at ?? 0).getTime(),
+    )
     .slice(0, 20);
 
   // Create tabs: For You, Top, then categories
@@ -74,89 +81,14 @@ export function DashboardContent({ categories }: DashboardContentProps) {
   ];
 
   const [selectedTab, setSelectedTab] = useState<string>('for-you');
-  const [currentPlaying, setCurrentPlaying] = useState<string | null>(null);
-  const [progress, setProgress] = useState<Record<string, number>>({});
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const audioRefs = useRef<Record<string, HTMLAudioElement>>({});
-
-  useEffect(() => {
-    if (currentPlaying !== null) {
-      const audio = audioRefs.current[currentPlaying];
-      if (audio) {
-        const updateProgress = () => {
-          if (audio.duration) {
-            const percent = (audio.currentTime / audio.duration) * 100;
-            setProgress(prev => ({ ...prev, [currentPlaying]: percent }));
-          }
-        };
-
-        const handleEnded = () => {
-          setCurrentPlaying(null);
-          setProgress(prev => ({ ...prev, [currentPlaying]: 0 }));
-        };
-
-        audio.addEventListener('timeupdate', updateProgress);
-        audio.addEventListener('ended', handleEnded);
-
-        return () => {
-          audio.removeEventListener('timeupdate', updateProgress);
-          audio.removeEventListener('ended', handleEnded);
-        };
-      }
-    }
-    return undefined;
-  }, [currentPlaying]);
-
-  const handlePlay = (id: string) => {
-    // Pause all other audio
-    Object.entries(audioRefs.current).forEach(([audioId, audio]) => {
-      if (audioId !== id) {
-        audio.pause();
-      }
-    });
-
-    const audio = audioRefs.current[id];
-    if (!audio) {
-      return;
-    }
-
-    audio.play();
-    setCurrentPlaying(id);
-  };
-
-  const handlePause = (id: string) => {
-    const audio = audioRefs.current[id];
-    if (!audio) {
-      return;
-    }
-
-    audio.pause();
-    setCurrentPlaying(null);
-  };
-
-  const registerAudioRef = (id: string, element: HTMLAudioElement | null) => {
-    if (element) {
-      audioRefs.current[id] = element;
-    }
-  };
 
   const selectedTabData = tabs.find(tab => tab.id === selectedTab);
   const displayedItems = selectedTabData?.items || [];
 
-  if (categories.length === 0) {
-    return (
-      <div className="py-20 text-center">
-        <p className="text-muted-foreground">
-          No content available yet. Check back soon!
-        </p>
-      </div>
-    );
-  }
-
-  const selectedTabIndex = tabs.findIndex(tab => tab.id === selectedTab);
-  const categoryAccentColor = accentColors[selectedTabIndex % accentColors.length];
-
-  const handleTabKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, tabId: string) => {
+  const handleTabKeyDown = (
+    e: React.KeyboardEvent<HTMLButtonElement>,
+    tabId: string,
+  ) => {
     const currentIndex = tabs.findIndex(tab => tab.id === tabId);
 
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
@@ -167,7 +99,9 @@ export function DashboardContent({ categories }: DashboardContentProps) {
       if (nextTab) {
         setSelectedTab(nextTab.id);
         // Focus the next tab button
-        const nextButton = e.currentTarget.parentElement?.children[nextIndex] as HTMLElement;
+        const nextButton = e.currentTarget.parentElement?.children[
+          nextIndex
+        ] as HTMLElement;
         nextButton?.focus();
       }
     } else if (e.key === 'Home') {
@@ -175,7 +109,8 @@ export function DashboardContent({ categories }: DashboardContentProps) {
       const firstTab = tabs[0];
       if (firstTab) {
         setSelectedTab(firstTab.id);
-        const firstButton = e.currentTarget.parentElement?.children[0] as HTMLElement;
+        const firstButton = e.currentTarget.parentElement
+          ?.children[0] as HTMLElement;
         firstButton?.focus();
       }
     } else if (e.key === 'End') {
@@ -183,11 +118,23 @@ export function DashboardContent({ categories }: DashboardContentProps) {
       const lastTab = tabs[tabs.length - 1];
       if (lastTab) {
         setSelectedTab(lastTab.id);
-        const lastButton = e.currentTarget.parentElement?.children[tabs.length - 1] as HTMLElement;
+        const lastButton = e.currentTarget.parentElement?.children[
+          tabs.length - 1
+        ] as HTMLElement;
         lastButton?.focus();
       }
     }
   };
+
+  if (categories.length === 0) {
+    return (
+      <div className="py-20 text-center">
+        <p className="text-muted-foreground">
+          No content available yet. Check back soon!
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -215,28 +162,31 @@ export function DashboardContent({ categories }: DashboardContentProps) {
               onKeyDown={e => handleTabKeyDown(e, tab.id)}
               style={{ touchAction: 'manipulation' }}
               className={cn(
-                'flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-all whitespace-nowrap',
+                'flex items-center gap-2 rounded-lg px-4 py-3 font-medium transition-all whitespace-nowrap',
                 'min-h-[44px] min-w-[44px]',
-                'focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-[#100e12]',
+                'focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]',
                 'active:scale-95 active:bg-white/15',
                 isActive
                   ? 'bg-white/10 text-white border border-white/20'
-                  : 'text-muted-foreground hover:text-white hover:bg-white/5',
+                  : 'text-white/70 hover:text-white hover:bg-white/5',
               )}
             >
-              <Icon className={cn(
-                'w-4 h-4 shrink-0',
-                isActive ? 'text-white' : 'text-muted-foreground',
-              )}
+              <Icon
+                className={cn(
+                  'h-4 w-4 shrink-0',
+                  isActive ? 'text-white' : 'text-white/70',
+                )}
               />
               <span>{tab.label}</span>
             </button>
           );
         })}
+
         {/* Scroll indicator */}
         <button
           type="button"
-          className="text-muted-foreground ml-2 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 transition-colors hover:border-white/20 hover:text-white"
+          aria-label="Scroll to see more categories"
+          className="ml-2 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-white/70 transition-colors hover:border-white/20 hover:text-white"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -261,28 +211,19 @@ export function DashboardContent({ categories }: DashboardContentProps) {
               id={`tabpanel-${selectedTab}`}
               role="tabpanel"
               aria-labelledby={`tab-${selectedTab}`}
-              className="grid gap-6 lg:grid-cols-3"
+              className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
             >
               {displayedItems.map((item, index) => (
-                <ContentAudioCard
+                <ContentGridCard
                   key={item.id}
                   id={item.id}
                   title={item.title}
                   summary={item.summary}
-                  audioUrl={item.audioUrl}
                   imageUrl={item.imageUrl}
-                  category={selectedTabData?.label || item.category}
+                  category={item.category}
                   duration={item.duration}
-                  accentColor={categoryAccentColor}
                   index={index}
-                  isPlaying={currentPlaying === item.id}
-                  onPlay={handlePlay}
-                  onPause={handlePause}
-                  progress={progress[item.id] || 0}
-                  onMouseEnter={() => setHoveredId(item.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                  isHovered={hoveredId === item.id}
-                  onAudioRef={registerAudioRef}
+                  locale={locale}
                 />
               ))}
             </div>
