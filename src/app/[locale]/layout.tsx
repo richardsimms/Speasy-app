@@ -37,6 +37,7 @@ export const metadata: Metadata = {
       url: '/favicon.ico',
     },
   ],
+  themeColor: '#0a090c',
 };
 
 export function generateStaticParams() {
