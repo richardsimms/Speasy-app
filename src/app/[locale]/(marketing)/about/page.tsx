@@ -25,19 +25,22 @@ export default function AboutPage() {
       <main className="relative overflow-x-hidden">
         {/* Hero Section */}
         <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden px-4">
-          <div className="mx-auto max-w-5xl space-y-8 py-20 text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="inline-flex items-center gap-2 rounded-full border border-gray-700 bg-gray-800/50 px-4 py-2 backdrop-blur-sm"
-            >
-              <Sparkles className="h-4 w-4 text-white" />
-              <span className="text-sm font-medium text-white">
-                About Speasy
-              </span>
-            </motion.div>
+          {/* Subtle gradient overlay */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-purple-500/5 via-transparent to-transparent" />
 
+          {/* Grid pattern */}
+          <div className="pointer-events-none absolute inset-0 opacity-[0.02]">
+            <div
+              className="h-full w-full"
+              style={{
+                backgroundImage:
+                  "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+                backgroundSize: "80px 80px",
+              }}
+            />
+          </div>
+
+          <div className="relative z-10 mx-auto max-w-5xl space-y-8 py-20 text-center">
             <motion.h1
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -49,7 +52,7 @@ export default function AboutPage() {
               className="pb-2 text-4xl font-bold leading-[1.1] tracking-tighter text-balance text-white md:text-6xl lg:text-7xl"
             >
               Reclaim your time. <br />
-              <span className="bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent">
                 Rewrite your story.
               </span>
             </motion.h1>
@@ -69,6 +72,10 @@ export default function AboutPage() {
               you, not sit unread.
             </motion.p>
           </div>
+
+          {/* Floating gradient orbs for depth */}
+          <div className="pointer-events-none absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-purple-500/10 blur-3xl" />
+          <div className="pointer-events-none absolute right-1/4 bottom-1/4 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl" />
         </section>
 
         {/* Problem Statement */}
@@ -93,6 +100,9 @@ export default function AboutPage() {
 
         {/* Our Story */}
         <section className="relative px-4 py-20">
+          {/* Decorative gradient line */}
+          <div className="pointer-events-none absolute left-1/2 top-0 h-px w-1/2 -translate-x-1/2 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
+
           <div className="mx-auto max-w-4xl">
             <motion.div
               initial={{ opacity: 0 }}
@@ -163,7 +173,7 @@ export default function AboutPage() {
                 What Speasy does
               </h2>
 
-              <Card className="border border-gray-700 bg-gray-900/50 p-8 backdrop-blur-sm md:p-12">
+              <Card className="group relative border border-gray-800/50 bg-gradient-to-br from-gray-900/50 to-gray-900/30 p-8 shadow-2xl shadow-purple-500/5 backdrop-blur-sm transition-all duration-500 hover:border-gray-700 hover:shadow-purple-500/10 md:p-12">
                 <p className="text-balance mb-8 text-lg leading-relaxed text-gray-200">
                   Speasy transforms selected newsletters and top articles into
                   short, clear audio.
@@ -248,7 +258,7 @@ export default function AboutPage() {
                       ease: [0.16, 1, 0.3, 1],
                     }}
                   >
-                    <Card className="border border-gray-700 bg-gray-900/30 h-full border p-6 backdrop-blur-sm">
+                    <Card className="relative h-full border border-gray-800/50 bg-gradient-to-br from-gray-900/40 to-gray-900/20 p-6 shadow-lg shadow-purple-500/5 backdrop-blur-sm transition-all duration-300 hover:border-gray-700 hover:shadow-purple-500/10">
                       <p className="text-center leading-relaxed text-gray-200">
                         {mission}
                       </p>
@@ -278,7 +288,7 @@ export default function AboutPage() {
                 Who Speasy is for
               </h2>
 
-              <Card className="border border-gray-700 bg-gray-900/50 p-8 backdrop-blur-sm md:p-12">
+              <Card className="group relative border border-gray-800/50 bg-gradient-to-br from-gray-900/50 to-gray-900/30 p-8 shadow-2xl shadow-purple-500/5 backdrop-blur-sm transition-all duration-500 hover:border-gray-700 hover:shadow-purple-500/10 md:p-12">
                 <p className="text-balance mb-8 text-center text-lg leading-relaxed text-gray-200">
                   Speasy is built for people who care about learning but lack
                   spare time.
@@ -373,7 +383,7 @@ export default function AboutPage() {
                       ease: [0.16, 1, 0.3, 1],
                     }}
                   >
-                    <Card className="border border-gray-700 bg-gray-900/30 border p-6 backdrop-blur-sm">
+                    <Card className="relative border border-gray-800/50 bg-gradient-to-br from-gray-900/40 to-gray-900/20 p-6 shadow-lg shadow-purple-500/5 backdrop-blur-sm transition-all duration-300 hover:border-gray-700 hover:shadow-purple-500/10">
                       <p className="mb-2 text-lg font-semibold text-white">
                         {item.q}
                       </p>
@@ -442,7 +452,7 @@ export default function AboutPage() {
                       whileHover={{ y: -4, transition: { duration: 0.2 } }}
                       className="group h-full"
                     >
-                      <Card className="relative h-full overflow-hidden border border-gray-700 bg-gray-900/50 p-8 backdrop-blur-sm transition-all duration-500 hover:border-gray-600">
+                      <Card className="relative h-full overflow-hidden border border-gray-800/50 bg-gradient-to-br from-gray-900/50 to-gray-900/30 p-8 shadow-2xl shadow-purple-500/5 backdrop-blur-sm transition-all duration-500 hover:border-gray-700 hover:shadow-purple-500/10">
                         {/* Animated glow effect on hover */}
                         <motion.div
                           className={`absolute inset-0 bg-gradient-to-br ${value.color} opacity-0 transition-opacity duration-500 group-hover:opacity-100`}
@@ -454,7 +464,7 @@ export default function AboutPage() {
                           <motion.div
                             whileHover={{ rotate: 360, scale: 1.1 }}
                             transition={{ duration: 0.6 }}
-                            className="mb-4 inline-block rounded-xl border border-gray-700 bg-gray-800/50 p-3"
+                            className="mb-4 inline-block rounded-xl border border-gray-800/50 bg-gradient-to-br from-gray-800/60 to-gray-900/40 p-3 shadow-lg shadow-purple-500/10"
                           >
                             <value.icon className="h-6 w-6 text-white" />
                           </motion.div>
