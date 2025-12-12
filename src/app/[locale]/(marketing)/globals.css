@@ -5,14 +5,14 @@
 
 /* Updated to darker, more futuristic theme inspired by Linear/Cursor */
 :root {
-  --background: oklch(0.05 0.01 280);
+  --background: lch(4.22 2.22 304.9);
   --foreground: oklch(0.98 0 0);
   --card: oklch(0.1 0.02 280);
   --card-foreground: oklch(0.98 0 0);
   --popover: oklch(0.1 0.02 280);
   --popover-foreground: oklch(0.98 0 0);
   --primary: oklch(0.98 0 0);
-  --primary-foreground: oklch(0.05 0.01 280);
+  --primary-foreground: lch(4.22 2.22 304.9);
   --secondary: oklch(0.2 0.02 280);
   --secondary-foreground: oklch(0.98 0 0);
   --muted: oklch(0.2 0.02 280);
@@ -34,14 +34,14 @@
 }
 
 .dark {
-  --background: oklch(0.05 0.01 280);
+  --background: lch(4.22 2.22 304.9);
   --foreground: oklch(0.98 0 0);
   --card: oklch(0.1 0.02 280);
   --card-foreground: oklch(0.98 0 0);
   --popover: oklch(0.1 0.02 280);
   --popover-foreground: oklch(0.98 0 0);
   --primary: oklch(0.98 0 0);
-  --primary-foreground: oklch(0.05 0.01 280);
+  --primary-foreground: lch(4.22 2.22 304.9);
   --secondary: oklch(0.2 0.02 280);
   --secondary-foreground: oklch(0.98 0 0);
   --muted: oklch(0.2 0.02 280);

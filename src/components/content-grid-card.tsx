@@ -50,7 +50,7 @@ export function ContentGridCard({
     >
       <Link
         href={`/${locale}/content/${id}`}
-        className="block overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-all duration-300 hover:border-white/30 hover:shadow-lg hover:shadow-white/5"
+        className="relative block overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-all duration-300 hover:border-white/30 hover:shadow-lg hover:shadow-white/5"
       >
         {/* Image Section */}
         {imageUrl
@@ -115,7 +115,7 @@ export function ContentGridCard({
         </div>
 
         {/* Hover indicator */}
-        <div className="absolute top-0 left-0 h-[2px] w-full origin-left scale-x-0 bg-gradient-to-r from-blue-500 to-purple-500 transition-transform duration-300 group-hover:scale-x-100" />
+        <div className="absolute top-0 right-4 left-4 h-[2px] origin-left scale-x-0 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 transition-transform duration-300 group-hover:scale-x-100" />
       </Link>
     </motion.div>
   );
