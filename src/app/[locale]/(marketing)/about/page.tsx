@@ -17,14 +17,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Footer } from "@/components/footer";
 import { ScrollProgress } from "@/components/scroll-progress";
-import { WebGLBackground } from "@/components/webgl-background";
 
 export default function AboutPage() {
   return (
     <>
-      <WebGLBackground />
       <ScrollProgress />
-      <main className="relative z-10 overflow-x-hidden">
+      <main className="relative overflow-x-hidden">
         {/* Hero Section */}
         <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden px-4">
           <div className="mx-auto max-w-5xl space-y-8 py-20 text-center">
