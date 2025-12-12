@@ -46,10 +46,10 @@ export default function AboutPage() {
                 delay: 0.1,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="text-foreground pb-2 text-4xl leading-[1.1] font-bold tracking-tighter text-balance md:text-6xl lg:text-7xl"
+              className="pb-2 text-4xl font-bold leading-[1.1] tracking-tighter text-balance text-white md:text-6xl lg:text-7xl"
             >
               Reclaim your time. <br />
-              <span className="from-primary to-primary/50 bg-gradient-to-r bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
                 Rewrite your story.
               </span>
             </motion.h1>
@@ -84,7 +84,7 @@ export default function AboutPage() {
               <p className="text-muted-foreground text-xl leading-relaxed text-balance md:text-2xl">
                 Work is busy. Life is full. Your reading list keeps growing.
               </p>
-              <p className="text-2xl font-semibold leading-relaxed text-balance md:text-3xl">
+              <p className="text-balance text-2xl font-semibold leading-relaxed text-white md:text-3xl">
                 Speasy exists to fix that.
               </p>
             </motion.div>
@@ -101,7 +101,7 @@ export default function AboutPage() {
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8"
             >
-              <h2 className="text-center text-3xl font-bold tracking-tight text-balance md:text-4xl">
+              <h2 className="text-balance text-center text-3xl font-bold tracking-tight text-white md:text-4xl">
                 Our story
               </h2>
 
@@ -114,14 +114,14 @@ export default function AboutPage() {
                   <p>Articles were saved with good intent, then forgotten.</p>
                 </div>
 
-                <p className="text-foreground font-medium">
+                <p className="font-medium text-white">
                   The issue was never the content. It was the format.
                 </p>
 
                 <p>
                   Reading needs stillness, focus, and a screen. Most days do not
                   offer that.{" "}
-                  <span className="text-foreground font-medium">
+                  <span className="font-medium text-white">
                     Listening does.
                   </span>
                 </p>
@@ -131,7 +131,7 @@ export default function AboutPage() {
                   meetings. These moments add up, but reading cannot use them.
                 </p>
 
-                <p className="text-foreground font-semibold text-xl">
+                <p className="text-xl font-semibold text-white">
                   So we built Speasy.
                 </p>
 
@@ -141,7 +141,7 @@ export default function AboutPage() {
                   pressure.
                 </p>
 
-                <p className="text-foreground font-medium">
+                <p className="font-medium text-white">
                   Just learning that fits real life.
                 </p>
               </div>
@@ -159,7 +159,7 @@ export default function AboutPage() {
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-12"
             >
-              <h2 className="text-center text-3xl font-bold tracking-tight text-balance md:text-4xl">
+              <h2 className="text-balance text-center text-3xl font-bold tracking-tight text-white md:text-4xl">
                 What Speasy does
               </h2>
 
@@ -221,11 +221,11 @@ export default function AboutPage() {
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8"
             >
-              <h2 className="text-center text-3xl font-bold tracking-tight text-balance md:text-4xl">
+              <h2 className="text-balance text-center text-3xl font-bold tracking-tight text-white md:text-4xl">
                 Our mission
               </h2>
 
-              <p className="text-center text-xl leading-relaxed text-balance">
+              <p className="text-balance text-center text-xl leading-relaxed text-white">
                 We help people stay informed without falling behind.
               </p>
 
@@ -255,7 +255,7 @@ export default function AboutPage() {
                 ))}
               </div>
 
-              <p className="text-center text-xl font-medium leading-relaxed text-balance">
+              <p className="text-balance text-center text-xl font-medium leading-relaxed text-white">
                 Learning should not feel like extra work. It should feel useful.
               </p>
             </motion.div>
@@ -272,7 +272,7 @@ export default function AboutPage() {
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8"
             >
-              <h2 className="text-center text-3xl font-bold tracking-tight text-balance md:text-4xl">
+              <h2 className="text-balance text-center text-3xl font-bold tracking-tight text-white md:text-4xl">
                 Who Speasy is for
               </h2>
 
@@ -316,7 +316,7 @@ export default function AboutPage() {
                   ))}
                 </div>
 
-                <p className="text-foreground mt-8 text-center text-lg font-medium leading-relaxed text-balance">
+                <p className="text-balance mt-8 text-center text-lg font-medium leading-relaxed text-white">
                   If you value progress and calm focus, Speasy is for you.
                 </p>
               </Card>
@@ -334,7 +334,7 @@ export default function AboutPage() {
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8"
             >
-              <h2 className="text-center text-3xl font-bold tracking-tight text-balance md:text-4xl">
+              <h2 className="text-balance text-center text-3xl font-bold tracking-tight text-white md:text-4xl">
                 Why Speasy works
               </h2>
 
@@ -369,8 +369,8 @@ export default function AboutPage() {
                       ease: [0.16, 1, 0.3, 1],
                     }}
                   >
-                    <Card className="bg-card/30 border-border/50 border p-6 backdrop-blur-sm">
-                      <p className="text-foreground mb-2 text-lg font-semibold">
+                    <Card className="border-border/50 bg-card/30 border p-6 backdrop-blur-sm">
+                      <p className="mb-2 text-lg font-semibold text-white">
                         {item.q}
                       </p>
                       <p className="text-muted-foreground leading-relaxed">
@@ -394,7 +394,7 @@ export default function AboutPage() {
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-12"
             >
-              <h2 className="text-center text-3xl font-bold tracking-tight text-balance md:text-4xl">
+              <h2 className="text-balance text-center text-3xl font-bold tracking-tight text-white md:text-4xl">
                 Our values
               </h2>
 
@@ -457,7 +457,7 @@ export default function AboutPage() {
                             <value.icon className="text-primary h-6 w-6" />
                           </motion.div>
 
-                          <h3 className="group-hover:text-primary mb-2 text-2xl font-bold transition-colors duration-300">
+                          <h3 className="group-hover:text-primary mb-2 text-2xl font-bold text-white transition-colors duration-300">
                             {value.title}
                           </h3>
                           <p className="text-muted-foreground leading-relaxed">
@@ -493,17 +493,17 @@ export default function AboutPage() {
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8 text-center"
             >
-              <h2 className="text-3xl font-bold tracking-tight text-balance md:text-5xl">
+              <h2 className="text-balance text-3xl font-bold tracking-tight text-white md:text-5xl">
                 Start listening
               </h2>
 
               <div className="space-y-6">
-                <p className="text-muted-foreground mx-auto max-w-2xl text-lg leading-relaxed text-balance md:text-xl">
+                <p className="text-muted-foreground mx-auto max-w-2xl text-balance text-lg leading-relaxed md:text-xl">
                   You are not trying to read more. <br />
                   You are trying to live well and stay sharp.
                 </p>
 
-                <p className="text-foreground text-xl font-medium">
+                <p className="text-xl font-medium text-white">
                   Speasy helps with that.
                 </p>
               </div>
