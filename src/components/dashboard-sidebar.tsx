@@ -5,10 +5,8 @@ import {
   ChevronUp,
   FileText,
   Home,
-  LayoutGrid,
 
   Menu,
-  TrendingUp,
   User,
   X,
 } from 'lucide-react';
@@ -74,14 +72,14 @@ function SidebarAccount({ onNavigate }: SidebarAccountProps) {
       <Link
         href="/sign-in/"
         onClick={onNavigate}
-        className="flex w-full items-center justify-center gap-2 rounded-lg bg-white/10 px-3 py-2.5 text-sm font-medium text-white transition-all hover:bg-white/15 active:scale-95"
+        className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-white transition-all hover:bg-white/15"
       >
         Sign In
       </Link>
       <Link
         href="/sign-up/"
         onClick={onNavigate}
-        className="bg-primary/90 hover:bg-primary flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-white transition-all active:scale-95"
+        className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-white transition-all hover:bg-white/15 active:scale-95"
       >
         Sign Up
       </Link>
@@ -146,16 +144,14 @@ export function DashboardSidebar({ currentPath = '/dashboard' }: SidebarProps) {
   }, [isMobileOpen]);
 
   const navItems: NavItem[] = [
-    { id: 'home', label: 'Home', icon: Home, href: '/' },
+    { id: 'home', label: 'Home', icon: Home, href: '/', active: true },
     {
       id: 'about',
       label: 'About',
       icon: FileText,
       href: '/about',
-      active: true,
+      active: false,
     },
-    { id: 'spaces', label: 'Spaces', icon: LayoutGrid, href: '/dashboard' },
-    { id: 'finance', label: 'Finance', icon: TrendingUp, href: '/dashboard' },
   ];
 
   const closeMobile = () => setIsMobileOpen(false);

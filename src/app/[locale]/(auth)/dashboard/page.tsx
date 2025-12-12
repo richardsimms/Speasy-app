@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { DashboardContent } from '@/components/dashboard-content';
+import { ContentGridDiscover } from '@/components/content-grid-discover';
 import { Env } from '@/libs/Env';
 import { getSupabaseAdmin } from '@/libs/Supabase';
 
@@ -21,38 +21,24 @@ export async function generateMetadata(props: {
   };
 }
 
-export default async function Dashboard() {
+export default async function Dashboard(props: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await props.params;
+
   // Check if Supabase is configured before attempting to use it
   const hasSupabaseUrl = !!Env.SUPABASE_URL;
   const hasSupabaseKey = !!Env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!hasSupabaseUrl || !hasSupabaseKey) {
-    // Log for debugging (only in development)
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Supabase configuration missing:', {
-        hasSupabaseUrl,
-        hasSupabaseKey,
-        supabaseUrl: Env.SUPABASE_URL ? 'set' : 'missing',
-        supabaseKey: Env.SUPABASE_SERVICE_ROLE_KEY ? 'set' : 'missing',
-      });
-    }
-
     return (
       <div className="py-5 [&_p]:my-6">
         <div className="mx-auto max-w-7xl px-4">
-          <h1 className="mb-12 text-4xl font-bold text-white">Your Content</h1>
+          <h1 className="mb-12 text-4xl font-bold text-white">Discover</h1>
           <div className="py-20 text-center">
             <p className="text-muted-foreground">
               Content is not available. Please check your configuration.
             </p>
-            {process.env.NODE_ENV === 'development' && (
-              <p className="text-muted-foreground mt-4 text-sm">
-                Missing:
-                {' '}
-                {!hasSupabaseUrl && 'SUPABASE_URL '}
-                {!hasSupabaseKey && 'SUPABASE_SERVICE_ROLE_KEY'}
-              </p>
-            )}
           </div>
         </div>
       </div>
@@ -62,17 +48,15 @@ export default async function Dashboard() {
   const supabase = getSupabaseAdmin();
 
   // Fetch content items with categories and audio files
-  // Use LEFT joins to include items with audio even if they don't have tags
-  // Then filter to only show items that have audio files
   const { data: contentItems, error } = await supabase
     .from('content_items')
-    .select(`
+    .select(
+      `
       id,
       title,
       summary,
       image_url,
       created_at,
-      source_id,
       content_item_tags(
         categories(
           name
@@ -85,30 +69,36 @@ export default async function Dashboard() {
         file_url,
         duration
       )
-    `)
+    `,
+    )
     .eq('status', 'done')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(50);
 
   if (error) {
-    console.error('Error fetching content items:', error);
     return (
-      <div className="py-5 [&_p]:my-6">
-        <p className="text-red-500">Error loading content. Please try again later.</p>
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <h1 className="mb-8 text-4xl font-bold text-white">Discover</h1>
+        <p className="text-red-500">
+          Error loading content. Please try again later.
+        </p>
       </div>
     );
   }
 
   // Transform and group by category
-  const categoryMap = new Map<string, Array<{
-    id: string;
-    title: string;
-    summary: string | null;
-    audioUrl: string;
-    imageUrl: string | null;
-    category: string;
-    duration: number | null;
-    created_at: string;
-  }>>();
+  const categoryMap = new Map<
+    string,
+    Array<{
+      id: string;
+      title: string;
+      summary: string | null;
+      imageUrl: string | null;
+      category: string;
+      duration: number | null;
+      created_at: string;
+    }>
+  >();
 
   contentItems?.forEach((item: any) => {
     // Get the first audio file (items can have multiple)
@@ -120,14 +110,11 @@ export default async function Dashboard() {
     }
 
     // Get category from tags, or fall back to content_sources.name, or default to "Uncategorized"
-    // Handle both single tag and multiple tags
     let categoryName = 'Uncategorized';
-    if (item.content_item_tags && item.content_item_tags.length > 0) {
-      const firstTag = item.content_item_tags[0];
-      categoryName = firstTag?.categories?.name || 'Uncategorized';
+    const firstTag = item.content_item_tags?.[0] as any;
+    if (firstTag?.categories?.name) {
+      categoryName = firstTag.categories.name;
     } else if (item.content_sources) {
-      // For uncategorized items, use the content_sources name as the category
-      // Handle both array and object formats (Supabase may return either)
       const source = Array.isArray(item.content_sources)
         ? item.content_sources[0]
         : item.content_sources;
@@ -143,7 +130,6 @@ export default async function Dashboard() {
       imageUrl: item.image_url,
       created_at: item.created_at,
       category: categoryName,
-      audioUrl: audioFile.file_url,
       duration: audioFile.duration,
     };
 
@@ -153,32 +139,30 @@ export default async function Dashboard() {
     categoryMap.get(categoryName)!.push(contentItem);
   });
 
-  // Merge categories with the same name (case-insensitive) to avoid duplicate tabs
-  // Store both the normalized key and the original category name
-  const mergedCategoryMap = new Map<string, {
-    categoryName: string;
-    items: Array<{
-      id: string;
-      title: string;
-      summary: string | null;
-      audioUrl: string;
-      imageUrl: string | null;
-      category: string;
-      duration: number | null;
-      created_at: string;
-    }>;
-  }>();
+  // Merge categories with the same name (case-insensitive)
+  const mergedCategoryMap = new Map<
+    string,
+    {
+      categoryName: string;
+      items: Array<{
+        id: string;
+        title: string;
+        summary: string | null;
+        imageUrl: string | null;
+        category: string;
+        duration: number | null;
+        created_at: string;
+      }>;
+    }
+  >();
 
   categoryMap.forEach((items, categoryName) => {
-    // Use lowercase for merging, but keep the original name for display
     const normalizedName = categoryName.toLowerCase();
     const existing = mergedCategoryMap.get(normalizedName);
 
     if (existing) {
-      // Merge items into existing category
       existing.items.push(...items);
     } else {
-      // Create new category entry
       mergedCategoryMap.set(normalizedName, {
         categoryName,
         items: [...items],
@@ -190,15 +174,16 @@ export default async function Dashboard() {
   const categories = Array.from(mergedCategoryMap.values())
     .map(({ categoryName, items }) => ({
       categoryName,
-      items: items.sort((a, b) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      items: items.sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
       ),
     }))
     .sort((a, b) => a.categoryName.localeCompare(b.categoryName));
 
   return (
-    <div className="p-4 md:p-8">
-      <DashboardContent categories={categories} />
+    <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 lg:px-8">
+      <ContentGridDiscover categories={categories} locale={locale} />
     </div>
   );
 }
