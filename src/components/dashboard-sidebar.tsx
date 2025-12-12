@@ -11,6 +11,7 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useId, useState } from 'react';
 import { cn } from '@/libs/utils';
 import { Badge } from './ui/badge';
@@ -33,12 +34,47 @@ type SidebarNavProps = {
   onNavigate?: () => void;
 };
 
+function normalizePathname(pathname: string) {
+  const trimmed = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
+  const segments = trimmed.split('/').filter(Boolean);
+
+  if (segments.length === 0) {
+    return '/';
+  }
+
+  const [first, ...rest] = segments;
+  const looksLikeLocale = /^[a-z]{2}(?:-[a-z]{2})?$/i.test(first ?? '');
+  if (!looksLikeLocale) {
+    return `/${segments.join('/')}`;
+  }
+
+  if (rest.length === 0) {
+    return '/';
+  }
+
+  return `/${rest.join('/')}`;
+}
+
+function getNavItemActive(pathname: string, navItemId: string) {
+  const normalizedPathname = normalizePathname(pathname);
+
+  if (navItemId === 'home') {
+    return normalizedPathname === '/' || normalizedPathname === '/dashboard';
+  }
+
+  if (navItemId === 'about') {
+    return normalizedPathname === '/about';
+  }
+
+  return false;
+}
+
 function SidebarNav({ navItems, currentPath, onNavigate }: SidebarNavProps) {
   return (
     <nav className="flex-1 space-y-1 p-4">
       {navItems.map((item) => {
         const Icon = item.icon;
-        const isActive = item.active || currentPath === item.href;
+        const isActive = item.active ?? getNavItemActive(currentPath, item.id);
 
         return (
           <Link
@@ -117,9 +153,11 @@ function SidebarAccount({ onNavigate }: SidebarAccountProps) {
   );
 }
 
-export function DashboardSidebar({ currentPath = '/dashboard' }: SidebarProps) {
+export function DashboardSidebar({ currentPath }: SidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const mobileDialogTitleId = useId();
+  const pathname = usePathname();
+  const resolvedPathname = currentPath ?? pathname ?? '/dashboard';
 
   useEffect(() => {
     if (!isMobileOpen) {
@@ -144,13 +182,19 @@ export function DashboardSidebar({ currentPath = '/dashboard' }: SidebarProps) {
   }, [isMobileOpen]);
 
   const navItems: NavItem[] = [
-    { id: 'home', label: 'Home', icon: Home, href: '/', active: true },
+    {
+      id: 'home',
+      label: 'Home',
+      icon: Home,
+      href: '/',
+      active: getNavItemActive(resolvedPathname, 'home'),
+    },
     {
       id: 'about',
       label: 'About',
       icon: FileText,
       href: '/about',
-      active: false,
+      active: getNavItemActive(resolvedPathname, 'about'),
     },
   ];
 
@@ -280,7 +324,7 @@ export function DashboardSidebar({ currentPath = '/dashboard' }: SidebarProps) {
 
             <SidebarNav
               navItems={navItems}
-              currentPath={currentPath}
+              currentPath={resolvedPathname}
               onNavigate={closeMobile}
             />
             <SidebarAccount onNavigate={closeMobile} />
@@ -293,7 +337,7 @@ export function DashboardSidebar({ currentPath = '/dashboard' }: SidebarProps) {
           <div className="flex h-16 items-center justify-start border-b border-white/10 px-4">
             {logo}
           </div>
-          <SidebarNav navItems={navItems} currentPath={currentPath} />
+          <SidebarNav navItems={navItems} currentPath={resolvedPathname} />
           <SidebarAccount />
         </div>
       </aside>
