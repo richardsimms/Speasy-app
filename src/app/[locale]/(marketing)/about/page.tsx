@@ -62,7 +62,7 @@ export default function AboutPage() {
                 delay: 0.25,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="text-muted-foreground mx-auto max-w-2xl text-lg leading-relaxed text-balance md:text-xl"
+              className="mx-auto max-w-2xl text-balance text-lg leading-relaxed text-gray-300 md:text-xl"
             >
               Speasy helps you keep learning without needing more hours in the
               day. We turn written content into audio so knowledge can move with
@@ -81,7 +81,7 @@ export default function AboutPage() {
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-6 text-center"
             >
-              <p className="text-muted-foreground text-xl leading-relaxed text-balance md:text-2xl">
+              <p className="text-balance text-xl leading-relaxed text-gray-300 md:text-2xl">
                 Work is busy. Life is full. Your reading list keeps growing.
               </p>
               <p className="text-balance text-2xl font-semibold leading-relaxed text-white md:text-3xl">
@@ -105,7 +105,7 @@ export default function AboutPage() {
                 Our story
               </h2>
 
-              <div className="text-muted-foreground space-y-6 text-lg leading-relaxed">
+              <div className="space-y-6 text-lg leading-relaxed text-gray-300">
                 <p>Speasy started with a familiar problem.</p>
 
                 <div className="space-y-2 pl-6">
@@ -163,8 +163,8 @@ export default function AboutPage() {
                 What Speasy does
               </h2>
 
-              <Card className="bg-card/50 border-border/50 border p-8 backdrop-blur-sm md:p-12">
-                <p className="text-muted-foreground mb-8 text-lg leading-relaxed text-balance">
+              <Card className="border-border/50 bg-card/50 border p-8 backdrop-blur-sm md:p-12">
+                <p className="text-balance mb-8 text-lg leading-relaxed text-gray-300">
                   Speasy transforms selected newsletters and top articles into
                   short, clear audio.
                 </p>
@@ -198,12 +198,14 @@ export default function AboutPage() {
                       className="flex items-start gap-3"
                     >
                       <item.icon className="text-primary mt-1 h-5 w-5 flex-shrink-0" />
-                      <span className="leading-relaxed">{item.text}</span>
+                      <span className="leading-relaxed text-gray-300">
+                        {item.text}
+                      </span>
                     </motion.div>
                   ))}
                 </div>
 
-                <p className="text-muted-foreground mt-8 text-center text-lg">
+                <p className="mt-8 text-center text-lg text-gray-300">
                   You listen when it fits. We handle the rest.
                 </p>
               </Card>
@@ -246,8 +248,8 @@ export default function AboutPage() {
                       ease: [0.16, 1, 0.3, 1],
                     }}
                   >
-                    <Card className="bg-card/30 border-border/50 h-full border p-6 backdrop-blur-sm">
-                      <p className="text-muted-foreground text-center leading-relaxed">
+                    <Card className="border-border/50 bg-card/30 h-full border p-6 backdrop-blur-sm">
+                      <p className="text-center leading-relaxed text-gray-300">
                         {mission}
                       </p>
                     </Card>
@@ -276,8 +278,8 @@ export default function AboutPage() {
                 Who Speasy is for
               </h2>
 
-              <Card className="bg-card/50 border-border/50 border p-8 backdrop-blur-sm md:p-12">
-                <p className="text-muted-foreground mb-8 text-center text-lg leading-relaxed text-balance">
+              <Card className="border-border/50 bg-card/50 border p-8 backdrop-blur-sm md:p-12">
+                <p className="text-balance mb-8 text-center text-lg leading-relaxed text-gray-300">
                   Speasy is built for people who care about learning but lack
                   spare time.
                 </p>
@@ -311,7 +313,9 @@ export default function AboutPage() {
                       className="flex items-start gap-3"
                     >
                       <item.icon className="text-primary mt-1 h-5 w-5 flex-shrink-0" />
-                      <span className="leading-relaxed">{item.text}</span>
+                      <span className="leading-relaxed text-gray-300">
+                        {item.text}
+                      </span>
                     </motion.div>
                   ))}
                 </div>
@@ -373,9 +377,7 @@ export default function AboutPage() {
                       <p className="mb-2 text-lg font-semibold text-white">
                         {item.q}
                       </p>
-                      <p className="text-muted-foreground leading-relaxed">
-                        {item.a}
-                      </p>
+                      <p className="leading-relaxed text-gray-300">{item.a}</p>
                     </Card>
                   </motion.div>
                 ))}
@@ -460,7 +462,7 @@ export default function AboutPage() {
                           <h3 className="group-hover:text-primary mb-2 text-2xl font-bold text-white transition-colors duration-300">
                             {value.title}
                           </h3>
-                          <p className="text-muted-foreground leading-relaxed">
+                          <p className="leading-relaxed text-gray-300">
                             {value.description}
                           </p>
                         </div>
@@ -498,7 +500,7 @@ export default function AboutPage() {
               </h2>
 
               <div className="space-y-6">
-                <p className="text-muted-foreground mx-auto max-w-2xl text-balance text-lg leading-relaxed md:text-xl">
+                <p className="mx-auto max-w-2xl text-balance text-lg leading-relaxed text-gray-300 md:text-xl">
                   You are not trying to read more. <br />
                   You are trying to live well and stay sharp.
                 </p>
