@@ -1,9 +1,9 @@
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 
 export function Footer() {
   return (
-    <footer className="border-border/50 relative border-t px-4 py-20 backdrop-blur-sm">
+    <footer className="relative border-t border-gray-700 px-4 py-20 backdrop-blur-sm">
       <div className="mx-auto max-w-6xl">
         <div className="space-y-8 text-center">
           <motion.h2
@@ -11,7 +11,7 @@ export function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-3xl font-bold text-balance md:text-5xl"
+            className="text-balance text-3xl font-bold text-white md:text-5xl"
           >
             Don&apos;t just read your newsletters. Live with them.
           </motion.h2>
@@ -20,10 +20,11 @@ export function Footer() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-muted-foreground mx-auto max-w-2xl text-lg leading-relaxed text-balance"
+            className="mx-auto max-w-2xl text-balance text-lg leading-relaxed text-gray-200"
           >
-            Join early and help us build the next version of Speasy, with inbox sync,
-            custom playlists, and AI-powered personalization. Reclaim your reading list—One listen at a time.
+            Join early and help us build the next version of Speasy, with inbox
+            sync, custom playlists, and AI-powered personalization. Reclaim your
+            reading list—One listen at a time.
           </motion.p>
 
           <motion.div
@@ -36,7 +37,11 @@ export function Footer() {
             <Button size="lg" className="rounded-full px-8 py-6 text-lg">
               Start listening - $5/month
             </Button>
-            <Button size="lg" variant="outline" className="rounded-full px-8 py-6 text-lg">
+            <Button
+              size="lg"
+              variant="outline"
+              className="rounded-full px-8 py-6 text-lg"
+            >
               Join Pro waitlist
             </Button>
           </motion.div>
@@ -46,15 +51,19 @@ export function Footer() {
             whileInView={{ opacity: 0.6 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="flex flex-wrap items-center justify-center gap-8 pt-12"
+            className="flex flex-wrap items-center justify-center gap-8 pt-12 text-gray-200"
           >
-            <span className="text-sm">Available on your favorite podcast apps</span>
+            <span className="text-sm">
+              Available on your favorite podcast apps
+            </span>
             <div className="flex gap-6">
-              {['Apple Podcasts', 'Spotify', 'Overcast', 'Pocket Casts'].map(app => (
-                <div key={app} className="text-xs font-medium">
-                  {app}
-                </div>
-              ))}
+              {["Apple Podcasts", "Spotify", "Overcast", "Pocket Casts"].map(
+                (app) => (
+                  <div key={app} className="text-xs font-medium">
+                    {app}
+                  </div>
+                ),
+              )}
             </div>
           </motion.div>
 
@@ -63,7 +72,7 @@ export function Footer() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.8 }}
-            className="text-muted-foreground pt-12 text-sm"
+            className="pt-12 text-sm text-gray-200"
           >
             <p>&copy; 2025 Speasy. All rights reserved.</p>
           </motion.div>
