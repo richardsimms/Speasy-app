@@ -15,7 +15,7 @@ function getSupabaseClient() {
   return createClient(url, key);
 }
 
-const BLOG_DIR = path.join(process.cwd(), 'blog');
+const BLOG_DIR = path.join(process.cwd(), 'src', 'blog');
 
 async function parseMarkdownFile(slug: string): Promise<BlogPost | null> {
   try {

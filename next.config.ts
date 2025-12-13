@@ -13,7 +13,7 @@ const baseConfig: NextConfig = {
   reactStrictMode: true,
   reactCompiler: true,
   outputFileTracingIncludes: {
-    '/': ['./migrations/**/*'],
+    '/': ['./migrations/**/*', './src/blog/**/*'],
   },
   experimental: {
     turbopackFileSystemCacheForDev: true,
