@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 import {
   ArrowLeft,
   Calendar,
@@ -10,12 +10,12 @@ import {
   Play,
   SkipBack,
   SkipForward,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { cn } from "@/libs/utils";
-import { useContentAnalytics } from "@/hooks/useContentAnalytics";
+} from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
+import { useContentAnalytics } from '@/hooks/useContentAnalytics';
+import { cn } from '@/libs/utils';
 
 type ContentDetailViewProps = {
   content: {
@@ -33,7 +33,7 @@ type ContentDetailViewProps = {
     createdAt: string;
   };
   locale: string;
-  surface?: "home" | "dashboard";
+  surface?: 'home' | 'dashboard';
   userId?: string;
   experimentVariant?: string;
 };
@@ -41,7 +41,7 @@ type ContentDetailViewProps = {
 export function ContentDetailView({
   content,
   locale,
-  surface = "home",
+  surface = 'home',
   userId,
   experimentVariant,
 }: ContentDetailViewProps) {
@@ -51,26 +51,26 @@ export function ContentDetailView({
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const hasTrackedPlayStart = useRef(false);
-  const { trackContentPlayStarted, trackContentPlayCompleted } =
-    useContentAnalytics();
+  const { trackContentPlayStarted, trackContentPlayCompleted }
+    = useContentAnalytics();
 
   // Format time from seconds to MM:SS
   const formatTime = (seconds: number): string => {
     if (!seconds || !Number.isFinite(seconds)) {
-      return "0:00";
+      return '0:00';
     }
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   // Format date
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   };
 
@@ -115,18 +115,18 @@ export function ContentDetailView({
       setIsLoading(false);
     };
 
-    audio.addEventListener("timeupdate", handleTimeUpdate);
-    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-    audio.addEventListener("ended", handleEnded);
-    audio.addEventListener("loadstart", handleLoadStart);
-    audio.addEventListener("canplay", handleCanPlay);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('loadstart', handleLoadStart);
+    audio.addEventListener('canplay', handleCanPlay);
 
     return () => {
-      audio.removeEventListener("timeupdate", handleTimeUpdate);
-      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      audio.removeEventListener("ended", handleEnded);
-      audio.removeEventListener("loadstart", handleLoadStart);
-      audio.removeEventListener("canplay", handleCanPlay);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('loadstart', handleLoadStart);
+      audio.removeEventListener('canplay', handleCanPlay);
     };
   }, []);
 
@@ -239,19 +239,21 @@ export function ContentDetailView({
             {content.sourceName && (
               <div className="flex items-center gap-2">
                 <span>•</span>
-                {content.sourceLink ? (
-                  <a
-                    href={content.sourceLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 hover:text-white"
-                  >
-                    {content.sourceName}
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                ) : (
-                  <span>{content.sourceName}</span>
-                )}
+                {content.sourceLink
+                  ? (
+                      <a
+                        href={content.sourceLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 hover:text-white"
+                      >
+                        {content.sourceName}
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )
+                  : (
+                      <span>{content.sourceName}</span>
+                    )}
               </div>
             )}
           </div>
@@ -352,9 +354,9 @@ export function ContentDetailView({
               className="mb-4 h-1 w-full cursor-pointer overflow-hidden rounded-full bg-white/10"
               onClick={handleSeek}
               onKeyDown={(e) => {
-                if (e.key === "ArrowLeft") {
+                if (e.key === 'ArrowLeft') {
                   skipTime(-5);
-                } else if (e.key === "ArrowRight") {
+                } else if (e.key === 'ArrowRight') {
                   skipTime(5);
                 }
               }}
@@ -394,19 +396,21 @@ export function ContentDetailView({
                   onClick={togglePlay}
                   disabled={isLoading}
                   className={cn(
-                    "flex h-14 w-14 items-center justify-center rounded-full transition-all",
+                    'flex h-14 w-14 items-center justify-center rounded-full transition-all',
                     isPlaying
-                      ? "bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.3)]"
-                      : "bg-white/10 text-white hover:bg-white hover:text-black",
-                    isLoading && "opacity-50",
+                      ? 'bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.3)]'
+                      : 'bg-white/10 text-white hover:bg-white hover:text-black',
+                    isLoading && 'opacity-50',
                   )}
-                  aria-label={isPlaying ? "Pause" : "Play"}
+                  aria-label={isPlaying ? 'Pause' : 'Play'}
                 >
-                  {isPlaying ? (
-                    <Pause className="h-6 w-6 fill-current" />
-                  ) : (
-                    <Play className="ml-1 h-6 w-6 fill-current" />
-                  )}
+                  {isPlaying
+                    ? (
+                        <Pause className="h-6 w-6 fill-current" />
+                      )
+                    : (
+                        <Play className="ml-1 h-6 w-6 fill-current" />
+                      )}
                 </motion.button>
 
                 <motion.button

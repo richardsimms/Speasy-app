@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { usePostHog } from "posthog-js/react";
-import { useCallback } from "react";
+import { usePostHog } from 'posthog-js/react';
+import { useCallback } from 'react';
 
-type Surface = "home" | "dashboard";
+type Surface = 'home' | 'dashboard';
 
 type ContentEventProperties = {
   user_id?: string;
@@ -23,7 +23,7 @@ export const useContentAnalytics = () => {
         return;
       }
 
-      posthog.capture("content_viewed", {
+      posthog.capture('content_viewed', {
         user_id: properties.user_id || posthog.get_distinct_id(),
         content_name: properties.content_name,
         content_category: properties.content_category,
@@ -41,7 +41,7 @@ export const useContentAnalytics = () => {
         return;
       }
 
-      posthog.capture("content_play_started", {
+      posthog.capture('content_play_started', {
         user_id: properties.user_id || posthog.get_distinct_id(),
         content_name: properties.content_name,
         content_category: properties.content_category,
@@ -59,7 +59,7 @@ export const useContentAnalytics = () => {
         return;
       }
 
-      posthog.capture("content_play_completed", {
+      posthog.capture('content_play_completed', {
         user_id: properties.user_id || posthog.get_distinct_id(),
         content_name: properties.content_name,
         content_category: properties.content_category,

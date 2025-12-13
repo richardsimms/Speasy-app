@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
-import { notFound } from "next/navigation";
-import { ContentDetailView } from "@/components/content-detail-view";
-import { Env } from "@/libs/Env";
-import { getSupabaseAdmin } from "@/libs/Supabase";
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import { ContentDetailView } from '@/components/content-detail-view';
+import { Env } from '@/libs/Env';
+import { getSupabaseAdmin } from '@/libs/Supabase';
 
 // Force dynamic rendering
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 type ContentDetailProps = {
   params: Promise<{ id: string; locale: string }>;
@@ -22,25 +22,25 @@ export async function generateMetadata(
 
   if (!hasSupabaseUrl || !hasSupabaseKey) {
     return {
-      title: "Content Not Available",
+      title: 'Content Not Available',
     };
   }
 
   const supabase = getSupabaseAdmin();
   const { data: item } = await supabase
-    .from("content_items")
-    .select("title")
-    .eq("id", id)
+    .from('content_items')
+    .select('title')
+    .eq('id', id)
     .single();
 
   const t = await getTranslations({
     locale,
-    namespace: "Dashboard",
+    namespace: 'Dashboard',
   });
 
   return {
-    title: item?.title || t("meta_title"),
-    description: item?.title || "Content detail",
+    title: item?.title || t('meta_title'),
+    description: item?.title || 'Content detail',
   };
 }
 
@@ -65,7 +65,7 @@ export default async function ContentDetail(props: ContentDetailProps) {
 
   // Fetch the content item with all related data
   const { data: item, error } = await supabase
-    .from("content_items")
+    .from('content_items')
     .select(
       `
       id,
@@ -90,8 +90,8 @@ export default async function ContentDetail(props: ContentDetailProps) {
       )
     `,
     )
-    .eq("id", id)
-    .eq("status", "done")
+    .eq('id', id)
+    .eq('status', 'done')
     .single();
 
   if (error || !item) {
@@ -99,7 +99,7 @@ export default async function ContentDetail(props: ContentDetailProps) {
   }
 
   // Get category from tags or content source
-  let categoryName = "Uncategorized";
+  let categoryName = 'Uncategorized';
   const firstTag = item.content_item_tags?.[0] as any;
   if (firstTag?.categories?.name) {
     categoryName = firstTag.categories.name;
