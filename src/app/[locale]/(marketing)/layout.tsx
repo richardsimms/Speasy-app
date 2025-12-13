@@ -1,6 +1,6 @@
+import { Analytics } from '@vercel/analytics/next';
 import { setRequestLocale } from 'next-intl/server';
 import { DashboardSidebar } from '@/components/dashboard-sidebar';
-
 // import { DashboardRightSidebar } from '@/components/dashboard-right-sidebar';
 
 export default async function MarketingLayout(props: {
@@ -15,6 +15,7 @@ export default async function MarketingLayout(props: {
       <DashboardSidebar />
       <main className="ml-0 min-h-screen md:ml-64">{props.children}</main>
       {/* <DashboardRightSidebar /> */}
+      <Analytics />
     </div>
   );
 }
