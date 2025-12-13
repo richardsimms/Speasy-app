@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 import {
   ArrowRight,
   BookOpen,
@@ -11,12 +11,12 @@ import {
   Target,
   Users,
   Zap,
-} from "lucide-react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Footer } from "@/components/footer";
-import { ScrollProgress } from "@/components/scroll-progress";
+} from 'lucide-react';
+import Link from 'next/link';
+import { Footer } from '@/components/footer';
+import { ScrollProgress } from '@/components/scroll-progress';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 export default function AboutPage() {
   return (
@@ -34,8 +34,8 @@ export default function AboutPage() {
               className="h-full w-full"
               style={{
                 backgroundImage:
-                  "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
-                backgroundSize: "80px 80px",
+                  'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
+                backgroundSize: '80px 80px',
               }}
             />
           </div>
@@ -49,9 +49,10 @@ export default function AboutPage() {
                 delay: 0.1,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="pb-2 text-4xl font-bold leading-[1.1] tracking-tighter text-balance text-white md:text-6xl lg:text-7xl"
+              className="pb-2 text-4xl leading-[1.1] font-bold tracking-tighter text-balance text-white md:text-6xl lg:text-7xl"
             >
-              Reclaim your time. <br />
+              Reclaim your time.
+              {' '}
               <span className="bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent">
                 Rewrite your story.
               </span>
@@ -65,7 +66,7 @@ export default function AboutPage() {
                 delay: 0.25,
                 ease: [0.16, 1, 0.3, 1],
               }}
-              className="mx-auto max-w-2xl text-balance text-lg leading-relaxed text-gray-200 md:text-xl"
+              className="mx-auto max-w-2xl text-lg leading-relaxed text-balance text-gray-200 md:text-xl"
             >
               Speasy helps you keep learning without needing more hours in the
               day. We turn written content into audio so knowledge can move with
@@ -74,7 +75,7 @@ export default function AboutPage() {
           </div>
 
           {/* Floating gradient orbs for depth */}
-          <div className="pointer-events-none absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-purple-500/10 blur-3xl" />
+          <div className="pointer-events-none absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-purple-500/10 blur-3xl" />
           <div className="pointer-events-none absolute right-1/4 bottom-1/4 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl" />
         </section>
 
@@ -84,14 +85,14 @@ export default function AboutPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-6 text-center"
             >
-              <p className="text-balance text-xl leading-relaxed text-gray-200 md:text-2xl">
+              <p className="text-xl leading-relaxed text-balance text-gray-200 md:text-2xl">
                 Work is busy. Life is full. Your reading list keeps growing.
               </p>
-              <p className="text-balance text-2xl font-semibold leading-relaxed text-white md:text-3xl">
+              <p className="text-2xl leading-relaxed font-semibold text-balance text-white md:text-3xl">
                 Speasy exists to fix that.
               </p>
             </motion.div>
@@ -101,28 +102,28 @@ export default function AboutPage() {
         {/* Our Story */}
         <section className="relative px-4 py-20">
           {/* Decorative gradient line */}
-          <div className="pointer-events-none absolute left-1/2 top-0 h-px w-1/2 -translate-x-1/2 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
+          <div className="pointer-events-none absolute top-0 left-1/2 h-px w-1/2 -translate-x-1/2 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
 
           <div className="mx-auto max-w-4xl">
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8"
             >
-              <h2 className="text-balance text-center text-3xl font-bold tracking-tight text-white md:text-4xl">
+              <h2 className="text-left text-3xl font-bold tracking-tight text-balance text-white md:text-4xl">
                 Our story
               </h2>
 
               <div className="space-y-6 text-lg leading-relaxed text-gray-200">
                 <p>Speasy started with a familiar problem.</p>
 
-                <div className="space-y-2 pl-6">
-                  <p>The inbox was full.</p>
-                  <p>The newsletter list was long.</p>
-                  <p>Articles were saved with good intent, then forgotten.</p>
-                </div>
+                <ul className="list-disc pl-6">
+                  <li>The inbox was full.</li>
+                  <li>The newsletter list was long.</li>
+                  <li>Articles were saved with good intent, then forgotten.</li>
+                </ul>
 
                 <p className="font-medium text-white">
                   The issue was never the content. It was the format.
@@ -130,7 +131,8 @@ export default function AboutPage() {
 
                 <p>
                   Reading needs stillness, focus, and a screen. Most days do not
-                  offer that.{" "}
+                  offer that.
+                  {' '}
                   <span className="font-medium text-white">
                     Listening does.
                   </span>
@@ -165,16 +167,15 @@ export default function AboutPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-12"
             >
-              <h2 className="text-balance text-center text-3xl font-bold tracking-tight text-white md:text-4xl">
-                What Speasy does
-              </h2>
-
               <Card className="group relative border border-gray-800/50 bg-gradient-to-br from-gray-900/50 to-gray-900/30 p-8 shadow-2xl shadow-purple-500/5 backdrop-blur-sm transition-all duration-500 hover:border-gray-700 hover:shadow-purple-500/10 md:p-12">
-                <p className="text-balance mb-8 text-lg leading-relaxed text-gray-200">
+                <h2 className="text-center text-3xl font-bold tracking-tight text-balance text-white md:text-4xl">
+                  What Speasy does
+                </h2>
+                <p className="mb-8 text-lg leading-relaxed text-balance text-gray-200">
                   Speasy transforms selected newsletters and top articles into
                   short, clear audio.
                 </p>
@@ -183,16 +184,16 @@ export default function AboutPage() {
                   {[
                     {
                       icon: Target,
-                      text: "Fresh content from the topics you choose",
+                      text: 'Fresh content from the topics you choose',
                     },
-                    { icon: Zap, text: "Clean, studio-quality voices" },
+                    { icon: Zap, text: 'Clean, studio-quality voices' },
                     {
                       icon: BookOpen,
-                      text: "Delivered through a simple web player and podcast feeds",
+                      text: 'Delivered through a simple web player and podcast feeds',
                     },
                     {
                       icon: Sparkles,
-                      text: "Works with Apple Podcasts, Overcast, and more",
+                      text: 'Works with Apple Podcasts, Overcast, and more',
                     },
                   ].map((item, index) => (
                     <motion.div
@@ -229,23 +230,23 @@ export default function AboutPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8"
             >
-              <h2 className="text-balance text-center text-3xl font-bold tracking-tight text-white md:text-4xl">
+              <h2 className="text-center text-3xl font-bold tracking-tight text-balance text-white md:text-4xl">
                 Our mission
               </h2>
 
-              <p className="text-balance text-center text-xl leading-relaxed text-white">
+              <p className="text-center text-xl leading-relaxed text-balance text-white">
                 We help people stay informed without falling behind.
               </p>
 
               <div className="grid gap-4 md:grid-cols-3">
                 {[
-                  "Turn written content into audio you can use anywhere",
-                  "Save time without lowering quality",
-                  "Respect your attention, privacy, and pace",
+                  'Turn written content into audio you can use anywhere',
+                  'Save time without lowering quality',
+                  'Respect your attention, privacy, and pace',
                 ].map((mission, index) => (
                   <motion.div
                     key={index}
@@ -267,7 +268,7 @@ export default function AboutPage() {
                 ))}
               </div>
 
-              <p className="text-balance text-center text-xl font-medium leading-relaxed text-white">
+              <p className="text-center text-xl leading-relaxed font-medium text-balance text-white">
                 Learning should not feel like extra work. It should feel useful.
               </p>
             </motion.div>
@@ -280,34 +281,34 @@ export default function AboutPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8"
             >
-              <h2 className="text-balance text-center text-3xl font-bold tracking-tight text-white md:text-4xl">
-                Who Speasy is for
-              </h2>
 
               <Card className="group relative border border-gray-800/50 bg-gradient-to-br from-gray-900/50 to-gray-900/30 p-8 shadow-2xl shadow-purple-500/5 backdrop-blur-sm transition-all duration-500 hover:border-gray-700 hover:shadow-purple-500/10 md:p-12">
-                <p className="text-balance mb-8 text-center text-lg leading-relaxed text-gray-200">
+                <h2 className="text-center text-3xl font-bold tracking-tight text-balance text-white md:text-4xl">
+                  Who Speasy is for
+                </h2>
+                <p className="mb-8 text-lg leading-relaxed text-balance text-gray-200">
                   Speasy is built for people who care about learning but lack
                   spare time.
                 </p>
 
                 <div className="grid gap-6 md:grid-cols-2">
                   {[
-                    { icon: Users, text: "Busy professionals aged 25–45" },
+                    { icon: Users, text: 'Busy professionals aged 25–45' },
                     {
                       icon: Brain,
-                      text: "Founders, makers, and knowledge workers",
+                      text: 'Founders, makers, and knowledge workers',
                     },
                     {
                       icon: BookOpen,
-                      text: "People who already listen to podcasts",
+                      text: 'People who already listen to podcasts',
                     },
                     {
                       icon: Clock,
-                      text: "Anyone with a growing backlog of saved reads",
+                      text: 'Anyone with a growing backlog of saved reads',
                     },
                   ].map((item, index) => (
                     <motion.div
@@ -330,7 +331,7 @@ export default function AboutPage() {
                   ))}
                 </div>
 
-                <p className="text-balance mt-8 text-center text-lg font-medium leading-relaxed text-white">
+                <p className="mt-8 text-center text-lg leading-relaxed font-medium text-balance text-white">
                   If you value progress and calm focus, Speasy is for you.
                 </p>
               </Card>
@@ -344,32 +345,32 @@ export default function AboutPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8"
             >
-              <h2 className="text-balance text-center text-3xl font-bold tracking-tight text-white md:text-4xl">
+              <h2 className="text-center text-3xl font-bold tracking-tight text-balance text-white md:text-4xl">
                 Why Speasy works
               </h2>
 
               <div className="space-y-4">
                 {[
                   {
-                    q: "Does it save time?",
-                    a: "Yes. You use time that already exists.",
+                    q: 'Does it save time?',
+                    a: 'Yes. You use time that already exists.',
                   },
                   {
-                    q: "Is the audio good?",
-                    a: "Yes. Clear, natural voices designed for long listening.",
+                    q: 'Is the audio good?',
+                    a: 'Yes. Clear, natural voices designed for long listening.',
                   },
-                  { q: "Is it simple?", a: "Yes. Choose topics. Press play." },
+                  { q: 'Is it simple?', a: 'Yes. Choose topics. Press play.' },
                   {
-                    q: "Is my data safe?",
-                    a: "Yes. Your feed is private and yours alone.",
+                    q: 'Is my data safe?',
+                    a: 'Yes. Your feed is private and yours alone.',
                   },
                   {
-                    q: "Will it stay useful?",
-                    a: "Yes. You control what goes in.",
+                    q: 'Will it stay useful?',
+                    a: 'Yes. You control what goes in.',
                   },
                 ].map((item, index) => (
                   <motion.div
@@ -402,11 +403,11 @@ export default function AboutPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-12"
             >
-              <h2 className="text-balance text-center text-3xl font-bold tracking-tight text-white md:text-4xl">
+              <h2 className="text-center text-3xl font-bold tracking-tight text-balance text-white md:text-4xl">
                 Our values
               </h2>
 
@@ -414,34 +415,34 @@ export default function AboutPage() {
                 {[
                   {
                     icon: Zap,
-                    title: "Simplicity",
-                    description: "The best tools stay out of the way.",
-                    color: "from-violet-500/20 to-purple-500/20",
+                    title: 'Simplicity',
+                    description: 'The best tools stay out of the way.',
+                    color: 'from-violet-500/20 to-purple-500/20',
                   },
                   {
                     icon: Heart,
-                    title: "Respect",
-                    description: "Your time and focus matter.",
-                    color: "from-pink-500/20 to-rose-500/20",
+                    title: 'Respect',
+                    description: 'Your time and focus matter.',
+                    color: 'from-pink-500/20 to-rose-500/20',
                   },
                   {
                     icon: Sparkles,
-                    title: "Care",
-                    description: "Quality over noise, always.",
-                    color: "from-blue-500/20 to-cyan-500/20",
+                    title: 'Care',
+                    description: 'Quality over noise, always.',
+                    color: 'from-blue-500/20 to-cyan-500/20',
                   },
                   {
                     icon: Target,
-                    title: "Growth",
-                    description: "Learning should support life, not crowd it.",
-                    color: "from-emerald-500/20 to-teal-500/20",
+                    title: 'Growth',
+                    description: 'Learning should support life, not crowd it.',
+                    color: 'from-emerald-500/20 to-teal-500/20',
                   },
                 ].map((value, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
+                    viewport={{ once: true, margin: '-50px' }}
                     transition={{
                       duration: 0.5,
                       delay: index * 0.1,
@@ -482,8 +483,8 @@ export default function AboutPage() {
                           className="pointer-events-none absolute inset-0 opacity-[0.02]"
                           style={{
                             backgroundImage:
-                              "radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)",
-                            backgroundSize: "24px 24px",
+                              'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)',
+                            backgroundSize: '24px 24px',
                           }}
                         />
                       </Card>
@@ -501,17 +502,19 @@ export default function AboutPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8 text-center"
             >
-              <h2 className="text-balance text-3xl font-bold tracking-tight text-white md:text-5xl">
+              <h2 className="text-3xl font-bold tracking-tight text-balance text-white md:text-5xl">
                 Start listening
               </h2>
 
               <div className="space-y-6">
-                <p className="mx-auto max-w-2xl text-balance text-lg leading-relaxed text-gray-200 md:text-xl">
-                  You are not trying to read more. <br />
+                <p className="mx-auto max-w-2xl text-lg leading-relaxed text-balance text-gray-200 md:text-xl">
+                  You are not trying to read more.
+                  {' '}
+                  <br />
                   You are trying to live well and stay sharp.
                 </p>
 

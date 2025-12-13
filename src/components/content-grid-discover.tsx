@@ -1,6 +1,6 @@
 'use client';
 
-import { Cpu, DollarSign, Home, Palette, Star, Trophy } from 'lucide-react';
+import { Cpu, DollarSign, Palette, Star, Trophy } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/libs/utils';
 import { ContentGridCard } from './content-grid-card';
@@ -65,7 +65,7 @@ export function ContentGridDiscover({
 
   // Create tabs: For You, Top, then categories
   const tabs = [
-    { id: 'for-you', label: 'For You', icon: Home, items: allItems },
+  //  { id: 'for-you', label: 'For You', icon: Home, items: allItems },
     { id: 'top', label: 'Top', icon: Star, items: topItems },
     ...categories.map(cat => ({
       id: cat.categoryName.toLowerCase().replace(/\s+/g, '-'),

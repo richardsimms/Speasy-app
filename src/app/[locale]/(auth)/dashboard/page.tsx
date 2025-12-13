@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
-import { ContentGridDiscover } from '@/components/content-grid-discover';
+import { DiscoverGrid } from '@/components/discover-grid';
 import { Env } from '@/libs/Env';
 import { getSupabaseAdmin } from '@/libs/Supabase';
 
@@ -183,7 +183,7 @@ export default async function Dashboard(props: {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 lg:px-8">
-      <ContentGridDiscover categories={categories} locale={locale} />
+      <DiscoverGrid categories={categories} locale={locale} />
     </div>
   );
 }

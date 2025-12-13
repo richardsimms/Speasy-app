@@ -4,7 +4,6 @@ import {
   ChevronRight,
   Cpu,
   DollarSign,
-  Home,
   Palette,
   Star,
   Trophy,
@@ -70,7 +69,7 @@ export function DiscoverGrid({ categories, locale }: DiscoverGridProps) {
 
   // Create tabs: For You, Top, then categories
   const tabs = [
-    { id: 'for-you', label: 'For You', icon: Home, items: allItems },
+    { id: 'all', label: 'All', icon: Star, items: allItems },
     { id: 'top', label: 'Top', icon: Star, items: topItems },
     ...categories.map(cat => ({
       id: cat.categoryName.toLowerCase().replace(/\s+/g, '-'),

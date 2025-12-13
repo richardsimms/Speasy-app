@@ -1,20 +1,11 @@
 'use client';
 
 import type { LucideIcon } from 'lucide-react';
-import {
-  ChevronUp,
-  FileText,
-  Home,
-
-  Menu,
-  User,
-  X,
-} from 'lucide-react';
+import { FileText, Home, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useId, useState } from 'react';
 import { cn } from '@/libs/utils';
-import { Badge } from './ui/badge';
 
 type SidebarProps = {
   currentPath?: string;
@@ -95,61 +86,6 @@ function SidebarNav({ navItems, currentPath, onNavigate }: SidebarNavProps) {
         );
       })}
     </nav>
-  );
-}
-
-type SidebarAccountProps = {
-  onNavigate?: () => void;
-};
-
-function SidebarAccount({ onNavigate }: SidebarAccountProps) {
-  return (
-    <div className="space-y-2 border-t border-white/10 p-4">
-      <Link
-        href="/sign-in/"
-        onClick={onNavigate}
-        className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-white transition-all hover:bg-white/15"
-      >
-        Sign In
-      </Link>
-      <Link
-        href="/sign-up/"
-        onClick={onNavigate}
-        className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-white transition-all hover:bg-white/15 active:scale-95"
-      >
-        Sign Up
-      </Link>
-
-      <div className="space-y-2 border-t border-white/10 pt-2">
-        <Link
-          href="/dashboard/user-profile"
-          onClick={onNavigate}
-          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/60 transition-all hover:bg-white/5 hover:text-white active:scale-95"
-        >
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
-            <User className="h-4 w-4" />
-          </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <span>Account</span>
-              <Badge
-                variant="secondary"
-                className="border-green-500/30 bg-green-500/20 px-1.5 py-0 text-xs text-green-400"
-              >
-                pro
-              </Badge>
-            </div>
-          </div>
-        </Link>
-        <button
-          type="button"
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/60 transition-all hover:bg-white/5 hover:text-white active:scale-95"
-        >
-          <ChevronUp className="h-4 w-4" />
-          <span>Upgrade</span>
-        </button>
-      </div>
-    </div>
   );
 }
 
@@ -327,7 +263,7 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
               currentPath={resolvedPathname}
               onNavigate={closeMobile}
             />
-            <SidebarAccount onNavigate={closeMobile} />
+            {/* {isAuthenticated && <SidebarAccount onNavigate={closeMobile} />} */}
           </div>
         </aside>
       </div>
@@ -338,7 +274,7 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
             {logo}
           </div>
           <SidebarNav navItems={navItems} currentPath={resolvedPathname} />
-          <SidebarAccount />
+          {/* <SidebarAccount /> */}
         </div>
       </aside>
     </>
