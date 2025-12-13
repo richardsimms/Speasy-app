@@ -1,11 +1,11 @@
-import type { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
-import { ContentGridDiscover } from '@/components/content-grid-discover';
-import { Env } from '@/libs/Env';
-import { getSupabaseAdmin } from '@/libs/Supabase';
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { ContentGridDiscover } from "@/components/content-grid-discover";
+import { Env } from "@/libs/Env";
+import { getSupabaseAdmin } from "@/libs/Supabase";
 
 // Force dynamic rendering since this page requires user-specific data
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
@@ -13,11 +13,11 @@ export async function generateMetadata(props: {
   const { locale } = await props.params;
   const t = await getTranslations({
     locale,
-    namespace: 'Dashboard',
+    namespace: "Dashboard",
   });
 
   return {
-    title: t('meta_title'),
+    title: t("meta_title"),
   };
 }
 
@@ -49,7 +49,7 @@ export default async function Dashboard(props: {
 
   // Fetch content items with categories and audio files
   const { data: contentItems, error } = await supabase
-    .from('content_items')
+    .from("content_items")
     .select(
       `
       id,
@@ -71,8 +71,8 @@ export default async function Dashboard(props: {
       )
     `,
     )
-    .eq('status', 'done')
-    .order('created_at', { ascending: false })
+    .eq("status", "done")
+    .order("created_at", { ascending: false })
     .limit(50);
 
   if (error) {
@@ -110,7 +110,7 @@ export default async function Dashboard(props: {
     }
 
     // Get category from tags, or fall back to content_sources.name, or default to "Uncategorized"
-    let categoryName = 'Uncategorized';
+    let categoryName = "Uncategorized";
     const firstTag = item.content_item_tags?.[0] as any;
     if (firstTag?.categories?.name) {
       categoryName = firstTag.categories.name;
@@ -183,7 +183,11 @@ export default async function Dashboard(props: {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 lg:px-8">
-      <ContentGridDiscover categories={categories} locale={locale} />
+      <ContentGridDiscover
+        categories={categories}
+        locale={locale}
+        surface="home"
+      />
     </div>
   );
 }
