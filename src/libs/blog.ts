@@ -77,10 +77,19 @@ export type BlogPost = {
   image_url: string | null;
 };
 
-// Use this for client requests (when cookies are available)
+// Use this for server-side requests (tries admin client as fallback)
 export async function getBlogPosts(): Promise<BlogPost[]> {
   try {
-    const client = getSupabaseClient();
+    // Try admin client first for server-side rendering (has full access)
+    // Fall back to anon client if admin is not configured
+    let client;
+    try {
+      client = getSupabaseAdmin();
+    } catch {
+      // Admin client not configured, try anon client
+      client = getSupabaseClient();
+    }
+
     if (client) {
       const { data: posts, error } = await client
         .from('blog_posts')
@@ -91,7 +100,7 @@ export async function getBlogPosts(): Promise<BlogPost[]> {
       if (error) {
         throw error;
       }
-      if (posts) {
+      if (posts && posts.length > 0) {
         return posts as BlogPost[];
       }
     }
@@ -130,7 +139,16 @@ export async function getBlogPostsForStaticGeneration(): Promise<BlogPost[]> {
 
 export async function getBlogPostBySlug(slug: string): Promise<BlogPost> {
   try {
-    const client = getSupabaseClient();
+    // Try admin client first for server-side rendering (has full access)
+    // Fall back to anon client if admin is not configured
+    let client;
+    try {
+      client = getSupabaseAdmin();
+    } catch {
+      // Admin client not configured, try anon client
+      client = getSupabaseClient();
+    }
+
     if (client) {
       const { data: post, error } = await client
         .from('blog_posts')
@@ -161,14 +179,23 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost> {
 
 export async function getAllBlogSlugs(): Promise<string[]> {
   try {
-    const client = getSupabaseClient();
+    // Try admin client first for server-side rendering (has full access)
+    // Fall back to anon client if admin is not configured
+    let client;
+    try {
+      client = getSupabaseAdmin();
+    } catch {
+      // Admin client not configured, try anon client
+      client = getSupabaseClient();
+    }
+
     if (client) {
       const { data: posts, error } = await client
         .from('blog_posts')
         .select('slug')
         .eq('is_published', true);
 
-      if (!error && posts) {
+      if (!error && posts && posts.length > 0) {
         return posts.map(post => post.slug);
       }
     }
