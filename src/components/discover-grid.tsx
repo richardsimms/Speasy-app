@@ -30,6 +30,9 @@ type CategoryGroup = {
 type DiscoverGridProps = {
   categories: CategoryGroup[];
   locale: string;
+  surface?: "home" | "dashboard";
+  userId?: string;
+  experimentVariant?: string;
 };
 
 // Map category names to icons
@@ -54,7 +57,13 @@ const getCategoryIcon = (categoryName: string) => {
   return Star;
 };
 
-export function DiscoverGrid({ categories, locale }: DiscoverGridProps) {
+export function DiscoverGrid({
+  categories,
+  locale,
+  surface = "dashboard",
+  userId,
+  experimentVariant,
+}: DiscoverGridProps) {
   // Get all items for "For You" (all content)
   const allItems = categories.flatMap((cat) => cat.items);
 
@@ -286,6 +295,9 @@ export function DiscoverGrid({ categories, locale }: DiscoverGridProps) {
                   duration={item.duration}
                   index={index}
                   locale={locale}
+                  surface={surface}
+                  userId={userId}
+                  experimentVariant={experimentVariant}
                 />
               </div>
             );
