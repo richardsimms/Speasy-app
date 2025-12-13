@@ -1,7 +1,7 @@
 'use client';
 
 import type { LucideIcon } from 'lucide-react';
-import { FileText, Home, Menu, X } from 'lucide-react';
+import { FileText, Home, Menu, Newspaper, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useId, useState } from 'react';
@@ -124,6 +124,13 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
       icon: Home,
       href: '/',
       active: getNavItemActive(resolvedPathname, 'home'),
+    },
+    {
+      id: 'digets',
+      label: 'Digest',
+      icon: Newspaper,
+      href: '/blog',
+      active: getNavItemActive(resolvedPathname, 'blog'),
     },
     {
       id: 'about',

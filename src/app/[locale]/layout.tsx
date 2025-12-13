@@ -152,7 +152,7 @@ export default async function RootLayout(props: {
                       </>
                     )}
                   >
-                    <div className="py-5 text-xl [&_p]:my-6">{props.children}</div>
+                    <div className="py-0 text-[0px] [&_p]:my-6">{props.children}</div>
                   </BaseTemplate>
                 )}
           </PostHogProvider>
