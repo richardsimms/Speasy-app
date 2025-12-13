@@ -67,8 +67,8 @@ export function DiscoverGrid({
   // Get all items for "For You" (all content)
   const allItems = categories.flatMap(cat => cat.items);
 
-  // Get "Top" items (most recent, limit to 20)
-  const topItems = [...allItems]
+  // Get "Latest" items (most recent, limit to 20)
+  const latestItems = [...allItems]
     .sort(
       (a, b) =>
         new Date(b.created_at ?? 0).getTime()
@@ -76,10 +76,10 @@ export function DiscoverGrid({
     )
     .slice(0, 20);
 
-  // Create tabs: For You, Top, then categories
+  // Create tabs: For You, Latest, then categories
   const tabs = [
     { id: 'for-you', label: 'For You', icon: Star, items: allItems },
-    { id: 'top', label: 'Top', icon: Star, items: topItems },
+    { id: 'latest', label: 'Latest', icon: Star, items: latestItems },
     ...categories.map(cat => ({
       id: cat.categoryName.toLowerCase().replace(/\s+/g, '-'),
       label: cat.categoryName,

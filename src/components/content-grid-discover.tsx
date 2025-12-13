@@ -60,19 +60,44 @@ export function ContentGridDiscover({
   // Get all items for "For You" (all content)
   const allItems = categories.flatMap(cat => cat.items);
 
-  // Get "Top" items (most recent, limit to 20)
-  const topItems = [...allItems]
-    .sort(
-      (a, b) =>
-        new Date(b.created_at ?? 0).getTime()
-          - new Date(a.created_at ?? 0).getTime(),
-    )
+  // Get "Latest" items (most recent, limit to 20)
+  // Sort by date first (newest first), then by title alphabetically
+  // For items on the same day, sort by title to interweave content
+  const latestItems = [...allItems]
+    .sort((a, b) => {
+      const dateA = new Date(a.created_at ?? 0);
+      const dateB = new Date(b.created_at ?? 0);
+
+      // Compare dates by day (ignoring time) for primary sort
+      const dateA_day = new Date(
+        dateA.getFullYear(),
+        dateA.getMonth(),
+        dateA.getDate(),
+      ).getTime();
+      const dateB_day = new Date(
+        dateB.getFullYear(),
+        dateB.getMonth(),
+        dateB.getDate(),
+      ).getTime();
+
+      // Primary sort: by date (newest first)
+      const dateDiff = dateB_day - dateA_day;
+      if (dateDiff !== 0) {
+        return dateDiff;
+      }
+
+      // Secondary sort: by title alphabetically (case-insensitive) when same day
+      return a.title.localeCompare(b.title, undefined, {
+        sensitivity: 'base',
+        numeric: true,
+      });
+    })
     .slice(0, 20);
 
-  // Create tabs: For You, Top, then categories
+  // Create tabs: For You, Latest, then categories
   const tabs = [
     //  { id: 'for-you', label: 'For You', icon: Home, items: allItems },
-    { id: 'top', label: 'Top', icon: Star, items: topItems },
+    { id: 'latest', label: 'Latest', icon: Star, items: latestItems },
     ...categories.map(cat => ({
       id: cat.categoryName.toLowerCase().replace(/\s+/g, '-'),
       label: cat.categoryName,
@@ -81,7 +106,7 @@ export function ContentGridDiscover({
     })),
   ];
 
-  const [selectedTab, setSelectedTab] = useState<string>('top');
+  const [selectedTab, setSelectedTab] = useState<string>('latest');
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
   const [indicatorStyle, setIndicatorStyle] = useState<{
     left: number;
