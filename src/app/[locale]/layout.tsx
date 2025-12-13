@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { GeistMono } from 'geist/font/mono';
 import { GeistSans } from 'geist/font/sans';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
@@ -82,6 +83,7 @@ export default async function RootLayout(props: {
       <body className="font-sans antialiased">
         <NextIntlClientProvider>
           <PostHogProvider>
+            <SpeedInsights />
             {isMarketingRoute
               ? (
                 // Marketing routes: render children directly (they have their own layout with sidebar)
