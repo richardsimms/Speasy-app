@@ -1,0 +1,78 @@
+---
+alwaysApply: true
+---
+# Rule: Commit messages must follow commitlint conventions
+
+## Description
+Use commitlint-style Conventional Commits when creating, editing, or suggesting git commit messages for this repository. Enforce the same rules that the `@commitlint/config-conventional` preset expects. [web:1]
+
+## Why this rule matters
+- Commit messages are linted using commitlint and must pass its checks. [web:1]
+- Conventional, structured messages improve changelog generation, release automation, and collaboration. [web:1][web:7]
+
+## When this rule applies
+- Whenever you propose a git commit message.
+- Whenever you modify an existing commit message.
+- Whenever you write examples of commit messages in docs, comments, or explanations.
+
+## Required format
+
+Always use a single-line header in the following format:
+
+`<type>[optional scope]: <short, imperative description>`
+
+- `<type>` is required and must be a valid conventional type.
+- `<scope>` is optional and, when used, is placed in parentheses after the type, with no spaces: `type(scope): description`.
+- The description must be short, in the imperative mood, and written in lowercase except for proper nouns. [web:1][web:7]
+
+### Allowed types
+
+Prefer the standard set used by `@commitlint/config-conventional`: [web:1]
+
+- `feat`: A new feature.
+- `fix`: A bug fix.
+- `docs`: Documentation-only changes.
+- `style`: Changes that do not affect meaning of the code (formatting, whitespace, etc.).
+- `refactor`: Code change that neither fixes a bug nor adds a feature.
+- `perf`: A change that improves performance.
+- `test`: Adding or updating tests.
+- `build`: Changes that affect the build system or external dependencies.
+- `ci`: Changes to CI configuration or scripts.
+- `chore`: Other changes that do not modify src or test files.
+- `revert`: Reverts a previous commit; message should reference the reverted commit. [web:1]
+
+If in doubt, choose from these types and avoid inventing new ones.
+
+### Examples of valid headers
+
+- `feat(api): add job recommendation endpoint`
+- `fix(ui): correct overflow in job list`
+- `docs: update README with setup instructions`
+- `chore: bump commitlint version`
+
+### Body and footer
+
+When a body or footer is needed, follow Conventional Commits guidelines: [web:7]
+
+- Separate header, body, and footer with a blank line.
+- Use the body to explain what and why, not how.
+- Mark breaking changes clearly using `BREAKING CHANGE:` in the footer followed by a description, or use `!` after the type/scope in the header (for example, `feat!: ...`). [web:7]
+
+### Line length
+
+- Keep the header line under 72 characters when possible.
+- Wrap body and footer text so lines are reasonably short and readable.
+
+## Things to avoid
+
+- Do not write commits without a type (for example, `update stuff` is invalid).
+- Do not capitalize the type (use `feat`, not `Feat`).
+- Do not end the header line with a period.
+- Do not use vague descriptions like `stuff`, `changes`, or `fixes`.
+- Do not include multiple unrelated changes in one commit message; prefer smaller, focused commits.
+
+## How the agent should behave
+
+- If a user supplies a non-conforming commit message, suggest a corrected version that passes commitlint.
+- When summarizing changes, propose one or more commit messages in the required format.
+- If information is missing (for example, there are unrelated changes), ask the user for clarification instead of guessing a misleading type or description.
