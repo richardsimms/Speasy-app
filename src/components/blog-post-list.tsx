@@ -2,10 +2,7 @@
 
 import type { BlogPost } from '@/libs/blog';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { Badge } from '@/components/ui/badge';
-import { formatDateShort } from '@/libs/utils';
 
 type BlogPostListProps = {
   posts: BlogPost[];
@@ -52,48 +49,38 @@ export function BlogPostList({ posts }: BlogPostListProps) {
             delay: index * 0.05,
             ease: [0.16, 1, 0.3, 1],
           }}
-          className="group"
+          className="group relative"
         >
-          <div className="relative block overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] p-6 transition-all duration-300 hover:border-white/30 hover:shadow-lg hover:shadow-white/5">
-            {/* Hover indicator */}
-            <div className="absolute top-0 right-4 left-4 h-[2px] origin-left scale-x-0 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 transition-transform duration-300 group-hover:scale-x-100" />
+          <Link
+            href={`/blog/${post.slug}`}
+            className="relative block overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-all duration-300 hover:border-white/30 hover:shadow-lg hover:shadow-white/5"
+          >
+            {/* Content Section */}
+            <div className="p-6">
+              {/* Category Tag */}
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1">
+                <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                <span className="text-xs font-medium tracking-wider text-white/70 uppercase">
+                  {post.category}
+                </span>
+              </div>
 
-            {/* Header with badge and date */}
-            <div className="mb-4 flex items-center justify-between">
-              <Badge
-                variant="secondary"
-                className="border-white/10 bg-white/5 text-white/70 hover:bg-white/10"
-              >
-                {post.category}
-              </Badge>
-              <time className="text-sm text-white/50">
-                {formatDateShort(post.published_at)}
-              </time>
+              {/* Title */}
+              <h3 className="mb-2 line-clamp-2 text-xl font-bold text-white transition-colors group-hover:text-white/90">
+                {post.title}
+              </h3>
+
+              {/* Excerpt */}
+              {post.excerpt && (
+                <p className="line-clamp-3 text-sm leading-relaxed text-white/60">
+                  {truncateExcerpt(post.excerpt, 280)}
+                </p>
+              )}
             </div>
 
-            {/* Title */}
-            <h2 className="mb-3 text-2xl font-bold text-white transition-colors group-hover:text-white/90">
-              <Link href={`/blog/${post.slug}`} className="hover:underline">
-                {post.title}
-              </Link>
-            </h2>
-
-            {/* Excerpt */}
-            {post.excerpt && (
-              <p className="mb-4 leading-relaxed text-white/60">
-                {truncateExcerpt(post.excerpt, 280)}
-              </p>
-            )}
-
-            {/* Read more link */}
-            <Link
-              href={`/blog/${post.slug}`}
-              className="inline-flex items-center gap-2 text-sm font-medium text-white/70 transition-colors group-hover:text-white"
-            >
-              Read more
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </Link>
-          </div>
+            {/* Hover indicator */}
+            <div className="absolute top-0 right-4 left-4 h-[2px] origin-left scale-x-0 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 transition-transform duration-300 group-hover:scale-x-100" />
+          </Link>
         </motion.div>
       ))}
     </div>

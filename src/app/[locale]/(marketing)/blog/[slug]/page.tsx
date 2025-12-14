@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Footer } from '@/components/footer';
 import { Markdown } from '@/components/markdown';
 import { PageHeader } from '@/components/page-header';
-import { Badge } from '@/components/ui/badge';
 import { getBlogPostBySlug, getBlogPostsForStaticGeneration } from '@/libs/blog';
 import { formatDate } from '@/libs/utils';
 
@@ -44,7 +44,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         <div className="container px-4 md:px-6">
           <div className="mx-auto max-w-3xl">
             <div className="mb-8 flex items-center justify-between">
-              <Badge variant="secondary">{post.category}</Badge>
+              {/* Category badge */}
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-2">
+                <span className="h-2 w-2 rounded-full bg-blue-500" />
+                <span className="text-sm font-medium tracking-wider text-white/70 uppercase">
+                  {post.category}
+                </span>
+              </div>
               <div className="text-sm text-white">
                 <time dateTime={post.published_at}>{formatDate(post.published_at)}</time>
                 <span className="mx-2">•</span>
@@ -54,24 +60,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
             <Markdown content={post.content} />
 
-            <div className="mt-12 border-t pt-6">
-              <Link href="/blog/" className="inline-flex items-center text-white hover:underline">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="mr-1 h-4 w-4"
-                >
-                  <path d="m12 19-7-7 7-7" />
-                  <path d="M19 12H5" />
-                </svg>
-                Back to all posts
+            <div className="mx-auto max-w-4xl px-4 py-6">
+              <Link href="/blog/" className="inline-flex items-center gap-2 text-white/70 transition-colors hover:text-white">
+                <ArrowLeft className="h-4 w-4" />
+                <span>Back to all posts</span>
               </Link>
             </div>
           </div>
