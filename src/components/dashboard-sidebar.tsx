@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import type { LucideIcon } from 'lucide-react';
-import { FileText, Home, Menu, Newspaper, X } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect, useId, useState } from 'react';
-import { cn } from '@/libs/utils';
+import type { LucideIcon } from "lucide-react";
+import { FileText, Home, Menu, Newspaper, X } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useId, useState } from "react";
+import { cn } from "@/libs/utils";
 
 type SidebarProps = {
   currentPath?: string;
@@ -26,35 +26,35 @@ type SidebarNavProps = {
 };
 
 function normalizePathname(pathname: string) {
-  const trimmed = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
-  const segments = trimmed.split('/').filter(Boolean);
+  const trimmed = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+  const segments = trimmed.split("/").filter(Boolean);
 
   if (segments.length === 0) {
-    return '/';
+    return "/";
   }
 
   const [first, ...rest] = segments;
-  const looksLikeLocale = /^[a-z]{2}(?:-[a-z]{2})?$/i.test(first ?? '');
+  const looksLikeLocale = /^[a-z]{2}(?:-[a-z]{2})?$/i.test(first ?? "");
   if (!looksLikeLocale) {
-    return `/${segments.join('/')}`;
+    return `/${segments.join("/")}`;
   }
 
   if (rest.length === 0) {
-    return '/';
+    return "/";
   }
 
-  return `/${rest.join('/')}`;
+  return `/${rest.join("/")}`;
 }
 
 function getNavItemActive(pathname: string, navItemId: string) {
   const normalizedPathname = normalizePathname(pathname);
 
-  if (navItemId === 'home') {
-    return normalizedPathname === '/' || normalizedPathname === '/dashboard';
+  if (navItemId === "home") {
+    return normalizedPathname === "/" || normalizedPathname === "/dashboard";
   }
 
-  if (navItemId === 'about') {
-    return normalizedPathname === '/about';
+  if (navItemId === "about") {
+    return normalizedPathname === "/about";
   }
 
   return false;
@@ -73,11 +73,11 @@ function SidebarNav({ navItems, currentPath, onNavigate }: SidebarNavProps) {
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
-              'hover:bg-white/5 active:scale-95',
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+              "hover:bg-white/5 active:scale-95",
               isActive
-                ? 'bg-white/10 text-white'
-                : 'text-white/60 hover:text-white',
+                ? "bg-white/10 text-white"
+                : "text-white/60 hover:text-white",
             )}
           >
             <Icon className="h-5 w-5 shrink-0" />
@@ -93,7 +93,7 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const mobileDialogTitleId = useId();
   const pathname = usePathname();
-  const resolvedPathname = currentPath ?? pathname ?? '/dashboard';
+  const resolvedPathname = currentPath ?? pathname ?? "/dashboard";
 
   useEffect(() => {
     if (!isMobileOpen) {
@@ -101,43 +101,43 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
     }
 
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         setIsMobileOpen(false);
       }
     };
 
-    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener("keydown", onKeyDown);
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener("keydown", onKeyDown);
     };
   }, [isMobileOpen]);
 
   const navItems: NavItem[] = [
     {
-      id: 'home',
-      label: 'Home',
+      id: "home",
+      label: "Home",
       icon: Home,
-      href: '/',
-      active: getNavItemActive(resolvedPathname, 'home'),
+      href: "/",
+      active: getNavItemActive(resolvedPathname, "home"),
     },
     {
-      id: 'digets',
-      label: 'Digest',
+      id: "digets",
+      label: "Digest",
       icon: Newspaper,
-      href: '/blog',
-      active: getNavItemActive(resolvedPathname, 'blog'),
+      href: "/blog",
+      active: getNavItemActive(resolvedPathname, "blog"),
     },
     {
-      id: 'about',
-      label: 'About',
+      id: "about",
+      label: "About",
       icon: FileText,
-      href: '/about',
-      active: getNavItemActive(resolvedPathname, 'about'),
+      href: "/about",
+      active: getNavItemActive(resolvedPathname, "about"),
     },
   ];
 
@@ -212,22 +212,20 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
 
   return (
     <>
-      <div className="sticky top-0 z-40 flex h-16 w-full items-center gap-3 border-b border-white/10 bg-[#100e12] px-4 md:hidden">
-        <button
-          type="button"
-          aria-label="Open menu"
-          onClick={() => setIsMobileOpen(true)}
+      <div className="sticky top-0 z-40 flex h-16 w-full items-center justify-center border-b border-white/10 bg-[#100e12] px-4 md:hidden">
+        <Link
+          href="/"
+          aria-label="Home"
           className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-white/5 hover:text-white"
         >
           <Menu className="h-5 w-5" />
-        </button>
-        <div className="flex items-center">{logo}</div>
+        </Link>
       </div>
 
       <div
         className={cn(
-          'fixed inset-0 z-50 md:hidden',
-          isMobileOpen ? 'pointer-events-auto' : 'pointer-events-none',
+          "fixed inset-0 z-50 md:hidden",
+          isMobileOpen ? "pointer-events-auto" : "pointer-events-none",
         )}
         aria-hidden={!isMobileOpen}
       >
@@ -236,8 +234,8 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
           aria-label="Close menu"
           onClick={closeMobile}
           className={cn(
-            'absolute inset-0 bg-black/60 transition-opacity',
-            isMobileOpen ? 'opacity-100' : 'opacity-0',
+            "absolute inset-0 bg-black/60 transition-opacity",
+            isMobileOpen ? "opacity-100" : "opacity-0",
           )}
         />
 
@@ -246,8 +244,8 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
           aria-modal="true"
           aria-labelledby={mobileDialogTitleId}
           className={cn(
-            'absolute inset-y-0 left-0 w-72 border-r border-white/10 bg-[#100e12] shadow-xl transition-transform',
-            isMobileOpen ? 'translate-x-0' : '-translate-x-full',
+            "absolute inset-y-0 left-0 w-72 border-r border-white/10 bg-[#100e12] shadow-xl transition-transform",
+            isMobileOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
           <div className="flex h-full flex-col">
