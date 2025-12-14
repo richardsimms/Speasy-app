@@ -212,14 +212,20 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
 
   return (
     <>
-      <div className="sticky top-0 z-40 flex h-16 w-full items-center justify-center border-b border-white/10 bg-[#100e12] px-4 md:hidden">
-        <Link
-          href="/"
-          aria-label="Home"
+      <div className="sticky top-0 z-40 flex h-16 w-full items-center border-b border-white/10 bg-[#100e12] px-4 md:hidden">
+        <button
+          type="button"
+          aria-label="Open menu"
+          onClick={() => setIsMobileOpen(true)}
           className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-white/5 hover:text-white"
         >
           <Menu className="h-5 w-5" />
-        </Link>
+        </button>
+        <div className="absolute left-1/2 -translate-x-1/2">
+          <Link href="/" aria-label="Home">
+            {logo}
+          </Link>
+        </div>
       </div>
 
       <div
