@@ -212,7 +212,7 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
 
   return (
     <>
-      <div className="sticky top-0 z-40 flex h-16 w-full items-center border-b border-white/10 bg-[#100e12] px-4 md:hidden">
+      <div className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-white/10 bg-[#100e12] px-4 md:hidden">
         <button
           type="button"
           aria-label="Open menu"
@@ -226,6 +226,7 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
             {logo}
           </Link>
         </div>
+        <div className="h-10 w-10" aria-hidden="true" />
       </div>
 
       <div
