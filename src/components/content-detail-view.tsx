@@ -337,12 +337,12 @@ export function ContentDetailView({
           initial={{ opacity: 0, y: 100 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="fixed right-0 bottom-0 left-0 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl"
+          className="fixed right-0 bottom-0 left-0 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl md:pl-64"
         >
           {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
           <audio ref={audioRef} src={content.audioUrl} preload="metadata" />
 
-          <div className="mx-auto max-w-7xl px-4 py-4">
+          <div className="mx-auto max-w-4xl px-4 py-4">
             {/* Progress bar */}
             <div
               role="slider"
@@ -425,7 +425,7 @@ export function ContentDetailView({
               </div>
 
               {/* Spacer for layout balance */}
-              <div className="w-24" />
+              <div className="h-24 w-24" aria-hidden="true"></div>
             </div>
           </div>
         </motion.div>
