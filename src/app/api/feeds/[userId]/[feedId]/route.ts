@@ -125,7 +125,9 @@ export async function GET(
         summary: item.summary,
         url: item.url,
         published_at: item.published_at,
-        content_markdown: item.content_markdown,
+        // Use 'content' field from database, which contains HTML content
+        // Convert to markdown-friendly format by using content if available, otherwise summary
+        content_markdown: item.content || item.summary || '',
         source: item.source?.[0] ? { name: item.source[0].name } : undefined,
         audio: item.audio,
       }));

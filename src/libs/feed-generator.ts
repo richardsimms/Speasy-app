@@ -130,9 +130,11 @@ export async function generateRssFeedAsync(
         }
 
         // Create a rich HTML description with the full article content
-        // Convert markdown content to HTML
+        // Content may already be HTML (from 'content' field) or markdown (from 'content_markdown' field)
         const content = item.content_markdown || item.summary || '';
-        const convertedHtml = converter.makeHtml(content);
+        // Check if content looks like HTML (starts with <) or is markdown
+        const isHtml = content.trim().startsWith('<');
+        const convertedHtml = isHtml ? content : converter.makeHtml(content);
         const htmlDescription = `
           <div class="podcast-content">
             <h1>${item.title}</h1>
