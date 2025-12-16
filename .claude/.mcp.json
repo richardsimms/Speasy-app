@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--project-ref=lmmobnqmxkcdwdhhpwwd"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "sbp_3564af3599794dfa3a045e5c75b292a968866349"
+      }
+    },
+    "pd": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "supergateway",
+        "--sse",
+        "https://mcp.pipedream.net/72eef5ad-7043-4fb5-9b30-5e315e84920b/inoreader"
+      ]
+    }
+  }
+}

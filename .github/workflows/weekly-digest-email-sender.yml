@@ -1,0 +1,62 @@
+name: Weekly Digest Email Sender
+
+on:
+  schedule:
+    - cron: '0 11 * * 1' # Run every Monday at 11:00 UTC (2 hours after digest generation)
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  send-emails:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Weekly Digest Emails
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          SUPABASE_URL="https://lmmobnqmxkcdwdhhpwwd.supabase.co"
+
+          echo "📧 Starting weekly digest email sending..."
+
+          # Send emails for the current week
+          RESPONSE=$(curl -s \
+            -X POST \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+            -d '{"testMode": false}' \
+            "$SUPABASE_URL/functions/v1/weekly-digest-sender")
+
+          echo "Response: $RESPONSE"
+
+          # Check if response is valid JSON before parsing
+          if ! echo "$RESPONSE" | jq . >/dev/null 2>&1; then
+            echo "❌ Email sending failed - Invalid JSON response"
+            echo "Raw response: $RESPONSE"
+            exit 1
+          fi
+
+          # Check if email sending was successful
+          SUCCESS=$(echo "$RESPONSE" | jq -r '.success // false')
+          if [ "$SUCCESS" != "true" ]; then
+            echo "❌ Email sending failed"
+            echo "$RESPONSE"
+            exit 1
+          fi
+
+          # Log email sending results
+          SUCCESSFUL=$(echo "$RESPONSE" | jq -r '.summary.successful // 0')
+          SKIPPED=$(echo "$RESPONSE" | jq -r '.summary.skipped // 0')
+          ERRORS=$(echo "$RESPONSE" | jq -r '.summary.errors // 0')
+          TOTAL_USERS=$(echo "$RESPONSE" | jq -r '.summary.totalUsers // 0')
+
+          echo "📊 Email Summary:"
+          echo "  📤 Total users: $TOTAL_USERS"
+          echo "  ✅ Emails sent: $SUCCESSFUL"
+          echo "  ⏭️  Skipped: $SKIPPED"
+          echo "  ❌ Errors: $ERRORS"
+
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "⚠️ Some emails failed to send. Check logs for details."
+            # Don't exit with error for partial failures
+          fi
+
+          echo "🎉 Weekly digest email process completed!"

@@ -1,0 +1,247 @@
+name: Daily Content Cleanup
+
+on:
+  schedule:
+    # Run daily at 2:00 AM UTC (optimal for global user base)
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    # Allow manual triggering for testing and emergency cleanup
+    inputs:
+      dry_run:
+        description: Run in dry-run mode (no actual cleanup)
+        required: false
+        default: false
+        type: boolean
+      force_run:
+        description: Force run even if recent cleanup detected
+        required: false
+        default: false
+        type: boolean
+
+env:
+  # Use production Supabase project - configure via repository secrets
+  SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+  CLEANUP_FUNCTION_URL: https://${{ secrets.SUPABASE_PROJECT_REF }}.supabase.co/functions/v1/cleanup-expired-content
+
+jobs:
+  cleanup-expired-content:
+    name: Clean Up Expired Content
+    runs-on: ubuntu-latest
+    timeout-minutes: 15 # Reasonable timeout for cleanup operations
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # Shallow clone for faster execution
+
+      - name: Install dependencies
+        run: |
+          echo "📦 Installing required dependencies..."
+          sudo apt-get update -q
+          sudo apt-get install -y jq
+          echo "✅ Dependencies installed"
+
+      - name: Set up environment variables
+        run: |
+          echo "WORKFLOW_RUN_ID=${{ github.run_id }}" >> $GITHUB_ENV
+          echo "WORKFLOW_RUN_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+          echo "TRIGGERED_BY=${{ github.event_name }}" >> $GITHUB_ENV
+          echo "DRY_RUN=${{ github.event.inputs.dry_run || 'false' }}" >> $GITHUB_ENV
+          echo "FORCE_RUN=${{ github.event.inputs.force_run || 'false' }}" >> $GITHUB_ENV
+
+      - name: Validate environment
+        run: |
+          echo "🔍 Validating environment configuration..."
+
+          # Check required secrets
+          if [ -z "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then
+            echo "❌ SUPABASE_SERVICE_ROLE_KEY secret not configured"
+            exit 1
+          fi
+
+          if [ -z "${{ secrets.SUPABASE_PROJECT_REF }}" ]; then
+            echo "❌ SUPABASE_PROJECT_REF secret not configured"
+            exit 1
+          fi
+
+          # Log workflow context (without sensitive data)
+          echo "📋 Workflow Context:"
+          echo "  Run ID: $WORKFLOW_RUN_ID"
+          echo "  Run Number: $WORKFLOW_RUN_NUMBER"
+          echo "  Triggered by: $TRIGGERED_BY"
+          echo "  Dry run: $DRY_RUN"
+          echo "  Force run: $FORCE_RUN"
+          echo "  Supabase Project: $SUPABASE_PROJECT_REF"
+          echo "  Function URL: $CLEANUP_FUNCTION_URL"
+
+          echo "✅ Environment validation passed"
+
+      - name: Check recent cleanup runs
+        id: recent_check
+        if: env.FORCE_RUN != 'true'
+        run: |
+          echo "🕐 Checking for recent cleanup runs..."
+
+          # Check if cleanup ran in the last 20 hours (allows for some overlap)
+          TWENTY_HOURS_AGO=$(date -u -d '20 hours ago' '+%Y-%m-%dT%H:%M:%SZ')
+          echo "Looking for runs since: $TWENTY_HOURS_AGO"
+
+          # For now, we'll skip this check and always run
+          # In production, you could query Supabase logs or a tracking table
+          echo "⏭️ Skipping recent run check (not implemented)"
+          echo "should_run=true" >> $GITHUB_OUTPUT
+
+      - name: Execute cleanup function
+        id: cleanup
+        if: steps.recent_check.outputs.should_run == 'true' || env.FORCE_RUN == 'true'
+        run: |
+          echo "🧹 Starting content cleanup process..."
+          echo "⏰ Cleanup started at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+
+          # Prepare request payload
+          PAYLOAD=$(cat << EOF
+          {
+            "workflow_run_id": "$WORKFLOW_RUN_ID",
+            "workflow_run_number": "$WORKFLOW_RUN_NUMBER",
+            "triggered_by": "$TRIGGERED_BY",
+            "dry_run": $DRY_RUN,
+            "force_run": $FORCE_RUN
+          }
+          EOF
+          )
+
+          echo "📤 Calling cleanup function..."
+
+          # Make request to cleanup function with timeout and retry
+          RESPONSE=$(curl -X POST \
+            --silent \
+            --show-error \
+            --max-time 600 \
+            --retry 3 \
+            --retry-delay 5 \
+            --retry-max-time 900 \
+            --fail-with-body \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            -d "$PAYLOAD" \
+            "$CLEANUP_FUNCTION_URL")
+
+          CURL_EXIT_CODE=$?
+
+          if [ $CURL_EXIT_CODE -eq 0 ]; then
+            echo "✅ Cleanup function executed successfully"
+            echo "📊 Response:"
+
+            # Validate JSON response
+            if echo "$RESPONSE" | jq '.' >/dev/null 2>&1; then
+              echo "$RESPONSE" | jq '.'
+
+              # Parse key metrics from response
+              SUCCESS=$(echo "$RESPONSE" | jq -r '.success // "unknown"')
+              PROCESSED=$(echo "$RESPONSE" | jq -r '.statistics.total_processed // "unknown"')
+              DELETED=$(echo "$RESPONSE" | jq -r '.statistics.successfully_deleted // "unknown"')
+              DURATION=$(echo "$RESPONSE" | jq -r '.duration_ms // "unknown"')
+            else
+              echo "⚠️ Response is not valid JSON, displaying raw response:"
+              echo "$RESPONSE"
+
+              # Fallback parsing without jq
+              SUCCESS="unknown"
+              PROCESSED="unknown"
+              DELETED="unknown"
+              DURATION="unknown"
+            fi
+
+            echo "🎯 Cleanup Summary:"
+            echo "  Success: $SUCCESS"
+            echo "  Items processed: $PROCESSED"
+            echo "  Items deleted: $DELETED"
+            echo "  Duration: ${DURATION}ms"
+
+            # Export for use in subsequent steps
+            echo "cleanup_success=$SUCCESS" >> $GITHUB_OUTPUT
+            echo "items_processed=$PROCESSED" >> $GITHUB_OUTPUT
+            echo "items_deleted=$DELETED" >> $GITHUB_OUTPUT
+            echo "cleanup_duration=$DURATION" >> $GITHUB_OUTPUT
+            echo "cleanup_response<<EOF" >> $GITHUB_OUTPUT
+            echo "$RESPONSE" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+
+          else
+            echo "❌ Cleanup function failed (exit code: $CURL_EXIT_CODE)"
+            echo "📋 Error response:"
+            echo "$RESPONSE"
+
+            # Export failure info
+            echo "cleanup_success=false" >> $GITHUB_OUTPUT
+            echo "error_message=$RESPONSE" >> $GITHUB_OUTPUT
+
+            exit 1
+          fi
+
+      - name: Validate cleanup results
+        if: steps.cleanup.outputs.cleanup_success == 'true'
+        run: |
+          echo "🔍 Validating cleanup results..."
+
+          PROCESSED=${{ steps.cleanup.outputs.items_processed }}
+          DELETED=${{ steps.cleanup.outputs.items_deleted }}
+
+          if [ "$PROCESSED" = "unknown" ] || [ "$DELETED" = "unknown" ]; then
+            echo "⚠️ Unable to parse cleanup metrics"
+          elif [ "$PROCESSED" = "0" ]; then
+            echo "✅ No expired content found - database is clean"
+          elif [ "$DELETED" = "$PROCESSED" ]; then
+            echo "✅ All expired content successfully processed"
+          else
+            FAILED=$((PROCESSED - DELETED))
+            echo "⚠️ Partial success: $FAILED items failed to process"
+
+            if [ $FAILED -gt 10 ]; then
+              echo "❌ Too many failures ($FAILED) - investigation required"
+              exit 1
+            fi
+          fi
+
+          echo "✅ Cleanup results validation passed"
+
+      - name: Report completion
+        if: always()
+        run: |
+          echo "📈 Content Cleanup Workflow Complete"
+          echo "⏰ Completed at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+
+          if [ "${{ steps.cleanup.outputs.cleanup_success }}" = "true" ]; then
+            echo "🎉 Status: SUCCESS"
+            echo "📊 Processed: ${{ steps.cleanup.outputs.items_processed }} items"
+            echo "🗑️ Deleted: ${{ steps.cleanup.outputs.items_deleted }} items"
+            echo "⏱️ Duration: ${{ steps.cleanup.outputs.cleanup_duration }}ms"
+          elif [ "${{ steps.cleanup.conclusion }}" = "skipped" ]; then
+            echo "⏭️ Status: SKIPPED (recent run detected)"
+          else
+            echo "❌ Status: FAILED"
+            echo "🔍 Check logs above for error details"
+          fi
+
+      - name: Cleanup on failure
+        if: failure()
+        run: |
+          echo "🚨 Workflow failed - performing cleanup actions..."
+
+          # Log failure context
+          echo "📋 Failure Context:"
+          echo "  Workflow: ${{ github.workflow }}"
+          echo "  Run ID: ${{ github.run_id }}"
+          echo "  Run Number: ${{ github.run_number }}"
+          echo "  Triggered by: ${{ github.event_name }}"
+          echo "  Repository: ${{ github.repository }}"
+          echo "  Ref: ${{ github.ref }}"
+
+          # Note: In production, you might want to:
+          # - Send notifications to monitoring systems
+          # - Create incident tickets
+          # - Update status dashboards
+
+          echo "🔔 Failure logging complete"
+          echo "💡 Consider investigating manually or triggering force_run"

@@ -60,6 +60,8 @@
     "react-dom": "^19.2.3",
     "react-hook-form": "^7.68.0",
     "react-markdown": "^10.1.0",
+    "showdown": "^2.1.0",
+    "supabase": "^2.67.1",
     "svix": "^1.82.0",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.1.13"
@@ -87,6 +89,7 @@
     "@types/node": "^24.10.3",
     "@types/pg": "^8.16.0",
     "@types/react": "^19.2.7",
+    "@types/showdown": "^2.0.6",
     "@vitejs/plugin-react": "^5.1.2",
     "@vitest/browser": "^4.0.15",
     "@vitest/browser-playwright": "^4.0.15",

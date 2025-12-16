@@ -128,7 +128,15 @@ export function ContentDetailView({
       audio.removeEventListener('loadstart', handleLoadStart);
       audio.removeEventListener('canplay', handleCanPlay);
     };
-  }, []);
+  }, [
+    trackContentPlayCompleted,
+    userId,
+    content.id,
+    content.title,
+    content.category,
+    surface,
+    experimentVariant,
+  ]);
 
   const togglePlay = async () => {
     const audio = audioRef.current;
@@ -425,7 +433,7 @@ export function ContentDetailView({
               </div>
 
               {/* Spacer for layout balance */}
-              <div className="h-24 w-24" aria-hidden="true"></div>
+              <div className="w-8 md:block md:w-24" aria-hidden="true"></div>
             </div>
           </div>
         </motion.div>

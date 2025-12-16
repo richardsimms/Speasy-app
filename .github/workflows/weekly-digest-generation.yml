@@ -1,0 +1,84 @@
+name: Weekly Digest Generation
+
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Run every Monday at 09:00 UTC
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  generate-digests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Weekly Digests in Batches
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          SUPABASE_URL="https://lmmobnqmxkcdwdhhpwwd.supabase.co"
+          BATCH_SIZE=1
+          OFFSET=0
+          HAS_MORE=true
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          PROCESSED=0
+          TOTAL=0
+
+          echo "🚀 Starting batch processing of weekly digest generation..."
+
+          while [ "$HAS_MORE" = "true" ]; do
+            echo "📦 Processing batch: offset=$OFFSET, size=$BATCH_SIZE"
+
+            # Make the request
+            RESPONSE=$(curl -s \
+              -X POST \
+              -H "Content-Type: application/json" \
+              -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+              -d "{\"batchSize\": $BATCH_SIZE, \"batchOffset\": $OFFSET}" \
+              "$SUPABASE_URL/functions/v1/weekly-digest")
+
+            echo "Response: $RESPONSE"
+
+            # Check if request was successful
+            SUCCESS=$(echo "$RESPONSE" | jq -r '.success // false')
+            if [ "$SUCCESS" != "true" ]; then
+              echo "❌ Batch failed, retrying ($RETRY_COUNT/$MAX_RETRIES)"
+              RETRY_COUNT=$((RETRY_COUNT+1))
+              if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+                echo "❌ Batch failed after $MAX_RETRIES retries, skipping this batch."
+                OFFSET=$(($OFFSET + $BATCH_SIZE))
+                RETRY_COUNT=0
+              else
+                sleep 5
+                continue
+              fi
+            else
+              RETRY_COUNT=0
+            fi
+
+            # Log processed, skipped, and errored categories
+            PROCESSED_BATCH=$(echo "$RESPONSE" | jq -r '.processedCategories // 0')
+            PROCESSED=$((PROCESSED + PROCESSED_BATCH))
+            SKIPPED=$(echo "$RESPONSE" | jq -r '.results[] | select(.status=="skipped") | .category' | wc -l)
+            ERRORED=$(echo "$RESPONSE" | jq -r '.results[] | select(.status=="error") | .category' | wc -l)
+            echo "✅ Processed in this batch: $PROCESSED_BATCH, Skipped: $SKIPPED, Errors: $ERRORED"
+
+            # Check if there are more batches to process
+            HAS_MORE=$(echo "$RESPONSE" | jq -r '.batchInfo.hasMore // false')
+            TOTAL=$(echo "$RESPONSE" | jq -r '.batchInfo.totalCategories // 0')
+
+            if [ "$HAS_MORE" = "true" ]; then
+              OFFSET=$(echo "$RESPONSE" | jq -r '.batchInfo.nextOffset')
+              echo "➡️ Moving to next batch with offset: $OFFSET"
+              echo "⏳ Waiting 10 seconds before next batch..."
+              sleep 10
+            else
+              echo "🎉 All batches completed!"
+              break
+            fi
+          done
+
+          echo "📊 Final summary: $PROCESSED out of $TOTAL categories processed."
+          if [ "$PROCESSED" -lt "$TOTAL" ]; then
+            echo "⚠️ Warning: Not all categories were processed. Please check logs for errors or skipped batches."
+            exit 1
+          fi
+          echo "✅ Weekly digest generation completed."

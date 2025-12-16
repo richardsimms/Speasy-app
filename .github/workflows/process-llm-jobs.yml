@@ -1,0 +1,19 @@
+name: Process LLM Jobs
+
+on:
+  schedule:
+    - cron: '0/15 * * * *' # Run every 15 mins
+  workflow_dispatch: # Allow manual triggering of the workflow
+
+jobs:
+  run-edge-function:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Edge Function
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          curl -L -X POST 'https://lmmobnqmxkcdwdhhpwwd.supabase.co/functions/v1/process_llm_job' \
+            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+            -H 'Content-Type: application/json' \
+            --data '{"name":"Functions"}'
