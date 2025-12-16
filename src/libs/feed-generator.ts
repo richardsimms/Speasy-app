@@ -48,7 +48,7 @@ export const CONFIG = {
     },
     article: (id: string) => `${CONFIG.getBaseUrl()}/content/${id}`,
     feed: (userId: string, feedId: string) => `${CONFIG.getBaseUrl()}/api/feeds/${userId}/${feedId}`,
-    cover: (userId: string) => `${CONFIG.getBaseUrl()}/api/feed-image/${userId}`,
+    cover: () => `${CONFIG.getBaseUrl()}/poster.png`,
   },
 };
 
@@ -200,11 +200,11 @@ export async function generateRssFeedAsync(
     </itunes:owner>
 
     <image>
-      <url>${CONFIG.urls.cover(userId)}</url>
+      <url>${CONFIG.urls.cover()}</url>
       <title>${escapeXml(title)}</title>
       <link>${CONFIG.getBaseUrl()}</link>
     </image>
-    <itunes:image href="${CONFIG.urls.cover(userId)}"/>
+    <itunes:image href="${CONFIG.urls.cover()}"/>
 
     <atom:link href="${CONFIG.urls.feed(userId, feedId)}" rel="self" type="application/rss+xml"/>
 

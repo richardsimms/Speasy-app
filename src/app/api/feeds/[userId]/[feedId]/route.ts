@@ -17,12 +17,19 @@ export async function GET(
     const supabase = createAdminClient();
 
     // Find feed for this user and feedId
-    const { data: feed, error: feedError } = await supabase
+    // If feedId is "default", look for is_default=true, otherwise match feed_url ending
+    let feedQuery = supabase
       .from('podcast_feeds')
       .select('*')
-      .eq('user_id', userId)
-      .eq('feed_url', feedId)
-      .single();
+      .eq('user_id', userId);
+
+    if (feedId === 'default') {
+      feedQuery = feedQuery.eq('is_default', true);
+    } else {
+      feedQuery = feedQuery.ilike('feed_url', `%/${feedId}`);
+    }
+
+    const { data: feed, error: feedError } = await feedQuery.single();
 
     if (!feed || feedError) {
       logger.error('Feed fetch error', { error: feedError, userId, feedId });
