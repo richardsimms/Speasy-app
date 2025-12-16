@@ -31,8 +31,13 @@ export async function GET(
 
     const { data: feed, error: feedError } = await feedQuery.single();
 
-    if (!feed || feedError) {
+    if (feedError) {
       logger.error('Feed fetch error', { error: feedError, userId, feedId });
+      return new NextResponse(`Feed not found: ${feedError.message}`, { status: 404 });
+    }
+
+    if (!feed) {
+      logger.error('Feed not found', { userId, feedId });
       return new NextResponse('Feed not found', { status: 404 });
     }
 
@@ -138,7 +143,15 @@ export async function GET(
       },
     });
   } catch (error) {
-    logger.error('Error generating feed', { error, userId, feedId });
-    return new NextResponse('Error generating feed', { status: 500 });
+    logger.error('Error generating feed', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      userId,
+      feedId,
+    });
+    return new NextResponse(
+      `Error generating feed: ${error instanceof Error ? error.message : String(error)}`,
+      { status: 500 },
+    );
   }
 }

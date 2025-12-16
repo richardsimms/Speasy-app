@@ -24,7 +24,7 @@ export const CONFIG = {
     if (typeof window !== 'undefined') {
       return window.location.origin;
     }
-    return process.env.NEXT_PUBLIC_URL || 'https://speasy.app';
+    return process.env.NEXT_PUBLIC_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://www.speasy.app';
   },
 
   // Specific URL generators
