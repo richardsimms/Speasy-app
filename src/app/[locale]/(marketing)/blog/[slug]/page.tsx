@@ -42,13 +42,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <section className="w-full py-12">
         <div className="container px-4 md:px-6">
           <div className="mx-auto max-w-3xl">
-            {/* Category badge */}
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-2">
-              <span className="h-2 w-2 rounded-full bg-blue-500" />
-              <span className="text-sm font-medium tracking-wider text-white/70 uppercase">
-                {post.category}
-              </span>
-            </div>
             <PageHeader title={post.title} />
             <div className="mb-4 flex items-center gap-4 text-sm text-white/60">
               <Calendar className="h-4 w-4" />
@@ -56,7 +49,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <time dateTime={post.published_at}>{formatDate(post.published_at)}</time>
               </span>
               <span className="mx-2">•</span>
-              <span>{post.author}</span>
+              <span>{post.category}</span>
             </div>
 
             <Markdown content={post.content} />
