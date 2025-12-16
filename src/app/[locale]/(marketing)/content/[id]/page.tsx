@@ -75,6 +75,8 @@ export default async function ContentDetail(props: ContentDetailProps) {
       image_url,
       created_at,
       url,
+      source_name,
+      source_url,
       content_item_tags(
         categories(
           name
@@ -82,7 +84,8 @@ export default async function ContentDetail(props: ContentDetailProps) {
       ),
       content_sources(
         name,
-        url
+        url,
+        category_id
       ),
       audio_files(
         file_url,
@@ -98,24 +101,14 @@ export default async function ContentDetail(props: ContentDetailProps) {
     notFound();
   }
 
-  // Get category from tags or content source
+  // Get category from tags (don't use source name as category fallback)
   let categoryName = 'Uncategorized';
   const firstTag = item.content_item_tags?.[0] as any;
   if (firstTag?.categories?.name) {
     categoryName = firstTag.categories.name;
-  } else if (item.content_sources) {
-    const source = Array.isArray(item.content_sources)
-      ? item.content_sources[0]
-      : item.content_sources;
-    if (source?.name) {
-      categoryName = source.name;
-    }
   }
 
   const audioFile = item.audio_files?.[0];
-  const source = Array.isArray(item.content_sources)
-    ? item.content_sources[0]
-    : item.content_sources;
 
   const contentData = {
     id: item.id,
@@ -127,8 +120,9 @@ export default async function ContentDetail(props: ContentDetailProps) {
     audioUrl: audioFile?.file_url || null,
     duration: audioFile?.duration || null,
     sourceUrl: item.url,
-    sourceName: source?.name || null,
-    sourceLink: source?.url || null,
+    // Use source_name and source_url directly from content_items table
+    sourceName: item.source_name || null,
+    sourceLink: item.source_url || null,
     createdAt: item.created_at,
   };
 

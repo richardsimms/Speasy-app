@@ -219,16 +219,9 @@ export function ContentDetailView({
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          {/* Category badge */}
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/5 px-4 py-2">
-            <span className="h-2 w-2 rounded-full bg-blue-500" />
-            <span className="text-sm font-medium tracking-wider text-white/70 uppercase">
-              {content.category}
-            </span>
-          </div>
 
           {/* Title */}
-          <h1 className="mb-4 text-4xl leading-tight font-bold text-white md:text-5xl">
+          <h1 className="mb-4 font-serif text-2xl leading-tight text-white md:text-4xl">
             {content.title}
           </h1>
 
