@@ -96,6 +96,8 @@ export function ContentGridCard({
     });
   };
 
+  const isFeaturedCard = surface === 'home' && index === 0;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -123,7 +125,9 @@ export function ContentGridCard({
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  unoptimized={imageUrl.startsWith('http')}
+                  priority={isFeaturedCard}
+                  fetchPriority={isFeaturedCard ? 'high' : 'auto'}
+                  quality={70}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent" />
 
