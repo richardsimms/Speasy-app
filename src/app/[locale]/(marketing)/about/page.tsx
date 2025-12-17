@@ -197,7 +197,7 @@ export default function AboutPage() {
                     },
                   ].map((item, index) => (
                     <motion.div
-                      key={index}
+                      key={item.text}
                       initial={{ opacity: 0, x: -10 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
@@ -249,7 +249,7 @@ export default function AboutPage() {
                   'Respect your attention, privacy, and pace',
                 ].map((mission, index) => (
                   <motion.div
-                    key={index}
+                    key={mission}
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -312,7 +312,7 @@ export default function AboutPage() {
                     },
                   ].map((item, index) => (
                     <motion.div
-                      key={index}
+                      key={item.text}
                       initial={{ opacity: 0, x: -10 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
@@ -374,7 +374,7 @@ export default function AboutPage() {
                   },
                 ].map((item, index) => (
                   <motion.div
-                    key={index}
+                    key={item.q}
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
@@ -439,7 +439,7 @@ export default function AboutPage() {
                   },
                 ].map((value, index) => (
                   <motion.div
-                    key={index}
+                    key={value.title}
                     initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: '-50px' }}
