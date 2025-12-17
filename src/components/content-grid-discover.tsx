@@ -180,11 +180,11 @@ export function ContentGridDiscover({
         aria-label="Content categories"
         className="-mx-4 flex w-full max-w-full items-center overflow-x-auto px-4 pt-2 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        <div className="relative inline-flex min-w-max items-center gap-8">
+        <div className="relative inline-flex min-w-max  items-center gap-8">
           {/* Animated hover/active background */}
           {indicatorStyle.width > 0 && (
             <div
-              className="pointer-events-none absolute inset-y-0 rounded-lg border border-white/20 bg-white/10 transition-all duration-300 ease-out"
+              className="pointer-events-none absolute inset-y-0 cursor-pointer rounded-lg border border-white/20 bg-white/10 transition-all duration-300 ease-out"
               style={{
                 transform: `translateX(${indicatorStyle.left}px)`,
                 width: `${indicatorStyle.width}px`,
@@ -225,7 +225,7 @@ export function ContentGridDiscover({
                 onKeyDown={e => handleTabKeyDown(e, tab.id)}
                 style={{ touchAction: 'manipulation' }}
                 className={cn(
-                  'relative z-10 inline-flex w-max shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-4 py-3 font-medium transition-colors',
+                  'relative z-10 inline-flex w-max shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-lg px-4 py-3 font-medium transition-colors',
                   'min-h-[44px]',
                   'focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]',
                   'active:scale-95',
