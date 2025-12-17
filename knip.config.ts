@@ -7,6 +7,7 @@ const config: KnipConfig = {
     'src/libs/I18n.ts',
     'src/types/I18n.ts',
     'src/utils/Helpers.ts',
+    'src/components/ui/card.tsx', // UI component library - components exported for use
     'tests/**/*.ts',
   ],
   // Dependencies to ignore during analysis
