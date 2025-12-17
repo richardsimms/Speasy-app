@@ -35,6 +35,11 @@ export default defineConfig<ChromaticConfig>({
     reuseExistingServer: !process.env.CI,
     env: {
       NEXT_PUBLIC_SENTRY_DISABLED: 'true',
+      // Pass through environment variables from parent process (GitHub Actions secrets)
+      // These will be available from the Docker container environment when CI runs
+      CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY || '',
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '',
+      DATABASE_URL: process.env.DATABASE_URL || '',
     },
   },
 

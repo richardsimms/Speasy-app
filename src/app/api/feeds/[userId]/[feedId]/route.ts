@@ -41,40 +41,8 @@ export async function GET(
       return new NextResponse('Feed not found', { status: 404 });
     }
 
-    // Handle user preferences and ensure defaults exist for new users
-    try {
-      const {
-        getUserPreferencesWithDefaults,
-        createDefaultPreferences,
-        // @ts-expect-error - preferences-server may not exist, handled in catch
-      } = await import('@/libs/preferences-server');
-
-      // This will return defaults if user has no preferences
-      const userPreferences = await getUserPreferencesWithDefaults(userId);
-
-      // If no preferences were found, try to create defaults
-      if (
-        !userPreferences.categoryPreferences
-        || userPreferences.categoryPreferences.length === 0
-      ) {
-        // Get user email for profile creation
-        const { data: authUser }
-          = await supabase.auth.admin.getUserById(userId);
-        if (authUser.user?.email) {
-          await createDefaultPreferences(userId, authUser.user.email);
-          logger.info('Created default preferences for user during feed generation', {
-            userId,
-          });
-        }
-      }
-    } catch (preferencesError) {
-      logger.warn('Error handling user preferences during feed generation', {
-        error: preferencesError,
-        userId,
-        feedId,
-      });
-      // Continue with feed generation even if preferences fail
-    }
+    // Note: User preferences handling removed as preferences-server module doesn't exist
+    // Feed generation continues with default behavior
 
     const { data: subscriptions } = await supabase
       .from('user_category_subscriptions')

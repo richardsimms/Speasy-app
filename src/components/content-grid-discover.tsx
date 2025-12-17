@@ -169,9 +169,6 @@ export function ContentGridDiscover({
       {/* Header */}
       <div className="mb-2">
         <h1 className="mb-3 font-serif text-5xl leading-tight text-white">Discover</h1>
-        <p className="text-lg text-white/70">
-          Explore the latest audio content curated for you
-        </p>
       </div>
 
       {/* Tab Navigation */}
