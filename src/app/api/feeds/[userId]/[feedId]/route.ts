@@ -97,7 +97,7 @@ export async function GET(
         .eq('status', 'done') // Only include processed, non-archived content
         .in('source.category_id', subscribedCategoryIds)
         .order('created_at', { ascending: false })
-        .limit(10);
+        .limit(100); // Fetch more items to account for filtering
 
       latestContent = contentItems ?? [];
     }
@@ -112,13 +112,15 @@ export async function GET(
         `)
         .eq('status', 'done') // Only include processed, non-archived content
         .order('created_at', { ascending: false })
-        .limit(10);
+        .limit(100); // Fetch more items to account for filtering
 
       latestContent = fallbackContent ?? [];
     }
 
+    // Filter for items with audio, then limit to 50 for RSS feed
     const contentItems: ContentItem[] = latestContent
       .filter(item => item.audio?.length > 0)
+      .slice(0, 50) // Limit to 50 items for RSS feed
       .map(item => ({
         id: item.id,
         title: item.title,
