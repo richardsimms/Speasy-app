@@ -12,6 +12,7 @@ type ContentItem = {
   imageUrl: string | null;
   category: string;
   duration: number | null;
+  keyInsight: string[] | null;
   created_at: string;
 };
 
@@ -61,36 +62,13 @@ export function ContentGridDiscover({
   const allItems = categories.flatMap(cat => cat.items);
 
   // Get "Latest" items (most recent, limit to 20)
-  // Sort by date first (newest first), then by title alphabetically
-  // For items on the same day, sort by title to interweave content
+  // Sort by full timestamp (newest first)
   const latestItems = [...allItems]
     .sort((a, b) => {
-      const dateA = new Date(a.created_at ?? 0);
-      const dateB = new Date(b.created_at ?? 0);
-
-      // Compare dates by day (ignoring time) for primary sort
-      const dateA_day = new Date(
-        dateA.getFullYear(),
-        dateA.getMonth(),
-        dateA.getDate(),
-      ).getTime();
-      const dateB_day = new Date(
-        dateB.getFullYear(),
-        dateB.getMonth(),
-        dateB.getDate(),
-      ).getTime();
-
-      // Primary sort: by date (newest first)
-      const dateDiff = dateB_day - dateA_day;
-      if (dateDiff !== 0) {
-        return dateDiff;
-      }
-
-      // Secondary sort: by title alphabetically (case-insensitive) when same day
-      return a.title.localeCompare(b.title, undefined, {
-        sensitivity: 'base',
-        numeric: true,
-      });
+      const dateA = new Date(a.created_at ?? 0).getTime();
+      const dateB = new Date(b.created_at ?? 0).getTime();
+      // Sort by full timestamp (newest first)
+      return dateB - dateA;
     })
     .slice(0, 20);
 
@@ -179,7 +157,7 @@ export function ContentGridDiscover({
   if (categories.length === 0) {
     return (
       <div className="py-20 text-center">
-        <p className="text-muted-foreground">
+        <p className="text-white/70">
           No content available yet. Check back soon!
         </p>
       </div>
@@ -190,7 +168,7 @@ export function ContentGridDiscover({
     <div className="space-y-8">
       {/* Header */}
       <div className="mb-2">
-        <h1 className="mb-3 text-5xl font-bold text-white">Discover</h1>
+        <h1 className="mb-3 font-serif text-5xl leading-tight text-white">Discover</h1>
         <p className="text-lg text-white/70">
           Explore the latest audio content curated for you
         </p>
@@ -307,9 +285,11 @@ export function ContentGridDiscover({
                   id={item.id}
                   title={item.title}
                   summary={item.summary}
+                  keyInsight={item.keyInsight}
                   imageUrl={item.imageUrl}
                   category={item.category}
                   duration={item.duration}
+                  createdAt={item.created_at}
                   index={index}
                   locale={locale}
                   surface={surface}

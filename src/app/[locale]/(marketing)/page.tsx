@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { ContentGridDiscover } from '@/components/content-grid-discover';
 import { Env } from '@/libs/Env';
+import { logger } from '@/libs/Logger';
 import { getSupabaseAdmin } from '@/libs/Supabase';
 
 // Force dynamic rendering since this page requires user-specific data
@@ -47,7 +48,9 @@ export default async function Dashboard(props: {
 
   const supabase = getSupabaseAdmin();
 
-  // Fetch content items with categories and audio files
+  // Fetch content items with audio files
+  // Query from content_items and use !inner join to audio_files to ensure only items with audio
+  // Order by created_at DESC to get newest items first
   const { data: contentItems, error } = await supabase
     .from('content_items')
     .select(
@@ -55,8 +58,10 @@ export default async function Dashboard(props: {
       id,
       title,
       summary,
+      key_insights,
       image_url,
       created_at,
+      status,
       content_item_tags(
         categories(
           name
@@ -65,7 +70,7 @@ export default async function Dashboard(props: {
       content_sources(
         name
       ),
-      audio_files(
+      audio_files!inner(
         file_url,
         duration
       )
@@ -76,11 +81,14 @@ export default async function Dashboard(props: {
     .limit(50);
 
   if (error) {
+    logger.error('Error fetching content items with audio', { error: error.message });
     return (
       <div className="mx-auto max-w-7xl px-4 py-8">
         <h1 className="mb-8 text-4xl font-bold text-white">Discover</h1>
         <p className="text-red-500">
-          Error loading content. Please try again later.
+          Error loading content:
+          {' '}
+          {error.message}
         </p>
       </div>
     );
@@ -93,6 +101,7 @@ export default async function Dashboard(props: {
       id: string;
       title: string;
       summary: string | null;
+      keyInsight: string[] | null;
       imageUrl: string | null;
       category: string;
       duration: number | null;
@@ -100,11 +109,13 @@ export default async function Dashboard(props: {
     }>
   >();
 
+  // Filter and transform content items
+  // Note: audio_files!inner ensures all returned items have at least one audio file
   contentItems?.forEach((item: any) => {
     // Get the first audio file (items can have multiple)
     const audioFile = item.audio_files?.[0];
 
-    // Skip items without audio files
+    // Skip items without audio files (shouldn't happen with !inner, but safety check)
     if (!audioFile) {
       return;
     }
@@ -127,7 +138,8 @@ export default async function Dashboard(props: {
       id: item.id,
       title: item.title,
       summary: item.summary,
-      imageUrl: item.image_url,
+      keyInsight: item.key_insights || null,
+      imageUrl: item.image_url && item.image_url.trim() !== '' ? item.image_url : null,
       created_at: item.created_at,
       category: categoryName,
       duration: audioFile.duration,
@@ -148,6 +160,7 @@ export default async function Dashboard(props: {
         id: string;
         title: string;
         summary: string | null;
+        keyInsight: string[] | null;
         imageUrl: string | null;
         category: string;
         duration: number | null;
@@ -181,10 +194,13 @@ export default async function Dashboard(props: {
     }))
     .sort((a, b) => a.categoryName.localeCompare(b.categoryName));
 
+  // Ensure we always pass an array, even if empty
+  const safeCategories = categories || [];
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 lg:px-8">
       <ContentGridDiscover
-        categories={categories}
+        categories={safeCategories}
         locale={locale}
         surface="home"
       />

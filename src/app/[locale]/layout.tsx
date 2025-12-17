@@ -38,8 +38,13 @@ export const metadata: Metadata = {
       url: '/favicon.ico',
     },
   ],
-  themeColor: '#0a090c',
 };
+
+export function generateViewport() {
+  return {
+    themeColor: '#0a090c',
+  };
+}
 
 export function generateStaticParams() {
   return routing.locales.map(locale => ({ locale }));
