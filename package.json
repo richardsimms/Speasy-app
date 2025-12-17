@@ -58,8 +58,8 @@
     "react-dom": "^19.2.3",
     "react-hook-form": "^7.68.0",
     "react-markdown": "^10.1.0",
+    "server-only": "^0.0.1",
     "showdown": "^2.1.0",
-    "supabase": "^2.67.1",
     "svix": "^1.82.0",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.1.13"
