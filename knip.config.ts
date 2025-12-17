@@ -11,10 +11,7 @@ const config: KnipConfig = {
   ],
   // Dependencies to ignore during analysis
   ignoreDependencies: [
-    '@commitlint/types',
-    '@clerk/types',
     'conventional-changelog-conventionalcommits',
-    'vite',
   ],
   // Binaries to ignore during analysis
   ignoreBinaries: [

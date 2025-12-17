@@ -150,6 +150,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
           restore-nextjs-cache: true
 
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
       - name: Run E2E tests
         uses: docker://mcr.microsoft.com/playwright:v1.56.1
         with:
