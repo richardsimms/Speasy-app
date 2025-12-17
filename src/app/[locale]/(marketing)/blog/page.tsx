@@ -4,7 +4,7 @@ import { getBlogPosts } from '@/libs/blog';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'Blog - Speasy',
+  title: 'Digests - Speasy',
   description: 'Latest news, updates, and insights from the Speasy team',
 };
 
@@ -16,7 +16,7 @@ export default async function BlogPage() {
       <div className="space-y-8">
         {/* Header */}
         <div className="mb-2">
-          <h1 className="mb-3 text-5xl font-bold text-white">Weekly digest</h1>
+          <h1 className="mb-3 font-serif text-5xl leading-tight text-white">Digests</h1>
           <p className="text-lg text-white/70">
             Stay up to date with the latest news from Speasy.
           </p>
