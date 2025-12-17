@@ -18,7 +18,7 @@ converter.setOption('simpleLineBreaks', true);
 converter.setOption('parseMetadata', true);
 
 // URL configuration object to centralize all URL handling
-export const CONFIG = {
+const CONFIG = {
   // Base URL for the application
   getBaseUrl: () => {
     if (typeof window !== 'undefined') {

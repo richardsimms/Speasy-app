@@ -176,32 +176,3 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost> {
   logger.error(`Blog post ${slug} not found in database or files`);
   notFound();
 }
-
-export async function getAllBlogSlugs(): Promise<string[]> {
-  try {
-    // Try admin client first for server-side rendering (has full access)
-    // Fall back to anon client if admin is not configured
-    let client;
-    try {
-      client = getSupabaseAdmin();
-    } catch {
-      // Admin client not configured, try anon client
-      client = getSupabaseClient();
-    }
-
-    if (client) {
-      const { data: posts, error } = await client
-        .from('blog_posts')
-        .select('slug')
-        .eq('is_published', true);
-
-      if (!error && posts && posts.length > 0) {
-        return posts.map(post => post.slug);
-      }
-    }
-  } catch (error) {
-    logger.error('Error fetching slugs from Supabase', { error });
-  }
-  const files = await getPostsFromFiles();
-  return files.map(p => p.slug);
-}

@@ -37,6 +37,11 @@ jobs:
         run: npm run build-local
         env:
           NEXT_PUBLIC_SENTRY_DISABLED: 'true' # Only upload Sentry source maps in deployment
+          # These are set by build:next:local via cross-env, but also set here for consistency
+          # The build-local script uses dummy values which are sufficient for CI builds
+          DATABASE_URL: postgresql://localhost:5433/postgres
+          CLERK_SECRET_KEY: dummy-clerk-secret-key-for-build
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_dummy-clerk-publishable-key-for-build
 
       - if: matrix.node-version == '22.x' && success()
         name: Cache Next.js build output
