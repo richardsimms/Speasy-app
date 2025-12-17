@@ -9,7 +9,10 @@ export default defineConfig({
   test: {
     coverage: {
       include: ['src/**/*'],
-      exclude: ['src/**/*.stories.{js,jsx,ts,tsx}'],
+      exclude: [
+        'src/**/*.stories.{js,jsx,ts,tsx}',
+        'src/**/*.md',
+      ],
     },
     projects: [
       {
@@ -17,7 +20,10 @@ export default defineConfig({
         test: {
           name: 'unit',
           include: ['src/**/*.test.{js,ts}'],
-          exclude: ['src/hooks/**/*.test.ts'],
+          exclude: [
+            'src/hooks/**/*.test.ts',
+            'src/**/*.md',
+          ],
           environment: 'node',
         },
       },

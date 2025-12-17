@@ -69,7 +69,7 @@ export type ContentItem = {
   content_markdown?: string;
 };
 
-export type FeedInfo = {
+type FeedInfo = {
   title: string;
   description: string;
   userId: string;
@@ -95,12 +95,7 @@ export async function generateRssFeedAsync(
     description,
     userId,
     feedId, // ← real UUID, not 'default'
-  }: {
-    title: string;
-    description: string;
-    userId: string;
-    feedId: string;
-  },
+  }: FeedInfo,
 ): Promise<string> {
   const now = new Date().toUTCString();
 
