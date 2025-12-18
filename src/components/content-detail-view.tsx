@@ -6,14 +6,13 @@ import {
   Calendar,
   Clock,
   ExternalLink,
-  Pause,
-  Play,
   SkipBack,
   SkipForward,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+import { usePlayback } from '@/components/playback/playback-provider';
 import { useContentAnalytics } from '@/hooks/useContentAnalytics';
 import { cn } from '@/libs/utils';
 
@@ -45,14 +44,54 @@ export function ContentDetailView({
   userId,
   experimentVariant,
 }: ContentDetailViewProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(content.duration || 0);
-  const [isLoading, setIsLoading] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const hasTrackedPlayStart = useRef(false);
+  const previousPositionRef = useRef(0);
   const { trackContentPlayStarted, trackContentPlayCompleted }
     = useContentAnalytics();
+  const {
+    activeTrack,
+    state,
+    playTrack,
+    togglePlay,
+    seek,
+    openPlayer,
+  } = usePlayback();
+
+  const track = useMemo(() => {
+    if (!content.audioUrl) {
+      return null;
+    }
+
+    return {
+      id: content.id,
+      title: content.title,
+      audioUrl: content.audioUrl,
+      author: content.sourceName || content.category,
+      artworkUrl: content.imageUrl ?? undefined,
+      durationSec: content.duration ?? undefined,
+      contentUrl: `/${locale}/content/${content.id}`,
+      sourceUrl: content.sourceUrl ?? undefined,
+    };
+  }, [
+    content.audioUrl,
+    content.category,
+    content.duration,
+    content.id,
+    content.imageUrl,
+    content.sourceName,
+    content.sourceUrl,
+    content.title,
+    locale,
+  ]);
+
+  const isActive = track
+    ? activeTrack?.id === track.id
+    : false;
+  const isPlaying = isActive && state.isPlaying;
+  const duration = isActive
+    ? state.durationSec ?? track?.durationSec ?? 0
+    : track?.durationSec ?? 0;
+  const currentTime = isActive ? state.currentTimeSec : 0;
 
   // Format time from seconds to MM:SS
   const formatTime = (seconds: number): string => {
@@ -75,25 +114,26 @@ export function ContentDetailView({
   };
 
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) {
+    if (!track || !isActive) {
+      hasTrackedPlayStart.current = false;
+      previousPositionRef.current = 0;
       return;
     }
 
-    const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
-    };
+    if (isPlaying && !hasTrackedPlayStart.current) {
+      trackContentPlayStarted({
+        user_id: userId,
+        content_name: content.title,
+        content_category: content.category,
+        content_id: content.id,
+        surface,
+        experiment_variant: experimentVariant,
+      });
+      hasTrackedPlayStart.current = true;
+    }
 
-    const handleLoadedMetadata = () => {
-      setDuration(audio.duration);
-      setIsLoading(false);
-    };
-
-    const handleEnded = () => {
-      setIsPlaying(false);
-      setCurrentTime(0);
-
-      // Track play completion
+    const previousPosition = previousPositionRef.current;
+    if (!isPlaying && previousPosition > 0 && state.currentTimeSec === 0) {
       trackContentPlayCompleted({
         user_id: userId,
         content_name: content.title,
@@ -102,100 +142,80 @@ export function ContentDetailView({
         surface,
         experiment_variant: experimentVariant,
       });
-
-      // Reset play start tracking for next playthrough
       hasTrackedPlayStart.current = false;
-    };
+    }
 
-    const handleLoadStart = () => {
-      setIsLoading(true);
-    };
-
-    const handleCanPlay = () => {
-      setIsLoading(false);
-    };
-
-    audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('loadstart', handleLoadStart);
-    audio.addEventListener('canplay', handleCanPlay);
-
-    return () => {
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('loadstart', handleLoadStart);
-      audio.removeEventListener('canplay', handleCanPlay);
-    };
+    previousPositionRef.current = state.currentTimeSec;
   }, [
-    trackContentPlayCompleted,
-    userId,
+    content.category,
     content.id,
     content.title,
-    content.category,
-    surface,
     experimentVariant,
+    isActive,
+    isPlaying,
+    state.currentTimeSec,
+    surface,
+    track,
+    trackContentPlayCompleted,
+    trackContentPlayStarted,
+    userId,
   ]);
 
-  const togglePlay = async () => {
-    const audio = audioRef.current;
-    if (!audio) {
+  const handleTogglePlay = async () => {
+    if (!track) {
       return;
     }
 
-    if (isPlaying) {
-      audio.pause();
-      setIsPlaying(false);
-    } else {
-      try {
-        await audio.play();
-        setIsPlaying(true);
-
-        // Track play start (only once per session)
-        if (!hasTrackedPlayStart.current) {
-          trackContentPlayStarted({
-            user_id: userId,
-            content_name: content.title,
-            content_category: content.category,
-            content_id: content.id,
-            surface,
-            experiment_variant: experimentVariant,
-          });
-          hasTrackedPlayStart.current = true;
-        }
-      } catch {
-        setIsPlaying(false);
-      }
+    if (!isActive) {
+      await playTrack(track, [track]);
+      return;
     }
+
+    await togglePlay();
   };
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    const audio = audioRef.current;
-    if (!audio || !duration) {
+  const handleSeek = async (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!duration || !track) {
       return;
     }
 
     const rect = e.currentTarget.getBoundingClientRect();
     const percent = (e.clientX - rect.left) / rect.width;
     const newTime = percent * duration;
-    audio.currentTime = newTime;
-    setCurrentTime(newTime);
+
+    if (!isActive) {
+      await playTrack(track, [track]);
+    }
+    seek(newTime);
   };
 
-  const skipTime = (seconds: number) => {
-    const audio = audioRef.current;
-    if (!audio) {
+  const skipTime = async (seconds: number) => {
+    if (!track || !duration) {
       return;
     }
 
-    audio.currentTime = Math.max(
-      0,
-      Math.min(duration, audio.currentTime + seconds),
-    );
+    const baseTime = isActive ? state.currentTimeSec : 0;
+    const newTime = Math.max(0, Math.min(duration, baseTime + seconds));
+
+    if (!isActive) {
+      await playTrack(track, [track]);
+    }
+    seek(newTime);
   };
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const handleOpenPlayer = async () => {
+    if (!track) {
+      return;
+    }
+    if (!isActive) {
+      await playTrack(track, [track]);
+    }
+    openPlayer();
+  };
+
+  const progress = duration > 0
+    ? (currentTime / duration) * 100
+    : 0;
 
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
@@ -340,9 +360,6 @@ export function ContentDetailView({
           transition={{ duration: 0.5, delay: 0.5 }}
           className="fixed right-0 bottom-0 left-0 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl md:pl-64"
         >
-          {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-          <audio ref={audioRef} src={content.audioUrl} preload="metadata" />
-
           <div className="mx-auto max-w-4xl px-4 py-4">
             {/* Progress bar */}
             <div
@@ -356,9 +373,9 @@ export function ContentDetailView({
               onClick={handleSeek}
               onKeyDown={(e) => {
                 if (e.key === 'ArrowLeft') {
-                  skipTime(-5);
+                  void skipTime(-5);
                 } else if (e.key === 'ArrowRight') {
-                  skipTime(5);
+                  void skipTime(5);
                 }
               }}
             >
@@ -384,7 +401,7 @@ export function ContentDetailView({
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => skipTime(-10)}
+                  onClick={() => void skipTime(-10)}
                   className="text-white/70 transition-colors hover:text-white"
                   aria-label="Skip back 10 seconds"
                 >
@@ -394,34 +411,44 @@ export function ContentDetailView({
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={togglePlay}
-                  disabled={isLoading}
+                  onClick={handleTogglePlay}
+                  disabled={!track}
                   className={cn(
                     'flex h-14 w-14 items-center justify-center rounded-full transition-all',
                     isPlaying
                       ? 'bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.3)]'
                       : 'bg-white/10 text-white hover:bg-white hover:text-black',
-                    isLoading && 'opacity-50',
+                    !track && 'opacity-50',
                   )}
                   aria-label={isPlaying ? 'Pause' : 'Play'}
                 >
                   {isPlaying
                     ? (
-                        <Pause className="h-6 w-6 fill-current" />
+                        <span className="text-lg font-semibold">❚❚</span>
                       )
                     : (
-                        <Play className="ml-1 h-6 w-6 fill-current" />
+                        <span className="ml-0.5 text-lg font-semibold">►</span>
                       )}
                 </motion.button>
 
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
-                  onClick={() => skipTime(10)}
+                  onClick={() => void skipTime(10)}
                   className="text-white/70 transition-colors hover:text-white"
                   aria-label="Skip forward 10 seconds"
                 >
                   <SkipForward className="h-5 w-5" />
+                </motion.button>
+
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => void handleOpenPlayer()}
+                  className="hidden rounded-full border border-white/20 px-4 py-2 text-sm font-medium text-white transition-colors hover:border-white/40 md:inline-flex"
+                  aria-label="Open player"
+                >
+                  Open player
                 </motion.button>
               </div>
 

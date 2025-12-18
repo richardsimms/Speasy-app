@@ -11,6 +11,7 @@ import { notFound } from 'next/navigation';
 
 import { PostHogProvider } from '@/components/analytics/PostHogProvider';
 import { LocaleSwitcher } from '@/components/LocaleSwitcher';
+import { PlaybackProvider } from '@/components/playback/playback-provider';
 import { routing } from '@/libs/I18nRouting';
 import { BaseTemplate } from '@/templates/BaseTemplate';
 import '@/styles/global.css';
@@ -88,80 +89,82 @@ export default async function RootLayout(props: {
       <body className="font-sans antialiased">
         <NextIntlClientProvider>
           <PostHogProvider>
-            <SpeedInsights />
-            {isMarketingRoute
-              ? (
-                // Marketing routes: render children directly (they have their own layout with sidebar)
-                  <div>{props.children}</div>
-                )
-              : (
-                // Other routes: use BaseTemplate with navigation
-                  <BaseTemplate
-                    leftNav={(
-                      <>
-                        <li>
-                          <Link
-                            href="/"
-                            className="border-none text-gray-700 hover:text-gray-900"
-                          >
-                            {t('home_link')}
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/about/"
-                            className="border-none text-gray-700 hover:text-gray-900"
-                          >
-                            {t('about_link')}
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/portfolio/"
-                            className="border-none text-gray-700 hover:text-gray-900"
-                          >
-                            {t('portfolio_link')}
-                          </Link>
-                        </li>
-                        <li>
-                          <a
-                            className="border-none text-gray-700 hover:text-gray-900"
-                            href="https://github.com/ixartz/Next-js-Boilerplate"
-                          >
-                            GitHub
-                          </a>
-                        </li>
-                      </>
-                    )}
-                    rightNav={(
-                      <>
-                        <li>
-                          <Link
-                            href="/sign-in/"
-                            className="border-none text-gray-700 hover:text-gray-900"
-                          >
-                            {t('sign_in_link')}
-                          </Link>
-                        </li>
+            <PlaybackProvider>
+              <SpeedInsights />
+              {isMarketingRoute
+                ? (
+                  // Marketing routes: render children directly (they have their own layout with sidebar)
+                    <div>{props.children}</div>
+                  )
+                : (
+                  // Other routes: use BaseTemplate with navigation
+                    <BaseTemplate
+                      leftNav={(
+                        <>
+                          <li>
+                            <Link
+                              href="/"
+                              className="border-none text-gray-700 hover:text-gray-900"
+                            >
+                              {t('home_link')}
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              href="/about/"
+                              className="border-none text-gray-700 hover:text-gray-900"
+                            >
+                              {t('about_link')}
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              href="/portfolio/"
+                              className="border-none text-gray-700 hover:text-gray-900"
+                            >
+                              {t('portfolio_link')}
+                            </Link>
+                          </li>
+                          <li>
+                            <a
+                              className="border-none text-gray-700 hover:text-gray-900"
+                              href="https://github.com/ixartz/Next-js-Boilerplate"
+                            >
+                              GitHub
+                            </a>
+                          </li>
+                        </>
+                      )}
+                      rightNav={(
+                        <>
+                          <li>
+                            <Link
+                              href="/sign-in/"
+                              className="border-none text-gray-700 hover:text-gray-900"
+                            >
+                              {t('sign_in_link')}
+                            </Link>
+                          </li>
 
-                        <li>
-                          <Link
-                            href="/sign-up/"
-                            className="border-none text-gray-700 hover:text-gray-900"
-                          >
-                            {t('sign_up_link')}
-                          </Link>
-                        </li>
+                          <li>
+                            <Link
+                              href="/sign-up/"
+                              className="border-none text-gray-700 hover:text-gray-900"
+                            >
+                              {t('sign_up_link')}
+                            </Link>
+                          </li>
 
-                        <li>
-                          <LocaleSwitcher />
-                        </li>
-                      </>
-                    )}
-                  >
-                    <div className="py-0 text-[0px] [&_p]:my-6">{props.children}</div>
-                  </BaseTemplate>
-                )}
+                          <li>
+                            <LocaleSwitcher />
+                          </li>
+                        </>
+                      )}
+                    >
+                      <div className="py-0 text-[0px] [&_p]:my-6">{props.children}</div>
+                    </BaseTemplate>
+                  )}
+            </PlaybackProvider>
           </PostHogProvider>
         </NextIntlClientProvider>
       </body>
