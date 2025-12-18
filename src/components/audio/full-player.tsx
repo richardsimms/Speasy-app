@@ -1,26 +1,19 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useAnimation, useDragControls } from "framer-motion";
 import { ChevronDown, Pause, Play, SkipBack, SkipForward } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef } from "react";
 
 import { cn } from "@/libs/utils";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { usePlayback } from "./playback-provider";
 
 /**
  * Full player sheet (~90vh) with queue display and extended controls
+ * Supports swipe-down gesture to close
  */
 export function FullPlayer() {
-  const router = useRouter();
   const {
     uiMode,
     activeTrack,
@@ -31,7 +24,6 @@ export function FullPlayer() {
     queue,
     activeIndex,
     queueEnabled,
-    selectedCategoryId,
     togglePlay,
     seek,
     closePlayer,
@@ -42,6 +34,8 @@ export function FullPlayer() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
   const progressBarRef = useRef<HTMLDivElement>(null);
+  const controls = useAnimation();
+  const dragControls = useDragControls();
 
   const isOpen = uiMode === "player";
 
@@ -55,15 +49,32 @@ export function FullPlayer() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   }, []);
 
-  // Handle close - navigate home with category persistence
+  // Handle close - just close player, stay on current page
   const handleClose = useCallback(() => {
     closePlayer();
-    // Navigate home with selected category
-    const categoryParam = selectedCategoryId
-      ? `?category=${selectedCategoryId}`
-      : "";
-    router.push(`/${categoryParam}`);
-  }, [closePlayer, router, selectedCategoryId]);
+  }, [closePlayer]);
+
+  // Handle drag end - close if dragged down enough
+  const handleDragEnd = useCallback(
+    (_: unknown, info: { offset: { y: number }; velocity: { y: number } }) => {
+      const shouldClose = info.offset.y > 100 || info.velocity.y > 500;
+      if (shouldClose) {
+        controls.start({ y: "100%" }).then(() => {
+          handleClose();
+        });
+      } else {
+        controls.start({ y: 0 });
+      }
+    },
+    [controls, handleClose],
+  );
+
+  // Animate in when opened
+  useEffect(() => {
+    if (isOpen) {
+      controls.start({ y: 0 });
+    }
+  }, [isOpen, controls]);
 
   // Audio visualization effect
   useEffect(() => {
@@ -146,20 +157,40 @@ export function FullPlayer() {
 
   const progress = durationSec ? (currentTimeSec / durationSec) * 100 : 0;
 
+  if (!isOpen) return null;
+
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <SheetContent
-        side="bottom"
-        className="h-[90vh] overflow-hidden p-0"
-        hideCloseButton
+    <>
+      {/* Backdrop */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 bg-black/80"
+        onClick={handleClose}
+      />
+
+      {/* Player sheet with swipe support */}
+      <motion.div
+        initial={{ y: "100%" }}
+        animate={controls}
+        drag="y"
+        dragControls={dragControls}
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0, bottom: 0.5 }}
+        onDragEnd={handleDragEnd}
+        className="fixed inset-x-0 bottom-0 z-50 h-[90vh] overflow-hidden rounded-t-3xl border-t border-white/10 bg-[#0A0A0A] shadow-2xl"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Now Playing: ${activeTrack?.title ?? "No track selected"}`}
       >
-        {/* Visually hidden title for accessibility */}
-        <SheetTitle className="sr-only">
-          Now Playing: {activeTrack?.title ?? "No track selected"}
-        </SheetTitle>
-        <SheetDescription className="sr-only">
-          Full audio player with playback controls and queue
-        </SheetDescription>
+        {/* Drag handle */}
+        <div
+          className="flex h-6 cursor-grab items-center justify-center active:cursor-grabbing"
+          onPointerDown={(e) => dragControls.start(e)}
+        >
+          <div className="h-1 w-12 rounded-full bg-white/30" />
+        </div>
 
         <div className="flex h-full flex-col">
           {/* Header with close button */}
@@ -366,7 +397,7 @@ export function FullPlayer() {
             )}
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      </motion.div>
+    </>
   );
 }

@@ -129,13 +129,23 @@ export function ContentGridDiscover({
   }, [selectedTab, locale, tracks]);
 
   // Update playback provider with selected category for persistence
+  // and preload the first track from the current tab
   useEffect(() => {
-    if (playback && selectedTab !== "latest") {
+    if (!playback) return;
+
+    // Set selected category for persistence
+    if (selectedTab !== "latest") {
       playback.setSelectedCategoryId(selectedTab);
-    } else if (playback) {
+    } else {
       playback.setSelectedCategoryId(undefined);
     }
-  }, [playback, selectedTab]);
+
+    // Preload the queue with current tab's tracks
+    // This sets up the queue so playing any track will work correctly
+    if (tracks.length > 0) {
+      playback.setQueueContext(queueContext, tracks);
+    }
+  }, [playback, selectedTab, tracks, queueContext]);
 
   const updateIndicator = useCallback((tabId: string) => {
     const button = tabRefs.current[tabId];
