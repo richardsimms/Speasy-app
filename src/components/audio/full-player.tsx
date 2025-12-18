@@ -24,6 +24,7 @@ export function FullPlayer() {
     queue,
     activeIndex,
     queueEnabled,
+    playerEnabled,
     togglePlay,
     seek,
     closePlayer,
@@ -157,7 +158,8 @@ export function FullPlayer() {
 
   const progress = durationSec ? (currentTimeSec / durationSec) * 100 : 0;
 
-  if (!isOpen) return null;
+  // Don't render if player disabled or not open
+  if (!playerEnabled || !isOpen) return null;
 
   return (
     <>

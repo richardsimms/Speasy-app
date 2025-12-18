@@ -20,6 +20,7 @@ export function MiniPlayer() {
     durationSec,
     isLoading,
     uiMode,
+    playerEnabled,
     togglePlay,
     openPlayer,
   } = usePlayback();
@@ -100,8 +101,8 @@ export function MiniPlayer() {
     openPlayer();
   }, [openPlayer]);
 
-  // Don't render if no active track or if full player is open
-  if (!activeTrack || uiMode === "player") {
+  // Don't render if player disabled, no active track, or if full player is open
+  if (!playerEnabled || !activeTrack || uiMode === "player") {
     return null;
   }
 

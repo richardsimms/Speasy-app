@@ -45,6 +45,8 @@ export type PlaybackState = {
   uiMode: PlayerUIMode;
   /** Whether queue auto-advance is enabled (true only while sheet is open) */
   queueEnabled: boolean;
+  /** Whether the global player is enabled (toggle in nav) - defaults to true */
+  playerEnabled: boolean;
   /** Current queue of tracks */
   queue: Track[];
   /** Index of the currently active track in the queue */
@@ -93,6 +95,8 @@ export type PlaybackActions = {
   setQueueContext: (context: VisibleQueueContext, tracks: Track[]) => void;
   /** Set the selected category ID for persistence */
   setSelectedCategoryId: (categoryId: string | undefined) => void;
+  /** Toggle the global player on/off */
+  togglePlayerEnabled: () => void;
 };
 
 /**
@@ -108,4 +112,5 @@ export const PLAYBACK_STORAGE_KEYS = {
   currentTimeSec: "speasy-current-time-sec",
   selectedCategoryId: "speasy-selected-category-id",
   lastQueueContext: "speasy-last-queue-context",
+  playerEnabled: "speasy-player-enabled",
 } as const;

@@ -55,6 +55,7 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
   // State
   const [uiMode, setUIMode] = useState<PlayerUIMode>("inline");
   const [queueEnabled, setQueueEnabled] = useState(false);
+  const [playerEnabled, setPlayerEnabled] = useState(true); // Default to ON
   const [queue, setQueue] = useState<Track[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -92,6 +93,14 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
       );
       if (savedCategoryId) {
         setSelectedCategoryIdState(savedCategoryId);
+      }
+
+      // Restore playerEnabled state (defaults to true if not set)
+      const savedPlayerEnabled = localStorage.getItem(
+        PLAYBACK_STORAGE_KEYS.playerEnabled,
+      );
+      if (savedPlayerEnabled !== null) {
+        setPlayerEnabled(savedPlayerEnabled === "true");
       }
     } catch {
       // Ignore localStorage errors
@@ -378,8 +387,22 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
     (context: VisibleQueueContext, tracks: Track[]) => {
       setVisibleQueueContext(context);
       setQueue(tracks);
+
+      // Pre-select the first track if:
+      // 1. Nothing is active yet (activeIndex < 0), OR
+      // 2. Not currently playing (can switch to new category's first track)
+      // This pre-loads without playing
+      if (tracks.length > 0 && (activeIndex < 0 || !isPlaying)) {
+        const firstTrack = tracks[0];
+        if (firstTrack && audioRef.current) {
+          setActiveIndex(0);
+          // Pre-load the audio without playing
+          audioRef.current.src = firstTrack.audioUrl;
+          audioRef.current.load();
+        }
+      }
     },
-    [],
+    [activeIndex, isPlaying],
   );
 
   const setSelectedCategoryId = useCallback(
@@ -389,11 +412,33 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
     [],
   );
 
+  const togglePlayerEnabled = useCallback(() => {
+    setPlayerEnabled((prev) => {
+      const newValue = !prev;
+      // Persist to localStorage
+      try {
+        localStorage.setItem(
+          PLAYBACK_STORAGE_KEYS.playerEnabled,
+          String(newValue),
+        );
+      } catch {
+        // Ignore localStorage errors
+      }
+      // If turning off, pause playback
+      if (!newValue && audioRef.current) {
+        audioRef.current.pause();
+        setIsPlaying(false);
+      }
+      return newValue;
+    });
+  }, []);
+
   const contextValue = useMemo<PlaybackContextValue>(
     () => ({
       // State
       uiMode,
       queueEnabled,
+      playerEnabled,
       queue,
       activeIndex,
       activeTrack,
@@ -414,10 +459,12 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
       prev,
       setQueueContext,
       setSelectedCategoryId,
+      togglePlayerEnabled,
     }),
     [
       uiMode,
       queueEnabled,
+      playerEnabled,
       queue,
       activeIndex,
       activeTrack,
@@ -437,6 +484,7 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
       prev,
       setQueueContext,
       setSelectedCategoryId,
+      togglePlayerEnabled,
     ],
   );
 
