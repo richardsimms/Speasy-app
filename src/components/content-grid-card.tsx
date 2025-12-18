@@ -1,10 +1,15 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Clock } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useContentAnalytics } from '@/hooks/useContentAnalytics';
+import { motion } from "framer-motion";
+import { Clock, Pause, Play } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useCallback } from "react";
+import { usePlaybackOptional } from "@/components/audio/playback-provider";
+import { useContentAnalytics } from "@/hooks/useContentAnalytics";
+import { cn } from "@/libs/utils";
+
+import type { Track, VisibleQueueContext } from "@/types/audio";
 
 type ContentGridCardProps = {
   id: string;
@@ -17,9 +22,15 @@ type ContentGridCardProps = {
   createdAt?: string;
   index?: number;
   locale: string;
-  surface?: 'home' | 'dashboard';
+  surface?: "home" | "dashboard";
   userId?: string;
   experimentVariant?: string;
+  /** Audio URL for inline playback */
+  audioUrl?: string | null;
+  /** Queue context for building queue on play */
+  queueContext?: VisibleQueueContext;
+  /** All tracks in the current view for queue building */
+  allTracks?: Track[];
 };
 
 export function ContentGridCard({
@@ -33,36 +44,85 @@ export function ContentGridCard({
   createdAt,
   index = 0,
   locale,
-  surface = 'home',
+  surface = "home",
   userId,
   experimentVariant,
+  audioUrl,
+  queueContext,
+  allTracks,
 }: ContentGridCardProps) {
-  const { trackContentViewed } = useContentAnalytics();
+  const { trackContentViewed, trackContentPlayStarted } = useContentAnalytics();
+  const playback = usePlaybackOptional();
+
+  // Check if this track is currently playing
+  const isCurrentTrack = playback?.activeTrack?.id === id;
+  const isPlaying = isCurrentTrack && playback?.isPlaying;
+
+  const handlePlayClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (!playback || !audioUrl) return;
+
+      if (isCurrentTrack) {
+        // Toggle play/pause for current track
+        playback.togglePlay();
+      } else {
+        // Start playing this track with queue context
+        playback.playTrack(id, queueContext, allTracks);
+
+        // Track analytics
+        trackContentPlayStarted({
+          user_id: userId,
+          content_name: title,
+          content_category: category,
+          content_id: id,
+          surface,
+          experiment_variant: experimentVariant,
+        });
+      }
+    },
+    [
+      playback,
+      audioUrl,
+      isCurrentTrack,
+      id,
+      queueContext,
+      allTracks,
+      trackContentPlayStarted,
+      userId,
+      title,
+      category,
+      surface,
+      experimentVariant,
+    ],
+  );
 
   // Format duration from seconds to MM:SS
   const formatDuration = (seconds: number | null | undefined): string => {
     if (!seconds) {
-      return '0:00';
+      return "0:00";
     }
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   // Get first character for placeholder, handling emojis and special characters
   const getFirstCharacter = (text: string): string => {
     if (!text) {
-      return '?';
+      return "?";
     }
     // Use Array.from to properly handle Unicode/emoji characters
     const chars = Array.from(text.trim());
     if (chars.length === 0) {
-      return '?';
+      return "?";
     }
     const firstChar = chars[0];
     // Type guard: ensure firstChar is defined and is a string
-    if (!firstChar || typeof firstChar !== 'string') {
-      return '?';
+    if (!firstChar || typeof firstChar !== "string") {
+      return "?";
     }
     // If it's a letter, return uppercase. Otherwise return as-is (for emojis, numbers, etc.)
     if (/[a-z]/i.test(firstChar)) {
@@ -75,13 +135,13 @@ export function ContentGridCard({
   // Format date to readable format
   const formatDate = (dateString: string | undefined): string => {
     if (!dateString) {
-      return '';
+      return "";
     }
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
@@ -96,13 +156,13 @@ export function ContentGridCard({
     });
   };
 
-  const isFeaturedCard = surface === 'home' && index === 0;
+  const isFeaturedCard = surface === "home" && index === 0;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
+      viewport={{ once: true, margin: "-50px" }}
       transition={{
         duration: 0.5,
         delay: index * 0.05,
@@ -116,47 +176,91 @@ export function ContentGridCard({
         className="relative block overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-all duration-300 hover:border-white/30 hover:shadow-lg hover:shadow-white/5"
       >
         {/* Image Section */}
-        {imageUrl && imageUrl.trim() !== ''
-          ? (
-              <div className="relative aspect-[16/9] w-full overflow-hidden">
-                <Image
-                  src={imageUrl}
-                  alt={title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  priority={isFeaturedCard}
-                  fetchPriority={isFeaturedCard ? 'high' : 'auto'}
-                  quality={70}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent" />
+        {imageUrl && imageUrl.trim() !== "" ? (
+          <div className="relative aspect-[16/9] w-full overflow-hidden">
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={isFeaturedCard}
+              fetchPriority={isFeaturedCard ? "high" : "auto"}
+              quality={70}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent" />
 
-                {/* Duration badge on image */}
-                {duration && (
-                  <div className="absolute right-3 bottom-3 flex items-center gap-1 rounded-lg bg-black/80 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                    <Clock className="h-3 w-3" />
-                    {formatDuration(duration)}
-                  </div>
-                )}
-              </div>
-            )
-          : (
-              <div className="relative aspect-[16/9] w-full bg-gradient-to-br from-white/5 to-white/10">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-6xl font-bold text-white/20">
-                    {getFirstCharacter(title)}
-                  </div>
-                </div>
-
-                {/* Duration badge */}
-                {duration && (
-                  <div className="absolute right-3 bottom-3 flex items-center gap-1 rounded-lg bg-black/80 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                    <Clock className="h-3 w-3" />
-                    {formatDuration(duration)}
-                  </div>
-                )}
+            {/* Duration badge on image */}
+            {duration && (
+              <div className="absolute right-3 bottom-3 flex items-center gap-1 rounded-lg bg-black/80 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                <Clock className="h-3 w-3" />
+                {formatDuration(duration)}
               </div>
             )}
+
+            {/* Play button overlay */}
+            {audioUrl && (
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handlePlayClick}
+                className={cn(
+                  "absolute left-3 bottom-3 flex h-10 w-10 items-center justify-center rounded-full transition-all",
+                  isPlaying
+                    ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]"
+                    : "bg-black/70 text-white opacity-0 backdrop-blur-sm group-hover:opacity-100 hover:bg-white hover:text-black",
+                )}
+                aria-label={isPlaying ? "Pause" : "Play"}
+              >
+                {isPlaying ? (
+                  <Pause className="h-4 w-4 fill-current" />
+                ) : (
+                  <Play className="ml-0.5 h-4 w-4 fill-current" />
+                )}
+              </motion.button>
+            )}
+          </div>
+        ) : (
+          <div className="relative aspect-[16/9] w-full bg-gradient-to-br from-white/5 to-white/10">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-6xl font-bold text-white/20">
+                {getFirstCharacter(title)}
+              </div>
+            </div>
+
+            {/* Duration badge */}
+            {duration && (
+              <div className="absolute right-3 bottom-3 flex items-center gap-1 rounded-lg bg-black/80 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                <Clock className="h-3 w-3" />
+                {formatDuration(duration)}
+              </div>
+            )}
+
+            {/* Play button overlay */}
+            {audioUrl && (
+              <motion.button
+                type="button"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handlePlayClick}
+                className={cn(
+                  "absolute left-3 bottom-3 flex h-10 w-10 items-center justify-center rounded-full transition-all",
+                  isPlaying
+                    ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]"
+                    : "bg-black/70 text-white opacity-0 backdrop-blur-sm group-hover:opacity-100 hover:bg-white hover:text-black",
+                )}
+                aria-label={isPlaying ? "Pause" : "Play"}
+              >
+                {isPlaying ? (
+                  <Pause className="h-4 w-4 fill-current" />
+                ) : (
+                  <Play className="ml-0.5 h-4 w-4 fill-current" />
+                )}
+              </motion.button>
+            )}
+          </div>
+        )}
         {/* Content Section */}
         <div className="p-6">
           {/* Category Tag and Date */}

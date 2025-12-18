@@ -1,6 +1,7 @@
-import { Analytics } from '@vercel/analytics/next';
-import { setRequestLocale } from 'next-intl/server';
-import { DashboardSidebar } from '@/components/dashboard-sidebar';
+import { Analytics } from "@vercel/analytics/next";
+import { setRequestLocale } from "next-intl/server";
+import { AudioPlayerLayout } from "@/components/audio/audio-player-layout";
+import { DashboardSidebar } from "@/components/dashboard-sidebar";
 // import { DashboardRightSidebar } from '@/components/dashboard-right-sidebar';
 
 export default async function MarketingLayout(props: {
@@ -11,11 +12,15 @@ export default async function MarketingLayout(props: {
   setRequestLocale(locale);
 
   return (
-    <div style={{ backgroundColor: '#100e12', minHeight: '100vh' }}>
-      <DashboardSidebar />
-      <main className="ml-0 min-h-screen md:ml-64">{props.children}</main>
-      {/* <DashboardRightSidebar /> */}
-      <Analytics />
-    </div>
+    <AudioPlayerLayout>
+      <div style={{ backgroundColor: "#100e12", minHeight: "100vh" }}>
+        <DashboardSidebar />
+        <main className="ml-0 min-h-screen pb-20 md:ml-64 md:pb-24">
+          {props.children}
+        </main>
+        {/* <DashboardRightSidebar /> */}
+        <Analytics />
+      </div>
+    </AudioPlayerLayout>
   );
 }

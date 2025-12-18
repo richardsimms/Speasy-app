@@ -1,0 +1,208 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { Pause, Play } from "lucide-react";
+import Image from "next/image";
+import { useCallback, useEffect, useRef } from "react";
+
+import { cn } from "@/libs/utils";
+import { usePlayback } from "./playback-provider";
+
+/**
+ * Mini player bar that appears at the bottom when a track is active
+ * Clicking anywhere opens the full player
+ */
+export function MiniPlayer() {
+  const {
+    activeTrack,
+    isPlaying,
+    currentTimeSec,
+    durationSec,
+    isLoading,
+    uiMode,
+    togglePlay,
+    openPlayer,
+  } = usePlayback();
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationFrameRef = useRef<number | undefined>(undefined);
+
+  // Format time from seconds to MM:SS
+  const formatTime = useCallback((seconds: number): string => {
+    if (!seconds || !Number.isFinite(seconds)) {
+      return "0:00";
+    }
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
+  }, []);
+
+  // Audio visualization effect
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const draw = () => {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const bars = 30;
+      const width = canvas.width / bars;
+      const gap = 2;
+      const progress = durationSec ? (currentTimeSec / durationSec) * 100 : 0;
+
+      for (let i = 0; i < bars; i++) {
+        // Dynamic height based on playing state
+        let height = 4;
+        if (isPlaying) {
+          height = Math.random() * 16 + 4;
+        }
+
+        // Color based on progress
+        const barPercent = (i / bars) * 100;
+        ctx.fillStyle =
+          barPercent <= progress
+            ? "rgba(255, 255, 255, 0.9)"
+            : "rgba(255, 255, 255, 0.2)";
+
+        const x = i * (width + gap);
+        const y = (canvas.height - height) / 2;
+
+        ctx.beginPath();
+        ctx.roundRect(x, y, width, height, 2);
+        ctx.fill();
+      }
+
+      animationFrameRef.current = requestAnimationFrame(draw);
+    };
+
+    draw();
+
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [isPlaying, currentTimeSec, durationSec]);
+
+  const handlePlayButtonClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      togglePlay();
+    },
+    [togglePlay],
+  );
+
+  const handleOpenPlayer = useCallback(() => {
+    openPlayer();
+  }, [openPlayer]);
+
+  // Don't render if no active track or if full player is open
+  if (!activeTrack || uiMode === "player") {
+    return null;
+  }
+
+  const progress = durationSec ? (currentTimeSec / durationSec) * 100 : 0;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 100 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 100 }}
+      transition={{ duration: 0.3 }}
+      className="fixed right-0 bottom-0 left-0 z-40 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl md:ml-64"
+    >
+      {/* Progress bar at top */}
+      <div className="absolute top-0 right-0 left-0 h-[2px] bg-white/10">
+        <motion.div
+          className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+          initial={{ width: 0 }}
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.1 }}
+        />
+      </div>
+
+      {/* Clickable area to open player */}
+      <button
+        type="button"
+        onClick={handleOpenPlayer}
+        className="flex w-full items-center gap-4 p-3 text-left hover:bg-white/5"
+        aria-label="Open full player"
+      >
+        {/* Album art / Track image */}
+        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white/10">
+          {activeTrack.imageUrl ? (
+            <Image
+              src={activeTrack.imageUrl}
+              alt={activeTrack.title}
+              fill
+              className="object-cover"
+              sizes="48px"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-xl font-bold text-white/30">
+              {activeTrack.title.charAt(0).toUpperCase()}
+            </div>
+          )}
+        </div>
+
+        {/* Track info */}
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate text-sm font-medium text-white">
+            {activeTrack.title}
+          </h3>
+          <div className="flex items-center gap-2 text-xs text-white/60">
+            <span className="truncate">{activeTrack.category}</span>
+            <span>•</span>
+            <span>
+              {formatTime(currentTimeSec)} / {formatTime(durationSec ?? 0)}
+            </span>
+          </div>
+        </div>
+
+        {/* Waveform visualization */}
+        <div className="hidden h-8 w-24 shrink-0 sm:block">
+          <canvas
+            ref={canvasRef}
+            width={96}
+            height={32}
+            className="h-full w-full"
+          />
+        </div>
+
+        {/* Play/Pause button */}
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handlePlayButtonClick}
+          className={cn(
+            "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all",
+            isPlaying
+              ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]"
+              : "bg-white/10 text-white hover:bg-white hover:text-black",
+            isLoading && "opacity-50",
+          )}
+          role="button"
+          aria-label={isPlaying ? "Pause" : "Play"}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              e.stopPropagation();
+              togglePlay();
+            }
+          }}
+        >
+          {isPlaying ? (
+            <Pause className="h-4 w-4 fill-current" />
+          ) : (
+            <Play className="ml-0.5 h-4 w-4 fill-current" />
+          )}
+        </motion.div>
+      </button>
+    </motion.div>
+  );
+}

@@ -36,6 +36,7 @@
     "@clerk/nextjs": "^6.36.2",
     "@hookform/resolvers": "^5.2.2",
     "@logtape/logtape": "^1.2.2",
+    "@radix-ui/react-dialog": "catalog:",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.4",
     "@sentry/nextjs": "^10.30.0",
