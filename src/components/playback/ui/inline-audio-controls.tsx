@@ -2,7 +2,7 @@
 
 import type { Track } from '@/types/playback';
 import { motion } from 'framer-motion';
-import { Pause, Play, Radio, RowsHorizontal } from 'lucide-react';
+import { LayoutList, Pause, Play, Radio } from 'lucide-react';
 import { usePlayback } from '@/components/playback/playback-provider';
 import { cn } from '@/libs/utils';
 
@@ -115,7 +115,7 @@ export function InlineAudioControls({
       >
         {layout === 'wide'
           ? (
-              <RowsHorizontal className="h-5 w-5" />
+              <LayoutList className="h-5 w-5" />
             )
           : (
               <Radio className="h-5 w-5" />

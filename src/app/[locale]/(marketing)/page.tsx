@@ -163,6 +163,7 @@ export default async function Dashboard(props: {
         summary: string | null;
         keyInsight: string[] | null;
         imageUrl: string | null;
+        audioUrl: string | null;
         category: string;
         duration: number | null;
         created_at: string;
