@@ -56,7 +56,7 @@ Built with modern, production-ready technologies:
 
 ## Requirements
 
-- Node.js 20+ and npm
+- Node.js 20+ and [pnpm](https://pnpm.io) (recommended) or npm
 
 ## Getting Started
 
@@ -65,53 +65,84 @@ Built with modern, production-ready technologies:
 ```shell
 git clone https://github.com/your-username/Speasy-app.git
 cd Speasy-app
-npm install
+pnpm install
 ```
+
+> **Note**: This project uses [pnpm](https://pnpm.io) for package management with a catalog-based dependency system. If you prefer npm, you can use it, but pnpm is recommended for consistency with the lockfile.
 
 ### Development
 
 Run the development server:
 
 ```shell
-npm run dev
+pnpm run dev
 ```
+
+This will:
+- Start the PGlite database server on port 5433
+- Start the Next.js development server on port 3000
+- Start Sentry Spotlight for local error monitoring
 
 Open [http://localhost:3000](http://localhost:3000) in your browser. The project is pre-configured with a local PGlite database—no additional setup required for local development.
 
 ### Environment Variables
 
+The project uses [`@t3-oss/env-nextjs`](https://env.t3.gg) for type-safe environment variable validation. If required variables are missing, you'll see a clear error message listing which variables need to be set.
+
 Create a `.env.local` file in the root directory with the following variables:
 
 ```shell
-# Clerk Authentication
+# Required - Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key
 
-# Database (optional for local dev - uses PGlite by default)
-DATABASE_URL=postgresql://user:password@localhost:5432/speasy
+# Required - Database (PGlite is used automatically in dev, but DATABASE_URL is still required)
+DATABASE_URL=postgresql://localhost:5433/postgres
 
-# Stripe (for payments)
+# Optional - Stripe (for payments)
 STRIPE_SECRET_KEY=your_stripe_secret_key
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
 STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+STRIPE_PRICE_ID=your_stripe_price_id
 
-# Sentry (optional - for error monitoring)
+# Optional - Sentry (for error monitoring)
 NEXT_PUBLIC_SENTRY_DSN=your_sentry_dsn
 SENTRY_ORGANIZATION=your_sentry_org
 SENTRY_PROJECT=your_sentry_project
 SENTRY_AUTH_TOKEN=your_sentry_auth_token
 
-# PostHog (optional - for analytics)
+# Optional - PostHog (for analytics)
 NEXT_PUBLIC_POSTHOG_KEY=your_posthog_key
 NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
 
-# Arcjet (optional - for security)
-ARCJET_KEY=your_arcjet_key
+# Optional - Arcjet (for security and bot protection)
+ARCJET_KEY=ajkey_your_arcjet_key
 
-# Better Stack (optional - for log management)
+# Optional - Better Stack (for log management)
 NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN=your_better_stack_token
 NEXT_PUBLIC_BETTER_STACK_INGESTING_HOST=your_better_stack_host
+
+# Optional - Supabase (if using Supabase features)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Optional - OpenAI (for AI features)
+OPENAI_KEY=your_openai_key
+
+# Optional - Other services
+UNSPLASH_ACCESS_KEY=your_unsplash_key
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+CLERK_WEBHOOK_SIGNING_SECRET=your_clerk_webhook_secret
 ```
+
+**Required Variables:**
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - Clerk publishable key for authentication
+- `CLERK_SECRET_KEY` - Clerk secret key for server-side operations
+- `DATABASE_URL` - PostgreSQL connection string (PGlite uses `postgresql://localhost:5433/postgres` in development)
+
+All other variables are optional and can be added as needed for specific features.
 
 ### Set Up Authentication
 
@@ -213,51 +244,55 @@ Then open [https://local.drizzle.studio](https://local.drizzle.studio) in your b
 
 ### Development
 
-- `npm run dev` - Start development server with hot reload
-- `npm run dev:spotlight` - Start Sentry Spotlight for local error monitoring
-- `npm run build` - Build for production
-- `npm run build-local` - Build with temporary in-memory database
-- `npm run start` - Start production server
+- `pnpm run dev` - Start development server with hot reload, PGlite database, and Sentry Spotlight
+- `pnpm run dev:next` - Start only the Next.js development server
+- `pnpm run dev:spotlight` - Start Sentry Spotlight for local error monitoring
+- `pnpm run build` - Build for production
+- `pnpm run build-local` - Build with temporary in-memory database
+- `pnpm run start` - Start production server
 
 ### Code Quality
 
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues automatically
-- `npm run check:types` - Type check with TypeScript
-- `npm run check:deps` - Check for unused dependencies (Knip)
-- `npm run check:i18n` - Validate translations
+- `pnpm run lint` - Run ESLint
+- `pnpm run lint:fix` - Fix ESLint issues automatically
+- `pnpm run check:types` - Type check with TypeScript
+- `pnpm run check:deps` - Check for unused dependencies (Knip)
+- `pnpm run check:i18n` - Validate translations
 
 ### Testing
 
-- `npm run test` - Run unit tests with Vitest
-- `npm run test:e2e` - Run E2E tests with Playwright
+- `pnpm run test` - Run unit tests with Vitest
+- `pnpm run test:e2e` - Run E2E tests with Playwright
 - `npx playwright install` - Install Playwright browsers (first time only)
 
 ### Storybook
 
-- `npm run storybook` - Start Storybook on port 6006
-- `npm run storybook:test` - Run Storybook tests
-- `npm run build-storybook` - Build Storybook for production
+- `pnpm run storybook` - Start Storybook on port 6006
+- `pnpm run storybook:test` - Run Storybook tests
+- `pnpm run build-storybook` - Build Storybook for production
 
 ### Database
 
-- `npm run db:generate` - Generate database migration
-- `npm run db:migrate` - Apply database migrations
-- `npm run db:studio` - Open Drizzle Studio
+- `pnpm run db:generate` - Generate database migration
+- `pnpm run db:migrate` - Apply database migrations
+- `pnpm run db:studio` - Open Drizzle Studio
+- `pnpm run db-server:file` - Start PGlite server with file-based database
+- `pnpm run db-server:memory` - Start PGlite server with in-memory database
 
 ### Other
 
-- `npm run build-stats` - Analyze bundle size
-- `npm run commit` - Interactive commit with Commitizen
+- `pnpm run build-stats` - Analyze bundle size
+- `pnpm run commit` - Interactive commit with Commitizen
+- `pnpm run clean` - Remove build artifacts (.next, out, coverage)
 
 ## Testing
 
 ### Unit Tests
 
-Unit tests are co-located with source files using the `*.test.ts` or `*.test.tsx` naming convention. Run tests with:
+Unit tests are co-located with source files using the `*.spec.ts` or `*.test.ts` naming convention. Run tests with:
 
 ```shell
-npm run test
+pnpm run test
 ```
 
 ### E2E Tests
@@ -265,7 +300,7 @@ npm run test
 E2E tests use Playwright and are located in `tests/e2e/`. Test files use the `*.e2e.ts` extension. Run E2E tests with:
 
 ```shell
-npm run test:e2e
+pnpm run test:e2e
 ```
 
 Install Playwright browsers first (one-time setup):
@@ -281,7 +316,7 @@ npx playwright install
 Generate a production build:
 
 ```shell
-npm run build
+pnpm run build
 ```
 
 Database migrations are automatically executed during the build process. Ensure `DATABASE_URL` is set in your environment variables.
@@ -315,7 +350,7 @@ PostHog is integrated for user analytics. Configure `NEXT_PUBLIC_POSTHOG_KEY` an
 
 ### Monitoring as Code (Checkly)
 
-Checkly is configured to run E2E tests ending with `*.check.e2e.ts` at regular intervals. Configure `CHECKLY_API_KEY` and `CHECKLY_ACCOUNT_ID` in GitHub Actions.
+Checkly is configured to run E2E tests ending with `*.check.e2e.ts` at regular intervals. Configure `CHECKLY_API_KEY` and `CHECKLY_ACCOUNT_ID` as GitHub repository secrets for the workflow to function properly.
 
 ## Security
 
@@ -338,7 +373,7 @@ Speasy supports multiple languages using `next-intl`. Currently supported:
 
 1. Add translation keys to `src/locales/en.json`
 2. Add corresponding translations to `src/locales/fr.json`
-3. Validate translations: `npm run check:i18n`
+3. Validate translations: `pnpm run check:i18n`
 
 ### Crowdin Integration (Optional)
 
@@ -355,10 +390,17 @@ Translations will sync automatically on pushes to `main`.
 This project follows [Conventional Commits](https://www.conventionalcommits.org/). Use the interactive CLI:
 
 ```shell
-npm run commit
+pnpm run commit
 ```
 
 This helps generate properly formatted commit messages and enables automatic versioning and changelog generation.
+
+Commit messages are validated using commitlint. All commits must follow the format:
+- `feat(scope): description` - New features
+- `fix(scope): description` - Bug fixes
+- `docs: description` - Documentation changes
+- `chore: description` - Maintenance tasks
+- And other conventional types
 
 ## Code Quality
 

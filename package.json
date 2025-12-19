@@ -102,6 +102,7 @@
     "eslint-plugin-react-hooks": "catalog:",
     "eslint-plugin-react-refresh": "catalog:",
     "eslint-plugin-tailwindcss": "catalog:",
+    "jiti": "catalog:",
     "knip": "catalog:",
     "lefthook": "catalog:",
     "npm-run-all": "catalog:",

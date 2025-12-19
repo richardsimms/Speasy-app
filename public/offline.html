@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a090c">
+  <title>Offline - Speasy</title>
+  <link rel="icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: #100e12;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .container {
+      text-align: center;
+      max-width: 400px;
+    }
+
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 24px;
+      border-radius: 16px;
+    }
+
+    .icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+
+    p {
+      font-size: 16px;
+      color: #9ca3af;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .retry-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #ffffff;
+      background-color: #7c3aed;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      text-decoration: none;
+    }
+
+    .retry-btn:hover {
+      background-color: #6d28d9;
+    }
+
+    .retry-btn:active {
+      transform: scale(0.98);
+    }
+
+    .cached-content {
+      margin-top: 32px;
+      padding-top: 32px;
+      border-top: 1px solid #374151;
+    }
+
+    .cached-content h2 {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      color: #d1d5db;
+    }
+
+    .cached-list {
+      text-align: left;
+    }
+
+    .cached-item {
+      display: block;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      background-color: #1f1d24;
+      border-radius: 8px;
+      color: #9ca3af;
+      text-decoration: none;
+      transition: background-color 0.2s;
+    }
+
+    .cached-item:hover {
+      background-color: #2d2b33;
+      color: #ffffff;
+    }
+
+    .status {
+      margin-top: 24px;
+      padding: 12px;
+      background-color: #1f1d24;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #9ca3af;
+    }
+
+    .status.online {
+      background-color: #064e3b;
+      color: #34d399;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="/android-chrome-192x192.png" alt="Speasy" class="logo">
+    <h1>You're Offline</h1>
+    <p>
+      It looks like you've lost your internet connection. 
+      Don't worry—your downloaded episodes are still available to play.
+    </p>
+    <button class="retry-btn" onclick="location.reload()">
+      Try Again
+    </button>
+
+    <div class="cached-content" id="cachedContent" style="display: none;">
+      <h2>Available Offline</h2>
+      <div class="cached-list" id="cachedList"></div>
+    </div>
+
+    <div class="status" id="status">
+      Checking connection...
+    </div>
+  </div>
+
+  <script>
+    // Check online status
+    function updateStatus() {
+      const statusEl = document.getElementById('status');
+      if (navigator.onLine) {
+        statusEl.textContent = 'Connection restored! Reloading...';
+        statusEl.classList.add('online');
+        setTimeout(() => location.reload(), 1000);
+      } else {
+        statusEl.textContent = 'No internet connection';
+        statusEl.classList.remove('online');
+      }
+    }
+
+    // Listen for online/offline events
+    window.addEventListener('online', updateStatus);
+    window.addEventListener('offline', updateStatus);
+    updateStatus();
+
+    // Show cached audio content if available
+    async function showCachedContent() {
+      try {
+        const cache = await caches.open('speasy-v1-audio');
+        const keys = await cache.keys();
+        
+        if (keys.length > 0) {
+          const container = document.getElementById('cachedContent');
+          const list = document.getElementById('cachedList');
+          container.style.display = 'block';
+          
+          keys.slice(0, 5).forEach(request => {
+            const url = new URL(request.url);
+            const item = document.createElement('a');
+            item.className = 'cached-item';
+            item.href = url.pathname;
+            item.textContent = decodeURIComponent(url.pathname.split('/').pop() || 'Audio content');
+            list.appendChild(item);
+          });
+        }
+      } catch (e) {
+        // Cache API not available or error
+        console.log('Could not check cached content:', e);
+      }
+    }
+
+    showCachedContent();
+  </script>
+</body>
+</html>
