@@ -46,7 +46,9 @@ export function useServiceWorker() {
           updateViaCache: 'none',
         });
 
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
 
         setState(prev => ({
           ...prev,
@@ -77,7 +79,9 @@ export function useServiceWorker() {
           });
         }, 60 * 60 * 1000);
       } catch (error) {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
 
         setState(prev => ({
           ...prev,

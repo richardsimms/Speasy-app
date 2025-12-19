@@ -44,7 +44,7 @@ function getInitialState(): PWAInstallState {
 
   const isStandalone
     = window.matchMedia('(display-mode: standalone)').matches
-    || (window.navigator as NavigatorWithStandalone).standalone === true;
+      || (window.navigator as NavigatorWithStandalone).standalone === true;
 
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 

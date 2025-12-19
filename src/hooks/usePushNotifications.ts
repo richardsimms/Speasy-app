@@ -41,8 +41,8 @@ function getInitialState(): PushNotificationState {
 
   const isSupported
     = 'serviceWorker' in navigator
-    && 'PushManager' in window
-    && 'Notification' in window;
+      && 'PushManager' in window
+      && 'Notification' in window;
 
   return {
     isSupported,
