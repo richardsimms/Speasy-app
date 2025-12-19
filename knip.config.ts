@@ -3,7 +3,6 @@ import type { KnipConfig } from 'knip';
 const config: KnipConfig = {
   // Files to exclude from Knip analysis
   ignore: [
-    'checkly.config.ts',
     'public/sw.js', // Service worker is referenced at runtime, not imported
     'src/libs/I18n.ts',
     'src/types/I18n.ts',
@@ -20,7 +19,6 @@ const config: KnipConfig = {
   // Dependencies to ignore during analysis
   ignoreDependencies: [
     'conventional-changelog-conventionalcommits',
-    'checkly', // Used in checkly.config.ts (config entrypoint)
     // These are used but knip doesn't detect them properly
     'drizzle-orm', // Used in src/utils/DBConnection.ts and src/libs/DB.ts
     'pg', // Used in src/utils/DBConnection.ts
