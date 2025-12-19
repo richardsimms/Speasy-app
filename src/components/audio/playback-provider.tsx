@@ -1,23 +1,23 @@
-"use client";
-
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+'use client';
 
 import type {
   PlaybackContextValue,
   PlayerUIMode,
   Track,
   VisibleQueueContext,
-} from "@/types/audio";
+} from '@/types/audio';
 
-import { PLAYBACK_STORAGE_KEYS } from "@/types/audio";
+import {
+  createContext,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+
+import { PLAYBACK_STORAGE_KEYS } from '@/types/audio';
 
 const PlaybackContext = createContext<PlaybackContextValue | null>(null);
 
@@ -26,9 +26,9 @@ const PlaybackContext = createContext<PlaybackContextValue | null>(null);
  * @throws Error if used outside of PlaybackProvider
  */
 export function usePlayback(): PlaybackContextValue {
-  const context = useContext(PlaybackContext);
+  const context = use(PlaybackContext);
   if (!context) {
-    throw new Error("usePlayback must be used within a PlaybackProvider");
+    throw new Error('usePlayback must be used within a PlaybackProvider');
   }
   return context;
 }
@@ -37,7 +37,7 @@ export function usePlayback(): PlaybackContextValue {
  * Optional hook that returns null if outside provider (for conditional usage)
  */
 export function usePlaybackOptional(): PlaybackContextValue | null {
-  return useContext(PlaybackContext);
+  return use(PlaybackContext);
 }
 
 type PlaybackProviderProps = {
@@ -53,9 +53,20 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // State
-  const [uiMode, setUIMode] = useState<PlayerUIMode>("inline");
+  const [uiMode, setUIMode] = useState<PlayerUIMode>('inline');
   const [queueEnabled, setQueueEnabled] = useState(false);
-  const [playerEnabled, setPlayerEnabled] = useState(true); // Default to ON
+  // Use lazy initializer to restore from localStorage without useEffect
+  const [playerEnabled, setPlayerEnabled] = useState(() => {
+    if (typeof window === 'undefined') {
+      return true; // Default to ON
+    }
+    try {
+      const saved = localStorage.getItem(PLAYBACK_STORAGE_KEYS.playerEnabled);
+      return saved !== null ? saved === 'true' : true;
+    } catch {
+      return true;
+    }
+  });
   const [queue, setQueue] = useState<Track[]>([]);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -64,9 +75,19 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
   const [visibleQueueContext, setVisibleQueueContext] = useState<
     VisibleQueueContext | undefined
   >();
+  // Use lazy initializer to restore from localStorage without useEffect
   const [selectedCategoryId, setSelectedCategoryIdState] = useState<
     string | undefined
-  >();
+  >(() => {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+    try {
+      return localStorage.getItem(PLAYBACK_STORAGE_KEYS.selectedCategoryId) ?? undefined;
+    } catch {
+      return undefined;
+    }
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   // Derived active track
@@ -79,36 +100,18 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
 
   // Initialize audio element on mount (client-side only)
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') {
+      return;
+    }
 
     // Create single audio element
     const audio = new Audio();
-    audio.preload = "metadata";
+    audio.preload = 'metadata';
     audioRef.current = audio;
-
-    // Restore persisted state
-    try {
-      const savedCategoryId = localStorage.getItem(
-        PLAYBACK_STORAGE_KEYS.selectedCategoryId,
-      );
-      if (savedCategoryId) {
-        setSelectedCategoryIdState(savedCategoryId);
-      }
-
-      // Restore playerEnabled state (defaults to true if not set)
-      const savedPlayerEnabled = localStorage.getItem(
-        PLAYBACK_STORAGE_KEYS.playerEnabled,
-      );
-      if (savedPlayerEnabled !== null) {
-        setPlayerEnabled(savedPlayerEnabled === "true");
-      }
-    } catch {
-      // Ignore localStorage errors
-    }
 
     return () => {
       audio.pause();
-      audio.src = "";
+      audio.src = '';
       audioRef.current = null;
     };
   }, []);
@@ -116,7 +119,9 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
   // Audio event handlers
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio) {
+      return;
+    }
 
     const handleTimeUpdate = () => {
       setCurrentTimeSec(audio.currentTime);
@@ -131,8 +136,8 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
       setIsPlaying(false);
       setCurrentTimeSec(0);
 
-      // Auto-next only if queueEnabled (player is open)
-      if (queueEnabled && activeIndex < queue.length - 1) {
+      // Auto-advance to next track if available (works even when player is closed)
+      if (activeIndex < queue.length - 1) {
         // Play next track
         const nextIndex = activeIndex + 1;
         setActiveIndex(nextIndex);
@@ -168,30 +173,32 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
       setIsPlaying(false);
     };
 
-    audio.addEventListener("timeupdate", handleTimeUpdate);
-    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-    audio.addEventListener("ended", handleEnded);
-    audio.addEventListener("loadstart", handleLoadStart);
-    audio.addEventListener("canplay", handleCanPlay);
-    audio.addEventListener("play", handlePlay);
-    audio.addEventListener("pause", handlePause);
-    audio.addEventListener("error", handleError);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('loadstart', handleLoadStart);
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('play', handlePlay);
+    audio.addEventListener('pause', handlePause);
+    audio.addEventListener('error', handleError);
 
     return () => {
-      audio.removeEventListener("timeupdate", handleTimeUpdate);
-      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      audio.removeEventListener("ended", handleEnded);
-      audio.removeEventListener("loadstart", handleLoadStart);
-      audio.removeEventListener("canplay", handleCanPlay);
-      audio.removeEventListener("play", handlePlay);
-      audio.removeEventListener("pause", handlePause);
-      audio.removeEventListener("error", handleError);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('loadstart', handleLoadStart);
+      audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener('error', handleError);
     };
   }, [queueEnabled, activeIndex, queue]);
 
   // Persist currentTimeSec and activeTrackId
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') {
+      return;
+    }
 
     try {
       if (activeTrack) {
@@ -211,7 +218,9 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
 
   // Persist selectedCategoryId
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') {
+      return;
+    }
 
     try {
       if (selectedCategoryId) {
@@ -231,7 +240,9 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
   const playTrack = useCallback(
     (trackId: string, queueContext?: VisibleQueueContext, tracks?: Track[]) => {
       const audio = audioRef.current;
-      if (!audio) return;
+      if (!audio) {
+        return;
+      }
 
       // If new tracks provided, update queue
       if (tracks && tracks.length > 0) {
@@ -241,7 +252,7 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
         }
 
         // Find track index in new tracks
-        const trackIndex = tracks.findIndex((t) => t.id === trackId);
+        const trackIndex = tracks.findIndex(t => t.id === trackId);
         if (trackIndex >= 0) {
           setActiveIndex(trackIndex);
           const track = tracks[trackIndex];
@@ -256,15 +267,16 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
         }
       } else {
         // Find track in existing queue
-        const trackIndex = queue.findIndex((t) => t.id === trackId);
+        const trackIndex = queue.findIndex(t => t.id === trackId);
         if (trackIndex >= 0) {
           const track = queue[trackIndex];
           if (track) {
-            // If same track, just play
-            if (
-              activeIndex === trackIndex &&
-              audio.src.includes(track.audioUrl)
-            ) {
+            // If same track, just play/resume
+            if (activeIndex === trackIndex) {
+              // Ensure source is set correctly
+              if (!audio.src || !audio.src.includes(track.audioUrl)) {
+                audio.src = track.audioUrl;
+              }
               audio.play().catch(() => {
                 setIsPlaying(false);
               });
@@ -295,12 +307,18 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
-    if (!audio || !activeTrack) return;
+    if (!audio || !activeTrack) {
+      return;
+    }
 
     if (isPlaying) {
       audio.pause();
       setIsPlaying(false);
     } else {
+      // Ensure audio source is set before playing
+      if (!audio.src || !audio.src.includes(activeTrack.audioUrl)) {
+        audio.src = activeTrack.audioUrl;
+      }
       audio.play().catch(() => {
         setIsPlaying(false);
       });
@@ -321,19 +339,21 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
   );
 
   const openPlayer = useCallback(() => {
-    setUIMode("player");
+    setUIMode('player');
     setQueueEnabled(true);
   }, []);
 
   const closePlayer = useCallback(() => {
-    setUIMode("inline");
+    setUIMode('inline');
     setQueueEnabled(false);
     // Audio continues playing, just UI changes
   }, []);
 
   const next = useCallback(() => {
     const audio = audioRef.current;
-    if (!audio || !queueEnabled) return;
+    if (!audio) {
+      return;
+    }
 
     if (activeIndex < queue.length - 1) {
       const nextIndex = activeIndex + 1;
@@ -346,14 +366,17 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
           audio.play().catch(() => {
             setIsPlaying(false);
           });
+          setIsPlaying(true);
         }
       }
     }
-  }, [queueEnabled, activeIndex, queue, isPlaying]);
+  }, [activeIndex, queue, isPlaying]);
 
   const prev = useCallback(() => {
     const audio = audioRef.current;
-    if (!audio || !queueEnabled) return;
+    if (!audio) {
+      return;
+    }
 
     // If more than 3 seconds into track, restart current track
     if (currentTimeSec > 3) {
@@ -374,6 +397,7 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
           audio.play().catch(() => {
             setIsPlaying(false);
           });
+          setIsPlaying(true);
         }
       }
     } else {
@@ -381,28 +405,51 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
       audio.currentTime = 0;
       setCurrentTimeSec(0);
     }
-  }, [queueEnabled, activeIndex, queue, isPlaying, currentTimeSec]);
+  }, [activeIndex, queue, isPlaying, currentTimeSec]);
 
   const setQueueContext = useCallback(
     (context: VisibleQueueContext, tracks: Track[]) => {
+      const audio = audioRef.current;
+      const wasPlaying = isPlaying;
+      const previousQueueContext = visibleQueueContext;
+
       setVisibleQueueContext(context);
       setQueue(tracks);
 
-      // Pre-select the first track if:
-      // 1. Nothing is active yet (activeIndex < 0), OR
-      // 2. Not currently playing (can switch to new category's first track)
-      // This pre-loads without playing
-      if (tracks.length > 0 && (activeIndex < 0 || !isPlaying)) {
+      // If switching to a new category/context, switch to first track
+      const isNewContext
+        = !previousQueueContext
+          || previousQueueContext.categoryId !== context.categoryId
+          || previousQueueContext.source !== context.source;
+
+      if (tracks.length > 0 && isNewContext) {
         const firstTrack = tracks[0];
-        if (firstTrack && audioRef.current) {
+        if (firstTrack && audio) {
           setActiveIndex(0);
-          // Pre-load the audio without playing
-          audioRef.current.src = firstTrack.audioUrl;
-          audioRef.current.load();
+          audio.src = firstTrack.audioUrl;
+
+          // If audio was playing, continue playing the new track
+          if (wasPlaying) {
+            audio.play().catch(() => {
+              setIsPlaying(false);
+            });
+            setIsPlaying(true);
+          } else {
+            // Pre-load the audio without playing
+            audio.load();
+          }
+        }
+      } else if (tracks.length > 0 && activeIndex < 0) {
+        // No active track yet, pre-load first track
+        const firstTrack = tracks[0];
+        if (firstTrack && audio) {
+          setActiveIndex(0);
+          audio.src = firstTrack.audioUrl;
+          audio.load();
         }
       }
     },
-    [activeIndex, isPlaying],
+    [activeIndex, isPlaying, visibleQueueContext],
   );
 
   const setSelectedCategoryId = useCallback(
@@ -489,8 +536,8 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
   );
 
   return (
-    <PlaybackContext.Provider value={contextValue}>
+    <PlaybackContext value={contextValue}>
       {children}
-    </PlaybackContext.Provider>
+    </PlaybackContext>
   );
 }

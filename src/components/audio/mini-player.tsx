@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import { Pause, Play } from "lucide-react";
-import Image from "next/image";
-import { useCallback, useEffect, useRef } from "react";
+import { motion } from 'framer-motion';
+import { Pause, Play } from 'lucide-react';
+import Image from 'next/image';
+import { useCallback, useEffect, useRef } from 'react';
 
-import { cn } from "@/libs/utils";
-import { usePlayback } from "./playback-provider";
+import { cn } from '@/libs/utils';
+import { usePlayback } from './playback-provider';
 
 /**
  * Mini player bar that appears at the bottom when a track is active
@@ -31,23 +31,29 @@ export function MiniPlayer() {
   // Format time from seconds to MM:SS
   const formatTime = useCallback((seconds: number): string => {
     if (!seconds || !Number.isFinite(seconds)) {
-      return "0:00";
+      return '0:00';
     }
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   }, []);
 
   // Audio visualization effect
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      return;
+    }
 
     const draw = () => {
-      if (!ctx || !canvas) return;
+      if (!ctx || !canvas) {
+        return;
+      }
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const bars = 30;
@@ -64,10 +70,10 @@ export function MiniPlayer() {
 
         // Color based on progress
         const barPercent = (i / bars) * 100;
-        ctx.fillStyle =
-          barPercent <= progress
-            ? "rgba(255, 255, 255, 0.9)"
-            : "rgba(255, 255, 255, 0.2)";
+        ctx.fillStyle
+          = barPercent <= progress
+            ? 'rgba(255, 255, 255, 0.9)'
+            : 'rgba(255, 255, 255, 0.2)';
 
         const x = i * (width + gap);
         const y = (canvas.height - height) / 2;
@@ -102,7 +108,7 @@ export function MiniPlayer() {
   }, [openPlayer]);
 
   // Don't render if player disabled, no active track, or if full player is open
-  if (!playerEnabled || !activeTrack || uiMode === "player") {
+  if (!playerEnabled || !activeTrack || uiMode === 'player') {
     return null;
   }
 
@@ -135,19 +141,21 @@ export function MiniPlayer() {
       >
         {/* Album art / Track image */}
         <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white/10">
-          {activeTrack.imageUrl ? (
-            <Image
-              src={activeTrack.imageUrl}
-              alt={activeTrack.title}
-              fill
-              className="object-cover"
-              sizes="48px"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-xl font-bold text-white/30">
-              {activeTrack.title.charAt(0).toUpperCase()}
-            </div>
-          )}
+          {activeTrack.imageUrl
+            ? (
+                <Image
+                  src={activeTrack.imageUrl}
+                  alt={activeTrack.title}
+                  fill
+                  className="object-cover"
+                  sizes="48px"
+                />
+              )
+            : (
+                <div className="flex h-full w-full items-center justify-center text-xl font-bold text-white/30">
+                  {activeTrack.title.charAt(0).toUpperCase()}
+                </div>
+              )}
         </div>
 
         {/* Track info */}
@@ -159,19 +167,12 @@ export function MiniPlayer() {
             <span className="truncate">{activeTrack.category}</span>
             <span>•</span>
             <span>
-              {formatTime(currentTimeSec)} / {formatTime(durationSec ?? 0)}
+              {formatTime(currentTimeSec)}
+              {' '}
+              /
+              {formatTime(durationSec ?? 0)}
             </span>
           </div>
-        </div>
-
-        {/* Waveform visualization */}
-        <div className="hidden h-8 w-24 shrink-0 sm:block">
-          <canvas
-            ref={canvasRef}
-            width={96}
-            height={32}
-            className="h-full w-full"
-          />
         </div>
 
         {/* Play/Pause button */}
@@ -180,28 +181,30 @@ export function MiniPlayer() {
           whileTap={{ scale: 0.95 }}
           onClick={handlePlayButtonClick}
           className={cn(
-            "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all",
+            'flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all',
             isPlaying
-              ? "bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]"
-              : "bg-white/10 text-white hover:bg-white hover:text-black",
-            isLoading && "opacity-50",
+              ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]'
+              : 'bg-white/10 text-white hover:bg-white hover:text-black',
+            isLoading && 'opacity-50',
           )}
           role="button"
-          aria-label={isPlaying ? "Pause" : "Play"}
+          aria-label={isPlaying ? 'Pause' : 'Play'}
           tabIndex={0}
           onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
+            if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
               e.stopPropagation();
               togglePlay();
             }
           }}
         >
-          {isPlaying ? (
-            <Pause className="h-4 w-4 fill-current" />
-          ) : (
-            <Play className="ml-0.5 h-4 w-4 fill-current" />
-          )}
+          {isPlaying
+            ? (
+                <Pause className="h-4 w-4 fill-current" />
+              )
+            : (
+                <Play className="ml-0.5 h-4 w-4 fill-current" />
+              )}
         </motion.div>
       </button>
     </motion.div>
