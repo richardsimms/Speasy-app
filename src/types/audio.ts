@@ -40,7 +40,7 @@ export type PlayerUIMode = 'inline' | 'player';
 /**
  * Global playback state managed by PlaybackProvider
  */
-export type PlaybackState = {
+type PlaybackState = {
   /** Current UI mode */
   uiMode: PlayerUIMode;
   /** Whether the global player is enabled (toggle in nav) - defaults to true */
@@ -68,7 +68,7 @@ export type PlaybackState = {
 /**
  * Actions available from the playback provider
  */
-export type PlaybackActions = {
+type PlaybackActions = {
   /** Play a specific track, optionally setting queue context */
   playTrack: (
     trackId: string,
