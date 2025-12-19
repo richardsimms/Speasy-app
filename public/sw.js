@@ -287,11 +287,8 @@ self.addEventListener('notificationclick', (event) => {
     // Navigate to player with specific digest
     const playerUrl = `/dashboard?play=${digestId}`;
     event.waitUntil(openOrFocusClient(playerUrl));
-  } else if (event.action === 'dismiss') {
-    // Just close the notification
-
-  } else {
-    // Default: open the dashboard
+  } else if (event.action !== 'dismiss') {
+    // Default: open the dashboard (dismiss action just closes notification)
     event.waitUntil(openOrFocusClient(urlToOpen));
   }
 });

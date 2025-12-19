@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { usePWA } from './PWAProvider';
 
 /**
@@ -8,7 +8,7 @@ import { usePWA } from './PWAProvider';
  */
 function getInitialDismissedState(): boolean {
   if (typeof window === 'undefined') {
-    return true;
+    return true; // SSR: default to hidden
   }
   return localStorage.getItem('speasy-ios-prompt-dismissed') === 'true';
 }
@@ -20,31 +20,33 @@ function getInitialDismissedState(): boolean {
 export function IOSInstallPrompt() {
   const { isIOS, isInstalled, getIOSInstructions } = usePWA();
   const [isDismissed, setIsDismissed] = useState(getInitialDismissedState);
-  const hasShownRef = useRef(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   const instructions = getIOSInstructions();
 
   // Show prompt after delay for iOS users who haven't dismissed
   useEffect(() => {
-    // Skip if already dismissed or not on iOS
-    if (isDismissed || !isIOS || isInstalled || !instructions.supported || hasShownRef.current) {
+    // Skip if already dismissed, not on iOS, already installed, or not supported
+    if (isDismissed || !isIOS || isInstalled || !instructions.supported) {
       return;
     }
 
+    // Show after 5 second delay
     const timer = setTimeout(() => {
-      hasShownRef.current = true;
-      setIsDismissed(false);
-    }, 5000); // Show after 5 seconds
+      setIsVisible(true);
+    }, 5000);
 
     return () => clearTimeout(timer);
   }, [isIOS, isInstalled, instructions.supported, isDismissed]);
 
   const handleDismiss = useCallback(() => {
     setIsDismissed(true);
+    setIsVisible(false);
     localStorage.setItem('speasy-ios-prompt-dismissed', 'true');
   }, []);
 
-  if (isDismissed || !isIOS || isInstalled || !instructions.supported) {
+  // Don't render if not visible or conditions not met
+  if (!isVisible || isDismissed || !isIOS || isInstalled || !instructions.supported) {
     return null;
   }
 

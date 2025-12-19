@@ -72,7 +72,20 @@ export function PWAProvider({ children }: PWAProviderProps) {
       promptInstall: install.promptInstall,
       getIOSInstructions: install.getIOSInstructions,
     }),
-    [sw, install],
+    [
+      sw.isSupported,
+      sw.isReady,
+      sw.updateAvailable,
+      sw.skipWaiting,
+      sw.cacheAudio,
+      sw.clearAudioCache,
+      install.isInstallable,
+      install.isInstalled,
+      install.isIOS,
+      install.isStandalone,
+      install.promptInstall,
+      install.getIOSInstructions,
+    ],
   );
 
   return <PWAContext value={value}>{children}</PWAContext>;

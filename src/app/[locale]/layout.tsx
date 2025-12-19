@@ -59,7 +59,7 @@ export const metadata: Metadata = {
       url: '/favicon.ico',
     },
   ],
-  manifest: '/manifest.webmanifest',
+  manifest: '/manifest.json',
   other: {
     'mobile-web-app-capable': 'yes',
   },
