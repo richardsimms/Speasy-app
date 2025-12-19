@@ -64,4 +64,15 @@ export const Env = createEnv({
     NEXT_PUBLIC_VAPID_PUBLIC_KEY: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
     NODE_ENV: process.env.NODE_ENV,
   },
+  onValidationError: (issues) => {
+    console.error('❌ Invalid environment variables:');
+    const errorMessages = issues.map((issue) => {
+      const path = (issue.path?.length ?? 0) > 0 ? issue.path!.join('.') : 'root';
+      return `  - ${path}: ${issue.message}`;
+    }).join('\n');
+    console.error(errorMessages);
+    throw new Error(
+      `Invalid environment variables:\n${errorMessages}`,
+    );
+  },
 });
