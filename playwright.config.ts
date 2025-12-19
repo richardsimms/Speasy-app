@@ -37,9 +37,14 @@ export default defineConfig<ChromaticConfig>({
       NEXT_PUBLIC_SENTRY_DISABLED: 'true',
       // Pass through environment variables from parent process (GitHub Actions secrets)
       // These will be available from the Docker container environment when CI runs
-      CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY || '',
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || '',
-      DATABASE_URL: process.env.DATABASE_URL || '',
+      // Fall back to non-empty dummy values so env validation passes in CI forks/PRs
+      CLERK_SECRET_KEY:
+        process.env.CLERK_SECRET_KEY || 'dummy-clerk-secret-key-for-build',
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:
+        process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+        || 'pk_test_dummy-clerk-publishable-key-for-build',
+      DATABASE_URL:
+        process.env.DATABASE_URL || 'postgresql://localhost:5433/postgres',
     },
   },
 

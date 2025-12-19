@@ -4,6 +4,7 @@ const config: KnipConfig = {
   // Files to exclude from Knip analysis
   ignore: [
     'checkly.config.ts',
+    'public/sw.js', // Service worker is referenced at runtime, not imported
     'src/libs/I18n.ts',
     'src/types/I18n.ts',
     'src/utils/Helpers.ts',
@@ -19,6 +20,7 @@ const config: KnipConfig = {
   // Dependencies to ignore during analysis
   ignoreDependencies: [
     'conventional-changelog-conventionalcommits',
+    'checkly', // Used in checkly.config.ts (config entrypoint)
     // These are used but knip doesn't detect them properly
     'drizzle-orm', // Used in src/utils/DBConnection.ts and src/libs/DB.ts
     'pg', // Used in src/utils/DBConnection.ts
@@ -31,9 +33,7 @@ const config: KnipConfig = {
     'tw-animate-css', // May be used in Tailwind config or CSS
   ],
   // Binaries to ignore during analysis
-  ignoreBinaries: [
-    'production', // False positive raised with dotenv-cli
-  ],
+  ignoreBinaries: [],
   compilers: {
     css: (text: string) => [...text.matchAll(/(?<=@)import[^;]+/g)].join('\n'),
   },

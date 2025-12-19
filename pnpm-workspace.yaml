@@ -29,7 +29,6 @@ catalog:
   '@next/bundle-analyzer': ^16.0.10
   '@next/eslint-plugin-next': ^16.0.10
   '@playwright/test': ^1.57.0
-  '@radix-ui/react-dialog': ^1.1.15
   '@radix-ui/react-select': ^2.2.6
   '@radix-ui/react-slot': ^1.2.4
   '@sentry/nextjs': ^10.30.0
@@ -53,7 +52,6 @@ catalog:
   clsx: ^2.1.1
   conventional-changelog-conventionalcommits: ^9.1.0
   cross-env: ^10.1.0
-  dotenv-cli: ^11.0.0
   drizzle-kit: ^0.31.8
   drizzle-orm: ^0.45.1
   eslint: ^9.39.2
