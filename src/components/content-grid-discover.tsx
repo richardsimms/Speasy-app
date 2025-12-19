@@ -10,6 +10,7 @@ type ContentItem = {
   title: string;
   summary: string | null;
   imageUrl: string | null;
+  audioUrl: string | null;
   category: string;
   duration: number | null;
   keyInsight: string[] | null;
@@ -94,6 +95,17 @@ export function ContentGridDiscover({
 
   const selectedTabData = tabs.find(tab => tab.id === selectedTab);
   const displayedItems = selectedTabData?.items || [];
+  const queueForTab = displayedItems
+    .filter(item => !!item.audioUrl)
+    .map(item => ({
+      id: item.id,
+      title: item.title,
+      audioUrl: item.audioUrl || '',
+      author: item.category,
+      artworkUrl: item.imageUrl ?? undefined,
+      durationSec: item.duration ?? undefined,
+      contentUrl: `/${locale}/content/${item.id}`,
+    }));
 
   const updateIndicator = useCallback((tabId: string) => {
     const button = tabRefs.current[tabId];
@@ -284,6 +296,7 @@ export function ContentGridDiscover({
                   summary={item.summary}
                   keyInsight={item.keyInsight}
                   imageUrl={item.imageUrl}
+                  audioUrl={item.audioUrl}
                   category={item.category}
                   duration={item.duration}
                   createdAt={item.created_at}
@@ -292,6 +305,7 @@ export function ContentGridDiscover({
                   surface={surface}
                   userId={userId}
                   experimentVariant={experimentVariant}
+                  queue={queueForTab}
                 />
               </div>
             );

@@ -142,6 +142,7 @@ export default async function Dashboard(props: {
       imageUrl: item.image_url && item.image_url.trim() !== '' ? item.image_url : null,
       created_at: item.created_at,
       category: categoryName,
+      audioUrl: audioFile.file_url || null,
       duration: audioFile.duration,
     };
 
@@ -162,6 +163,7 @@ export default async function Dashboard(props: {
         summary: string | null;
         keyInsight: string[] | null;
         imageUrl: string | null;
+        audioUrl: string | null;
         category: string;
         duration: number | null;
         created_at: string;
