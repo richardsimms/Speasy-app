@@ -54,6 +54,10 @@ function getNavItemActive(pathname: string, navItemId: string) {
     return normalizedPathname === '/' || normalizedPathname === '/dashboard';
   }
 
+  if (navItemId === 'digest') {
+    return normalizedPathname === '/blog' || normalizedPathname.startsWith('/blog/');
+  }
+
   if (navItemId === 'about') {
     return normalizedPathname === '/about';
   }
@@ -203,11 +207,11 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
       active: getNavItemActive(resolvedPathname, 'home'),
     },
     {
-      id: 'digets',
+      id: 'digest',
       label: 'Digest',
       icon: Newspaper,
       href: '/blog',
-      active: getNavItemActive(resolvedPathname, 'blog'),
+      active: getNavItemActive(resolvedPathname, 'digest'),
     },
     {
       id: 'about',

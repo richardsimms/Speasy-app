@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
-import { ContentGridDiscover } from "@/components/content-grid-discover";
-import { Env } from "@/libs/Env";
-import { logger } from "@/libs/Logger";
-import { getSupabaseAdmin } from "@/libs/Supabase";
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
+import { ContentGridDiscover } from '@/components/content-grid-discover';
+import { Env } from '@/libs/Env';
+import { logger } from '@/libs/Logger';
+import { getSupabaseAdmin } from '@/libs/Supabase';
 
 // Force dynamic rendering since this page requires user-specific data
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
@@ -14,11 +14,11 @@ export async function generateMetadata(props: {
   const { locale } = await props.params;
   const t = await getTranslations({
     locale,
-    namespace: "Index",
+    namespace: 'Index',
   });
 
   return {
-    title: t("meta_title"),
+    title: t('meta_title'),
   };
 }
 
@@ -52,7 +52,7 @@ export default async function Dashboard(props: {
   // Query from content_items and use !inner join to audio_files to ensure only items with audio
   // Order by created_at DESC to get newest items first
   const { data: contentItems, error } = await supabase
-    .from("content_items")
+    .from('content_items')
     .select(
       `
       id,
@@ -76,18 +76,21 @@ export default async function Dashboard(props: {
       )
     `,
     )
-    .eq("status", "done")
-    .order("created_at", { ascending: false })
+    .eq('status', 'done')
+    .order('created_at', { ascending: false })
     .limit(50);
 
   if (error) {
-    logger.error("Error fetching content items with audio", {
+    logger.error('Error fetching content items with audio', {
       error: error.message,
     });
     return (
       <div className="mx-auto max-w-7xl px-4 py-8">
         <h1 className="mb-8 text-4xl font-bold text-white">Discover</h1>
-        <p className="text-red-500">Error loading content: {error.message}</p>
+        <p className="text-red-500">
+          Error loading content:
+          {error.message}
+        </p>
       </div>
     );
   }
@@ -119,7 +122,7 @@ export default async function Dashboard(props: {
     }
 
     // Get category from tags, or fall back to content_sources.name, or default to "Uncategorized"
-    let categoryName = "Uncategorized";
+    let categoryName = 'Uncategorized';
     const firstTag = item.content_item_tags?.[0] as any;
     if (firstTag?.categories?.name) {
       categoryName = firstTag.categories.name;
@@ -138,7 +141,7 @@ export default async function Dashboard(props: {
       summary: item.summary,
       keyInsight: item.key_insights || null,
       imageUrl:
-        item.image_url && item.image_url.trim() !== "" ? item.image_url : null,
+        item.image_url && item.image_url.trim() !== '' ? item.image_url : null,
       created_at: item.created_at,
       category: categoryName,
       duration: audioFile.duration,

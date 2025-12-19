@@ -51,10 +51,11 @@ type PlaybackProviderProps = {
 export function PlaybackProvider({ children }: PlaybackProviderProps) {
   // Single Audio instance
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const restoreRef = useRef<{ trackId?: string; timeSec?: number }>({});
+  const pendingSeekRef = useRef<number | undefined>(undefined);
 
   // State
   const [uiMode, setUIMode] = useState<PlayerUIMode>('inline');
-  const [queueEnabled, setQueueEnabled] = useState(false);
   // Use lazy initializer to restore from localStorage without useEffect
   const [playerEnabled, setPlayerEnabled] = useState(() => {
     if (typeof window === 'undefined') {
@@ -104,6 +105,20 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
       return;
     }
 
+    // Snapshot persisted resume state without triggering a render
+    try {
+      const savedTrackId = localStorage.getItem(PLAYBACK_STORAGE_KEYS.activeTrackId);
+      const savedTimeSecRaw = localStorage.getItem(PLAYBACK_STORAGE_KEYS.currentTimeSec);
+      const savedTimeSec = savedTimeSecRaw ? Number(savedTimeSecRaw) : undefined;
+
+      restoreRef.current = {
+        trackId: savedTrackId ?? undefined,
+        timeSec: Number.isFinite(savedTimeSec) ? savedTimeSec : undefined,
+      };
+    } catch {
+      // Ignore localStorage errors
+    }
+
     // Create single audio element
     const audio = new Audio();
     audio.preload = 'metadata';
@@ -130,6 +145,13 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
     const handleLoadedMetadata = () => {
       setDurationSec(audio.duration);
       setIsLoading(false);
+
+      if (pendingSeekRef.current !== undefined) {
+        const seekTo = pendingSeekRef.current;
+        pendingSeekRef.current = undefined;
+        audio.currentTime = Math.max(0, Math.min(seekTo, audio.duration || seekTo));
+        setCurrentTimeSec(audio.currentTime);
+      }
     };
 
     const handleEnded = () => {
@@ -192,7 +214,7 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
       audio.removeEventListener('pause', handlePause);
       audio.removeEventListener('error', handleError);
     };
-  }, [queueEnabled, activeIndex, queue]);
+  }, [activeIndex, queue]);
 
   // Persist currentTimeSec and activeTrackId
   useEffect(() => {
@@ -340,12 +362,10 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
 
   const openPlayer = useCallback(() => {
     setUIMode('player');
-    setQueueEnabled(true);
   }, []);
 
   const closePlayer = useCallback(() => {
     setUIMode('inline');
-    setQueueEnabled(false);
     // Audio continues playing, just UI changes
   }, []);
 
@@ -422,31 +442,55 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
           || previousQueueContext.categoryId !== context.categoryId
           || previousQueueContext.source !== context.source;
 
-      if (tracks.length > 0 && isNewContext) {
-        const firstTrack = tracks[0];
-        if (firstTrack && audio) {
-          setActiveIndex(0);
-          audio.src = firstTrack.audioUrl;
+      if (!audio || tracks.length === 0) {
+        return;
+      }
 
-          // If audio was playing, continue playing the new track
-          if (wasPlaying) {
-            audio.play().catch(() => {
-              setIsPlaying(false);
-            });
-            setIsPlaying(true);
-          } else {
-            // Pre-load the audio without playing
-            audio.load();
-          }
-        }
-      } else if (tracks.length > 0 && activeIndex < 0) {
-        // No active track yet, pre-load first track
+      // If switching category/context, jump to the first track and (if playing) keep playing.
+      if (isNewContext) {
         const firstTrack = tracks[0];
-        if (firstTrack && audio) {
-          setActiveIndex(0);
-          audio.src = firstTrack.audioUrl;
+        if (!firstTrack) {
+          return;
+        }
+
+        setActiveIndex(0);
+        audio.src = firstTrack.audioUrl;
+        pendingSeekRef.current = undefined;
+
+        if (wasPlaying) {
+          audio.play().catch(() => {
+            setIsPlaying(false);
+          });
+          setIsPlaying(true);
+        } else {
           audio.load();
         }
+        return;
+      }
+
+      // Initial load / refresh: try to restore last active track + time if it exists in this queue.
+      const restore = restoreRef.current;
+      const restoreIndex = restore.trackId
+        ? tracks.findIndex(t => t.id === restore.trackId)
+        : -1;
+
+      if (activeIndex < 0) {
+        const nextIndex = restoreIndex >= 0 ? restoreIndex : 0;
+        const nextTrack = tracks[nextIndex];
+        if (!nextTrack) {
+          return;
+        }
+
+        setActiveIndex(nextIndex);
+        audio.src = nextTrack.audioUrl;
+
+        if (restoreIndex >= 0 && restore.timeSec !== undefined) {
+          pendingSeekRef.current = restore.timeSec;
+        } else {
+          pendingSeekRef.current = undefined;
+        }
+
+        audio.load();
       }
     },
     [activeIndex, isPlaying, visibleQueueContext],
@@ -484,7 +528,6 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
     () => ({
       // State
       uiMode,
-      queueEnabled,
       playerEnabled,
       queue,
       activeIndex,
@@ -510,7 +553,6 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
     }),
     [
       uiMode,
-      queueEnabled,
       playerEnabled,
       queue,
       activeIndex,

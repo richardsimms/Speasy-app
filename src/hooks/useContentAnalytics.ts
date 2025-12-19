@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { usePostHog } from "posthog-js/react";
-import { useCallback } from "react";
+import { usePostHog } from 'posthog-js/react';
+import { useCallback } from 'react';
 
-type Surface = "home" | "dashboard" | "detail";
-type Source = "category" | "latest" | "detail";
+type Surface = 'home' | 'dashboard' | 'detail';
+type Source = 'category' | 'latest' | 'detail';
 
 type ContentEventProperties = {
   user_id?: string;
@@ -36,7 +36,7 @@ export const useContentAnalytics = () => {
         return;
       }
 
-      posthog.capture("content_viewed", {
+      posthog.capture('content_viewed', {
         user_id: properties.user_id || posthog.get_distinct_id(),
         content_name: properties.content_name,
         content_category: properties.content_category,
@@ -54,7 +54,7 @@ export const useContentAnalytics = () => {
         return;
       }
 
-      posthog.capture("content_play_started", {
+      posthog.capture('content_play_started', {
         user_id: properties.user_id || posthog.get_distinct_id(),
         content_name: properties.content_name,
         content_category: properties.content_category,
@@ -72,7 +72,7 @@ export const useContentAnalytics = () => {
         return;
       }
 
-      posthog.capture("content_play_completed", {
+      posthog.capture('content_play_completed', {
         user_id: properties.user_id || posthog.get_distinct_id(),
         content_name: properties.content_name,
         content_category: properties.content_category,
@@ -89,9 +89,11 @@ export const useContentAnalytics = () => {
    */
   const trackPlayerOpen = useCallback(
     (properties: PlayerEventProperties) => {
-      if (!posthog) return;
+      if (!posthog) {
+        return;
+      }
 
-      posthog.capture("player_open", {
+      posthog.capture('player_open', {
         content_id: properties.content_id,
         source: properties.source,
         category_id: properties.category_id,
@@ -108,9 +110,11 @@ export const useContentAnalytics = () => {
    */
   const trackPlayerClose = useCallback(
     (properties: PlayerEventProperties) => {
-      if (!posthog) return;
+      if (!posthog) {
+        return;
+      }
 
-      posthog.capture("player_close", {
+      posthog.capture('player_close', {
         content_id: properties.content_id,
         source: properties.source,
         category_id: properties.category_id,
@@ -127,9 +131,11 @@ export const useContentAnalytics = () => {
    */
   const trackAudioNextAuto = useCallback(
     (properties: PlayerEventProperties) => {
-      if (!posthog) return;
+      if (!posthog) {
+        return;
+      }
 
-      posthog.capture("audio_next_auto", {
+      posthog.capture('audio_next_auto', {
         content_id: properties.content_id,
         source: properties.source,
         category_id: properties.category_id,
@@ -146,9 +152,11 @@ export const useContentAnalytics = () => {
    */
   const trackAudioNextManual = useCallback(
     (properties: PlayerEventProperties) => {
-      if (!posthog) return;
+      if (!posthog) {
+        return;
+      }
 
-      posthog.capture("audio_next_manual", {
+      posthog.capture('audio_next_manual', {
         content_id: properties.content_id,
         source: properties.source,
         category_id: properties.category_id,
@@ -165,9 +173,11 @@ export const useContentAnalytics = () => {
    */
   const trackAudioPrevManual = useCallback(
     (properties: PlayerEventProperties) => {
-      if (!posthog) return;
+      if (!posthog) {
+        return;
+      }
 
-      posthog.capture("audio_prev_manual", {
+      posthog.capture('audio_prev_manual', {
         content_id: properties.content_id,
         source: properties.source,
         category_id: properties.category_id,
@@ -184,9 +194,11 @@ export const useContentAnalytics = () => {
    */
   const trackAudioComplete = useCallback(
     (properties: PlayerEventProperties) => {
-      if (!posthog) return;
+      if (!posthog) {
+        return;
+      }
 
-      posthog.capture("audio_complete", {
+      posthog.capture('audio_complete', {
         content_id: properties.content_id,
         source: properties.source,
         category_id: properties.category_id,
@@ -208,9 +220,11 @@ export const useContentAnalytics = () => {
         seek_from_sec: number;
       },
     ) => {
-      if (!posthog) return;
+      if (!posthog) {
+        return;
+      }
 
-      posthog.capture("seek", {
+      posthog.capture('seek', {
         content_id: properties.content_id,
         source: properties.source,
         category_id: properties.category_id,

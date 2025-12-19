@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { Cpu, DollarSign, Palette, Star, Trophy } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { usePlaybackOptional } from "@/components/audio/playback-provider";
-import { cn } from "@/libs/utils";
-import { ContentGridCard } from "./content-grid-card";
+import type { Track, VisibleQueueContext } from '@/types/audio';
+import { Cpu, DollarSign, Palette, Star, Trophy } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { usePlaybackOptional } from '@/components/audio/playback-provider';
+import { cn } from '@/libs/utils';
 
-import type { Track, VisibleQueueContext } from "@/types/audio";
+import { ContentGridCard } from './content-grid-card';
 
 type ContentItem = {
   id: string;
@@ -28,7 +28,7 @@ type CategoryGroup = {
 type ContentGridDiscoverProps = {
   categories: CategoryGroup[];
   locale: string;
-  surface?: "home" | "dashboard";
+  surface?: 'home' | 'dashboard';
   userId?: string;
   experimentVariant?: string;
 };
@@ -36,20 +36,20 @@ type ContentGridDiscoverProps = {
 // Map category names to icons
 const getCategoryIcon = (categoryName: string) => {
   const name = categoryName.toLowerCase();
-  if (name.includes("tech") || name.includes("ai") || name === "technology") {
+  if (name.includes('tech') || name.includes('ai') || name === 'technology') {
     return Cpu;
   }
-  if (name.includes("business") || name.includes("finance")) {
+  if (name.includes('business') || name.includes('finance')) {
     return DollarSign;
   }
   if (
-    name.includes("design") ||
-    name.includes("arts") ||
-    name.includes("culture")
+    name.includes('design')
+    || name.includes('arts')
+    || name.includes('culture')
   ) {
     return Palette;
   }
-  if (name.includes("sport")) {
+  if (name.includes('sport')) {
     return Trophy;
   }
   return Star;
@@ -58,14 +58,14 @@ const getCategoryIcon = (categoryName: string) => {
 export function ContentGridDiscover({
   categories,
   locale,
-  surface = "home",
+  surface = 'home',
   userId,
   experimentVariant,
 }: ContentGridDiscoverProps) {
   const playback = usePlaybackOptional();
 
   // Get all items for "For You" (all content)
-  const allItems = categories.flatMap((cat) => cat.items);
+  const allItems = categories.flatMap(cat => cat.items);
 
   // Get "Latest" items (most recent, limit to 20)
   // Sort by full timestamp (newest first)
@@ -81,16 +81,16 @@ export function ContentGridDiscover({
   // Create tabs: For You, Latest, then categories
   const tabs = [
     //  { id: 'for-you', label: 'For You', icon: Home, items: allItems },
-    { id: "latest", label: "Latest", icon: Star, items: latestItems },
-    ...categories.map((cat) => ({
-      id: cat.categoryName.toLowerCase().replace(/\s+/g, "-"),
+    { id: 'latest', label: 'Latest', icon: Star, items: latestItems },
+    ...categories.map(cat => ({
+      id: cat.categoryName.toLowerCase().replace(/\s+/g, '-'),
       label: cat.categoryName,
       icon: getCategoryIcon(cat.categoryName),
       items: cat.items,
     })),
   ];
 
-  const [selectedTab, setSelectedTab] = useState<string>("latest");
+  const [selectedTab, setSelectedTab] = useState<string>('latest');
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
   const [indicatorStyle, setIndicatorStyle] = useState<{
     left: number;
@@ -98,14 +98,14 @@ export function ContentGridDiscover({
   }>({ left: 0, width: 0 });
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
-  const selectedTabData = tabs.find((tab) => tab.id === selectedTab);
+  const selectedTabData = tabs.find(tab => tab.id === selectedTab);
   const displayedItems = selectedTabData?.items || [];
 
   // Build tracks array from displayed items (for queue)
   const tracks = useMemo<Track[]>(() => {
     return displayedItems
-      .filter((item) => item.audioUrl)
-      .map((item) => ({
+      .filter(item => item.audioUrl)
+      .map(item => ({
         id: item.id,
         title: item.title,
         audioUrl: item.audioUrl!,
@@ -119,22 +119,24 @@ export function ContentGridDiscover({
 
   // Build queue context based on selected tab
   const queueContext = useMemo<VisibleQueueContext>(() => {
-    const isLatest = selectedTab === "latest";
+    const isLatest = selectedTab === 'latest';
     return {
-      source: isLatest ? "latest" : "category",
+      source: isLatest ? 'latest' : 'category',
       locale,
       categoryId: isLatest ? undefined : selectedTab,
-      visibleTrackIds: tracks.map((t) => t.id),
+      visibleTrackIds: tracks.map(t => t.id),
     };
   }, [selectedTab, locale, tracks]);
 
   // Update playback provider with selected category for persistence
   // and preload the first track from the current tab
   useEffect(() => {
-    if (!playback) return;
+    if (!playback) {
+      return;
+    }
 
     // Set selected category for persistence
-    if (selectedTab !== "latest") {
+    if (selectedTab !== 'latest') {
       playback.setSelectedCategoryId(selectedTab);
     } else {
       playback.setSelectedCategoryId(undefined);
@@ -169,11 +171,11 @@ export function ContentGridDiscover({
     e: React.KeyboardEvent<HTMLButtonElement>,
     tabId: string,
   ) => {
-    const currentIndex = tabs.findIndex((tab) => tab.id === tabId);
+    const currentIndex = tabs.findIndex(tab => tab.id === tabId);
 
-    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
       e.preventDefault();
-      const direction = e.key === "ArrowLeft" ? -1 : 1;
+      const direction = e.key === 'ArrowLeft' ? -1 : 1;
       const nextIndex = (currentIndex + direction + tabs.length) % tabs.length;
       const nextTab = tabs[nextIndex];
       if (nextTab) {
@@ -184,7 +186,7 @@ export function ContentGridDiscover({
         ] as HTMLElement;
         nextButton?.focus();
       }
-    } else if (e.key === "Home") {
+    } else if (e.key === 'Home') {
       e.preventDefault();
       const firstTab = tabs[0];
       if (firstTab) {
@@ -193,7 +195,7 @@ export function ContentGridDiscover({
           ?.children[0] as HTMLElement;
         firstButton?.focus();
       }
-    } else if (e.key === "End") {
+    } else if (e.key === 'End') {
       e.preventDefault();
       const lastTab = tabs[tabs.length - 1];
       if (lastTab) {
@@ -273,20 +275,20 @@ export function ContentGridDiscover({
                   setHoveredTab(null);
                   updateIndicator(selectedTab);
                 }}
-                onKeyDown={(e) => handleTabKeyDown(e, tab.id)}
-                style={{ touchAction: "manipulation" }}
+                onKeyDown={e => handleTabKeyDown(e, tab.id)}
+                style={{ touchAction: 'manipulation' }}
                 className={cn(
-                  "relative z-10 inline-flex w-max shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-lg px-4 py-3 font-medium transition-colors",
-                  "min-h-[44px]",
-                  "focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]",
-                  "active:scale-95",
-                  isActive || isHovered ? "text-white" : "text-white/70",
+                  'relative z-10 inline-flex w-max shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap rounded-lg px-4 py-3 font-medium transition-colors',
+                  'min-h-[44px]',
+                  'focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-[#0A0A0A]',
+                  'active:scale-95',
+                  isActive || isHovered ? 'text-white' : 'text-white/70',
                 )}
               >
                 <Icon
                   className={cn(
-                    "h-4 w-4 shrink-0 transition-colors",
-                    isActive || isHovered ? "text-white" : "text-white/70",
+                    'h-4 w-4 shrink-0 transition-colors',
+                    isActive || isHovered ? 'text-white' : 'text-white/70',
                   )}
                 />
                 <span>{tab.label}</span>
@@ -326,10 +328,10 @@ export function ContentGridDiscover({
               <div
                 key={item.id}
                 className={cn(
-                  "transition-all",
+                  'transition-all',
                   isFeatured
-                    ? "sm:col-span-2 lg:col-span-2"
-                    : "sm:col-span-1 lg:col-span-1",
+                    ? 'sm:col-span-2 lg:col-span-2'
+                    : 'sm:col-span-1 lg:col-span-1',
                 )}
               >
                 <ContentGridCard

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { usePathname } from "next/navigation";
-import { FullPlayer } from "./full-player";
-import { MiniPlayer } from "./mini-player";
-import { PlaybackProvider } from "./playback-provider";
+import { usePathname } from 'next/navigation';
+import { FullPlayer } from './full-player';
+import { MiniPlayer } from './mini-player';
+import { PlaybackProvider } from './playback-provider';
 
 type AudioPlayerLayoutProps = {
   children: React.ReactNode;
@@ -16,15 +16,17 @@ type AudioPlayerLayoutProps = {
 function isHomePage(pathname: string): boolean {
   // Match home page patterns: /, /en, /en/, etc.
   // Don't match /content/, /about/, /blog/, etc.
-  const segments = pathname.split("/").filter(Boolean);
+  const segments = pathname.split('/').filter(Boolean);
 
   // Root or just locale
-  if (segments.length === 0) return true;
+  if (segments.length === 0) {
+    return true;
+  }
 
   // Just locale like /en or /en/
   if (
-    segments.length === 1 &&
-    /^[a-z]{2}(-[a-z]{2})?$/i.test(segments[0] ?? "")
+    segments.length === 1
+    && /^[a-z]{2}(?:-[a-z]{2})?$/i.test(segments[0] ?? '')
   ) {
     return true;
   }

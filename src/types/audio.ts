@@ -23,7 +23,7 @@ export type Track = {
  * Used to rebuild queue from the current list view
  */
 export type VisibleQueueContext = {
-  source: "category" | "latest";
+  source: 'category' | 'latest';
   locale: string;
   categoryId?: string;
   /** Track IDs in newest → oldest order */
@@ -35,7 +35,7 @@ export type VisibleQueueContext = {
  * - 'inline': Mini player bar at bottom (default when track is active)
  * - 'player': Full player sheet is open
  */
-export type PlayerUIMode = "inline" | "player";
+export type PlayerUIMode = 'inline' | 'player';
 
 /**
  * Global playback state managed by PlaybackProvider
@@ -43,8 +43,6 @@ export type PlayerUIMode = "inline" | "player";
 export type PlaybackState = {
   /** Current UI mode */
   uiMode: PlayerUIMode;
-  /** Whether queue auto-advance is enabled (true only while sheet is open) */
-  queueEnabled: boolean;
   /** Whether the global player is enabled (toggle in nav) - defaults to true */
   playerEnabled: boolean;
   /** Current queue of tracks */
@@ -87,9 +85,9 @@ export type PlaybackActions = {
   openPlayer: () => void;
   /** Close the full player sheet */
   closePlayer: () => void;
-  /** Skip to next track (only works when queueEnabled) */
+  /** Skip to next track */
   next: () => void;
-  /** Skip to previous track (only works when queueEnabled) */
+  /** Skip to previous track */
   prev: () => void;
   /** Set the visible queue context and tracks */
   setQueueContext: (context: VisibleQueueContext, tracks: Track[]) => void;
@@ -108,9 +106,9 @@ export type PlaybackContextValue = PlaybackState & PlaybackActions;
  * localStorage keys for persistence
  */
 export const PLAYBACK_STORAGE_KEYS = {
-  activeTrackId: "speasy-active-track-id",
-  currentTimeSec: "speasy-current-time-sec",
-  selectedCategoryId: "speasy-selected-category-id",
-  lastQueueContext: "speasy-last-queue-context",
-  playerEnabled: "speasy-player-enabled",
+  activeTrackId: 'speasy-active-track-id',
+  currentTimeSec: 'speasy-current-time-sec',
+  selectedCategoryId: 'speasy-selected-category-id',
+  lastQueueContext: 'speasy-last-queue-context',
+  playerEnabled: 'speasy-player-enabled',
 } as const;

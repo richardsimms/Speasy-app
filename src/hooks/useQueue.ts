@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useCallback, useMemo } from "react";
+import type { Track, VisibleQueueContext } from '@/types/audio';
 
-import type { Track, VisibleQueueContext } from "@/types/audio";
+import { useCallback, useMemo } from 'react';
 
 type ContentItem = {
   id: string;
@@ -16,7 +16,7 @@ type ContentItem = {
 };
 
 type UseQueueOptions = {
-  source: "category" | "latest";
+  source: 'category' | 'latest';
   locale: string;
   categoryId?: string;
 };
@@ -30,8 +30,8 @@ export function useQueue(items: ContentItem[], options: UseQueueOptions) {
   // Convert content items to Track objects
   const tracks = useMemo<Track[]>(() => {
     return items
-      .filter((item) => item.audioUrl) // Only items with audio
-      .map((item) => ({
+      .filter(item => item.audioUrl) // Only items with audio
+      .map(item => ({
         id: item.id,
         title: item.title,
         audioUrl: item.audioUrl!,
@@ -49,7 +49,7 @@ export function useQueue(items: ContentItem[], options: UseQueueOptions) {
       source,
       locale,
       categoryId,
-      visibleTrackIds: tracks.map((t) => t.id),
+      visibleTrackIds: tracks.map(t => t.id),
     }),
     [source, locale, categoryId, tracks],
   );
@@ -57,7 +57,7 @@ export function useQueue(items: ContentItem[], options: UseQueueOptions) {
   // Helper to find a track by ID
   const getTrackById = useCallback(
     (trackId: string): Track | undefined => {
-      return tracks.find((t) => t.id === trackId);
+      return tracks.find(t => t.id === trackId);
     },
     [tracks],
   );
@@ -65,7 +65,7 @@ export function useQueue(items: ContentItem[], options: UseQueueOptions) {
   // Helper to get track index
   const getTrackIndex = useCallback(
     (trackId: string): number => {
-      return tracks.findIndex((t) => t.id === trackId);
+      return tracks.findIndex(t => t.id === trackId);
     },
     [tracks],
   );
@@ -94,7 +94,9 @@ export function mapContentToTrack(
   },
   locale: string,
 ): Track | null {
-  if (!item.audioUrl) return null;
+  if (!item.audioUrl) {
+    return null;
+  }
 
   return {
     id: item.id,

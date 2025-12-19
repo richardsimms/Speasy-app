@@ -38,7 +38,7 @@ export function MiniPlayer() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }, []);
 
-  // Audio visualization effect
+  // Audio visualization effect (only animates while playing)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) {
@@ -50,7 +50,7 @@ export function MiniPlayer() {
       return;
     }
 
-    const draw = () => {
+    const drawFrame = () => {
       if (!ctx || !canvas) {
         return;
       }
@@ -62,18 +62,13 @@ export function MiniPlayer() {
       const progress = durationSec ? (currentTimeSec / durationSec) * 100 : 0;
 
       for (let i = 0; i < bars; i++) {
-        // Dynamic height based on playing state
-        let height = 4;
-        if (isPlaying) {
-          height = Math.random() * 16 + 4;
-        }
+        const height = isPlaying ? Math.random() * 16 + 4 : 6;
 
         // Color based on progress
         const barPercent = (i / bars) * 100;
-        ctx.fillStyle
-          = barPercent <= progress
-            ? 'rgba(255, 255, 255, 0.9)'
-            : 'rgba(255, 255, 255, 0.2)';
+        ctx.fillStyle = barPercent <= progress
+          ? 'rgba(255, 255, 255, 0.9)'
+          : 'rgba(255, 255, 255, 0.2)';
 
         const x = i * (width + gap);
         const y = (canvas.height - height) / 2;
@@ -83,10 +78,12 @@ export function MiniPlayer() {
         ctx.fill();
       }
 
-      animationFrameRef.current = requestAnimationFrame(draw);
+      if (isPlaying) {
+        animationFrameRef.current = requestAnimationFrame(drawFrame);
+      }
     };
 
-    draw();
+    drawFrame();
 
     return () => {
       if (animationFrameRef.current) {
@@ -95,13 +92,9 @@ export function MiniPlayer() {
     };
   }, [isPlaying, currentTimeSec, durationSec]);
 
-  const handlePlayButtonClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      togglePlay();
-    },
-    [togglePlay],
-  );
+  const handlePlayButtonClick = useCallback(() => {
+    togglePlay();
+  }, [togglePlay]);
 
   const handleOpenPlayer = useCallback(() => {
     openPlayer();
@@ -132,51 +125,54 @@ export function MiniPlayer() {
         />
       </div>
 
-      {/* Clickable area to open player */}
-      <button
-        type="button"
-        onClick={handleOpenPlayer}
-        className="flex w-full items-center gap-4 p-3 text-left hover:bg-white/5"
-        aria-label="Open full player"
-      >
-        {/* Album art / Track image */}
-        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white/10">
-          {activeTrack.imageUrl
-            ? (
-                <Image
-                  src={activeTrack.imageUrl}
-                  alt={activeTrack.title}
-                  fill
-                  className="object-cover"
-                  sizes="48px"
-                />
-              )
-            : (
-                <div className="flex h-full w-full items-center justify-center text-xl font-bold text-white/30">
-                  {activeTrack.title.charAt(0).toUpperCase()}
-                </div>
-              )}
-        </div>
-
-        {/* Track info */}
-        <div className="min-w-0 flex-1">
-          <h3 className="truncate text-sm font-medium text-white">
-            {activeTrack.title}
-          </h3>
-          <div className="flex items-center gap-2 text-xs text-white/60">
-            <span className="truncate">{activeTrack.category}</span>
-            <span>•</span>
-            <span>
-              {formatTime(currentTimeSec)}
-              {' '}
-              /
-              {formatTime(durationSec ?? 0)}
-            </span>
+      <div className="flex w-full items-center gap-4 p-3">
+        {/* Clickable area to open player */}
+        <button
+          type="button"
+          onClick={handleOpenPlayer}
+          className="flex min-w-0 flex-1 items-center gap-4 text-left hover:bg-white/5"
+          aria-label="Open full player"
+        >
+          {/* Album art / Track image */}
+          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white/10">
+            {activeTrack.imageUrl
+              ? (
+                  <Image
+                    src={activeTrack.imageUrl}
+                    alt={activeTrack.title}
+                    fill
+                    className="object-cover"
+                    sizes="48px"
+                  />
+                )
+              : (
+                  <div className="flex h-full w-full items-center justify-center text-xl font-bold text-white/30">
+                    {activeTrack.title.charAt(0).toUpperCase()}
+                  </div>
+                )}
           </div>
-        </div>
+
+          {/* Track info */}
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate text-sm font-medium text-white">
+              {activeTrack.title}
+            </h3>
+            <div className="flex items-center gap-2 text-xs text-white/60">
+              <span className="truncate">{activeTrack.category}</span>
+              <span>•</span>
+              <span>
+                {formatTime(currentTimeSec)}
+                {' '}
+                /
+                {formatTime(durationSec ?? 0)}
+              </span>
+            </div>
+          </div>
+        </button>
 
         {/* Play/Pause button */}
-        <motion.div
+        <motion.button
+          type="button"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={handlePlayButtonClick}
@@ -187,16 +183,7 @@ export function MiniPlayer() {
               : 'bg-white/10 text-white hover:bg-white hover:text-black',
             isLoading && 'opacity-50',
           )}
-          role="button"
           aria-label={isPlaying ? 'Pause' : 'Play'}
-          tabIndex={0}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              e.stopPropagation();
-              togglePlay();
-            }
-          }}
         >
           {isPlaying
             ? (
@@ -205,8 +192,8 @@ export function MiniPlayer() {
             : (
                 <Play className="ml-0.5 h-4 w-4 fill-current" />
               )}
-        </motion.div>
-      </button>
+        </motion.button>
+      </div>
     </motion.div>
   );
 }
