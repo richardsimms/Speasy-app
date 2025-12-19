@@ -8,8 +8,6 @@ import {
   ExternalLink,
   Pause,
   Play,
-  SkipBack,
-  SkipForward,
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -198,7 +196,7 @@ export function ContentDetailView({
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A]">
+    <div className="min-h-screen ">
       {/* Back button */}
       <div className="mx-auto max-w-4xl px-4 py-6">
         <Link
@@ -344,60 +342,49 @@ export function ContentDetailView({
           <audio ref={audioRef} src={content.audioUrl} preload="metadata" />
 
           <div className="mx-auto max-w-4xl px-4 py-4">
-            {/* Progress bar */}
-            <div
-              role="slider"
-              aria-label="Audio progress"
-              aria-valuemin={0}
-              aria-valuemax={duration}
-              aria-valuenow={currentTime}
-              tabIndex={0}
-              className="mb-4 h-1 w-full cursor-pointer overflow-hidden rounded-full bg-white/10"
-              onClick={handleSeek}
-              onKeyDown={(e) => {
-                if (e.key === 'ArrowLeft') {
-                  skipTime(-5);
-                } else if (e.key === 'ArrowRight') {
-                  skipTime(5);
-                }
-              }}
-            >
-              <motion.div
-                className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
-                initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
-                transition={{ duration: 0.1 }}
-              />
-            </div>
 
             {/* Controls */}
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center justify-between gap-4 align-middle">
               {/* Time */}
               <div className="flex items-center gap-2 font-mono text-sm text-white/70">
                 <span>{formatTime(currentTime)}</span>
                 <span>/</span>
                 <span>{formatTime(duration)}</span>
               </div>
-
+              {/* Progress bar */}
+              <div
+                role="slider"
+                aria-label="Audio progress"
+                aria-valuemin={0}
+                aria-valuemax={duration}
+                aria-valuenow={currentTime}
+                tabIndex={0}
+                className="h-1 w-full cursor-pointer overflow-hidden rounded-full bg-white/10 align-middle"
+                onClick={handleSeek}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowLeft') {
+                    skipTime(-5);
+                  } else if (e.key === 'ArrowRight') {
+                    skipTime(5);
+                  }
+                }}
+              >
+                <motion.div
+                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 0.1 }}
+                />
+              </div>
               {/* Playback controls */}
               <div className="flex items-center gap-4">
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => skipTime(-10)}
-                  className="text-white/70 transition-colors hover:text-white"
-                  aria-label="Skip back 10 seconds"
-                >
-                  <SkipBack className="h-5 w-5" />
-                </motion.button>
-
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={togglePlay}
                   disabled={isLoading}
                   className={cn(
-                    'flex h-14 w-14 items-center justify-center rounded-full transition-all',
+                    'flex h-10 w-10 items-center justify-center rounded-full transition-all',
                     isPlaying
                       ? 'bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.3)]'
                       : 'bg-white/10 text-white hover:bg-white hover:text-black',
@@ -407,26 +394,14 @@ export function ContentDetailView({
                 >
                   {isPlaying
                     ? (
-                        <Pause className="h-6 w-6 fill-current" />
+                        <Pause className="h-4 w-4 fill-current" />
                       )
                     : (
-                        <Play className="ml-1 h-6 w-6 fill-current" />
+                        <Play className="ml-1 h-4 w-4 fill-current" />
                       )}
                 </motion.button>
 
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => skipTime(10)}
-                  className="text-white/70 transition-colors hover:text-white"
-                  aria-label="Skip forward 10 seconds"
-                >
-                  <SkipForward className="h-5 w-5" />
-                </motion.button>
               </div>
-
-              {/* Spacer for layout balance */}
-              <div className="w-8 md:block md:w-24" aria-hidden="true"></div>
             </div>
           </div>
         </motion.div>

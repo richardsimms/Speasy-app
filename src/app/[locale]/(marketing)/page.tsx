@@ -81,13 +81,14 @@ export default async function Dashboard(props: {
     .limit(50);
 
   if (error) {
-    logger.error('Error fetching content items with audio', { error: error.message });
+    logger.error('Error fetching content items with audio', {
+      error: error.message,
+    });
     return (
       <div className="mx-auto max-w-7xl px-4 py-8">
         <h1 className="mb-8 text-4xl font-bold text-white">Discover</h1>
         <p className="text-red-500">
           Error loading content:
-          {' '}
           {error.message}
         </p>
       </div>
@@ -139,10 +140,12 @@ export default async function Dashboard(props: {
       title: item.title,
       summary: item.summary,
       keyInsight: item.key_insights || null,
-      imageUrl: item.image_url && item.image_url.trim() !== '' ? item.image_url : null,
+      imageUrl:
+        item.image_url && item.image_url.trim() !== '' ? item.image_url : null,
       created_at: item.created_at,
       category: categoryName,
       duration: audioFile.duration,
+      audioUrl: audioFile.file_url,
     };
 
     if (!categoryMap.has(categoryName)) {

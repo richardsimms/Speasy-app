@@ -1,10 +1,15 @@
 'use client';
 
+import type { Track, VisibleQueueContext } from '@/types/audio';
 import { motion } from 'framer-motion';
-import { Clock } from 'lucide-react';
+import { Clock, Pause, Play } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useCallback } from 'react';
+import { usePlaybackOptional } from '@/components/audio/playback-provider';
 import { useContentAnalytics } from '@/hooks/useContentAnalytics';
+
+import { cn } from '@/libs/utils';
 
 type ContentGridCardProps = {
   id: string;
@@ -20,6 +25,12 @@ type ContentGridCardProps = {
   surface?: 'home' | 'dashboard';
   userId?: string;
   experimentVariant?: string;
+  /** Audio URL for inline playback */
+  audioUrl?: string | null;
+  /** Queue context for building queue on play */
+  queueContext?: VisibleQueueContext;
+  /** All tracks in the current view for queue building */
+  allTracks?: Track[];
 };
 
 export function ContentGridCard({
@@ -36,8 +47,59 @@ export function ContentGridCard({
   surface = 'home',
   userId,
   experimentVariant,
+  audioUrl,
+  queueContext,
+  allTracks,
 }: ContentGridCardProps) {
-  const { trackContentViewed } = useContentAnalytics();
+  const { trackContentViewed, trackContentPlayStarted } = useContentAnalytics();
+  const playback = usePlaybackOptional();
+
+  // Check if this track is currently playing
+  const isCurrentTrack = playback?.activeTrack?.id === id;
+  const isPlaying = isCurrentTrack && playback?.isPlaying;
+
+  const handlePlayClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (!playback || !audioUrl) {
+        return;
+      }
+
+      if (isCurrentTrack) {
+        // Toggle play/pause for current track
+        playback.togglePlay();
+      } else {
+        // Start playing this track with queue context
+        playback.playTrack(id, queueContext, allTracks);
+
+        // Track analytics
+        trackContentPlayStarted({
+          user_id: userId,
+          content_name: title,
+          content_category: category,
+          content_id: id,
+          surface,
+          experiment_variant: experimentVariant,
+        });
+      }
+    },
+    [
+      playback,
+      audioUrl,
+      isCurrentTrack,
+      id,
+      queueContext,
+      allTracks,
+      trackContentPlayStarted,
+      userId,
+      title,
+      category,
+      surface,
+      experimentVariant,
+    ],
+  );
 
   // Format duration from seconds to MM:SS
   const formatDuration = (seconds: number | null | undefined): string => {
@@ -138,6 +200,31 @@ export function ContentGridCard({
                     {formatDuration(duration)}
                   </div>
                 )}
+
+                {/* Play button overlay */}
+                {audioUrl && (
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handlePlayClick}
+                    className={cn(
+                      'absolute left-3 bottom-3 flex h-10 w-10 items-center justify-center rounded-full transition-all',
+                      isPlaying
+                        ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]'
+                        : 'bg-black/70 text-white opacity-0 backdrop-blur-sm group-hover:opacity-100 hover:bg-white hover:text-black',
+                    )}
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
+                  >
+                    {isPlaying
+                      ? (
+                          <Pause className="h-4 w-4 fill-current" />
+                        )
+                      : (
+                          <Play className="ml-0.5 h-4 w-4 fill-current" />
+                        )}
+                  </motion.button>
+                )}
               </div>
             )
           : (
@@ -154,6 +241,31 @@ export function ContentGridCard({
                     <Clock className="h-3 w-3" />
                     {formatDuration(duration)}
                   </div>
+                )}
+
+                {/* Play button overlay */}
+                {audioUrl && (
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handlePlayClick}
+                    className={cn(
+                      'absolute left-3 bottom-3 flex h-10 w-10 items-center justify-center rounded-full transition-all',
+                      isPlaying
+                        ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]'
+                        : 'bg-black/70 text-white opacity-0 backdrop-blur-sm group-hover:opacity-100 hover:bg-white hover:text-black',
+                    )}
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
+                  >
+                    {isPlaying
+                      ? (
+                          <Pause className="h-4 w-4 fill-current" />
+                        )
+                      : (
+                          <Play className="ml-0.5 h-4 w-4 fill-current" />
+                        )}
+                  </motion.button>
                 )}
               </div>
             )}

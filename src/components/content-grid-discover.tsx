@@ -1,8 +1,11 @@
 'use client';
 
+import type { Track, VisibleQueueContext } from '@/types/audio';
 import { Cpu, DollarSign, Palette, Star, Trophy } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { usePlaybackOptional } from '@/components/audio/playback-provider';
 import { cn } from '@/libs/utils';
+
 import { ContentGridCard } from './content-grid-card';
 
 type ContentItem = {
@@ -14,6 +17,7 @@ type ContentItem = {
   duration: number | null;
   keyInsight: string[] | null;
   created_at: string;
+  audioUrl?: string | null;
 };
 
 type CategoryGroup = {
@@ -58,6 +62,8 @@ export function ContentGridDiscover({
   userId,
   experimentVariant,
 }: ContentGridDiscoverProps) {
+  const playback = usePlaybackOptional();
+
   // Get all items for "For You" (all content)
   const allItems = categories.flatMap(cat => cat.items);
 
@@ -94,6 +100,54 @@ export function ContentGridDiscover({
 
   const selectedTabData = tabs.find(tab => tab.id === selectedTab);
   const displayedItems = selectedTabData?.items || [];
+
+  // Build tracks array from displayed items (for queue)
+  const tracks = useMemo<Track[]>(() => {
+    return displayedItems
+      .filter(item => item.audioUrl)
+      .map(item => ({
+        id: item.id,
+        title: item.title,
+        audioUrl: item.audioUrl!,
+        imageUrl: item.imageUrl ?? undefined,
+        category: item.category,
+        duration: item.duration ?? undefined,
+        publishedAt: item.created_at,
+        contentUrl: `/${locale}/content/${item.id}`,
+      }));
+  }, [displayedItems, locale]);
+
+  // Build queue context based on selected tab
+  const queueContext = useMemo<VisibleQueueContext>(() => {
+    const isLatest = selectedTab === 'latest';
+    return {
+      source: isLatest ? 'latest' : 'category',
+      locale,
+      categoryId: isLatest ? undefined : selectedTab,
+      visibleTrackIds: tracks.map(t => t.id),
+    };
+  }, [selectedTab, locale, tracks]);
+
+  // Update playback provider with selected category for persistence
+  // and preload the first track from the current tab
+  useEffect(() => {
+    if (!playback) {
+      return;
+    }
+
+    // Set selected category for persistence
+    if (selectedTab !== 'latest') {
+      playback.setSelectedCategoryId(selectedTab);
+    } else {
+      playback.setSelectedCategoryId(undefined);
+    }
+
+    // Preload the queue with current tab's tracks
+    // This sets up the queue so playing any track will work correctly
+    if (tracks.length > 0) {
+      playback.setQueueContext(queueContext, tracks);
+    }
+  }, [playback, selectedTab, tracks, queueContext]);
 
   const updateIndicator = useCallback((tabId: string) => {
     const button = tabRefs.current[tabId];
@@ -168,7 +222,9 @@ export function ContentGridDiscover({
     <div className="space-y-8">
       {/* Header */}
       <div className="mb-2">
-        <h1 className="mb-3 font-serif text-5xl leading-tight text-white">Discover</h1>
+        <h1 className="mb-3 font-serif text-5xl leading-tight text-white">
+          Discover
+        </h1>
       </div>
 
       {/* Tab Navigation */}
@@ -292,6 +348,9 @@ export function ContentGridDiscover({
                   surface={surface}
                   userId={userId}
                   experimentVariant={experimentVariant}
+                  audioUrl={item.audioUrl}
+                  queueContext={queueContext}
+                  allTracks={tracks}
                 />
               </div>
             );

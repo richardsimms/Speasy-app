@@ -1,10 +1,11 @@
 'use client';
 
 import type { LucideIcon } from 'lucide-react';
-import { FileText, Home, Menu, Newspaper, X } from 'lucide-react';
+import { FileText, Home, Menu, Newspaper, Radio, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useId, useState } from 'react';
+import { usePlaybackOptional } from '@/components/audio/playback-provider';
 import { cn } from '@/libs/utils';
 
 type SidebarProps = {
@@ -53,6 +54,10 @@ function getNavItemActive(pathname: string, navItemId: string) {
     return normalizedPathname === '/' || normalizedPathname === '/dashboard';
   }
 
+  if (navItemId === 'digest') {
+    return normalizedPathname === '/blog' || normalizedPathname.startsWith('/blog/');
+  }
+
   if (navItemId === 'about') {
     return normalizedPathname === '/about';
   }
@@ -86,6 +91,82 @@ function SidebarNav({ navItems, currentPath, onNavigate }: SidebarNavProps) {
         );
       })}
     </nav>
+  );
+}
+
+function PlayerToggleCompact() {
+  const playback = usePlaybackOptional();
+
+  if (!playback) {
+    return <div className="h-10 w-10" aria-hidden="true" />;
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={playback.togglePlayerEnabled}
+      className={cn(
+        'inline-flex h-10 w-10 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-white/5 hover:text-white',
+        playback.playerEnabled && 'bg-gradient-to-r from-blue-500/20 to-purple-500/20',
+      )}
+      aria-label={
+        playback.playerEnabled
+          ? 'Turn off radio player'
+          : 'Turn on radio player'
+      }
+      aria-pressed={playback.playerEnabled}
+    >
+      <Radio
+        className={cn(
+          'h-5 w-5',
+          playback.playerEnabled && 'text-blue-400',
+        )}
+      />
+    </button>
+  );
+}
+
+function PlayerToggle({ className }: { className?: string }) {
+  const playback = usePlaybackOptional();
+
+  if (!playback) {
+    return null;
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={playback.togglePlayerEnabled}
+      className={cn(
+        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
+        'hover:bg-white/5 active:scale-95',
+        playback.playerEnabled
+          ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white'
+          : 'text-white/60 hover:text-white',
+        className,
+      )}
+      aria-label={
+        playback.playerEnabled
+          ? 'Turn off radio player'
+          : 'Turn on radio player'
+      }
+      aria-pressed={playback.playerEnabled}
+    >
+      <Radio
+        className={cn(
+          'h-5 w-5 shrink-0',
+          playback.playerEnabled && 'text-blue-400',
+        )}
+      />
+      <span>Radio</span>
+      <span
+        className={cn(
+          'ml-auto h-2 w-2 rounded-full transition-colors',
+          playback.playerEnabled ? 'bg-green-500' : 'bg-white/20',
+        )}
+        aria-hidden="true"
+      />
+    </button>
   );
 }
 
@@ -126,11 +207,11 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
       active: getNavItemActive(resolvedPathname, 'home'),
     },
     {
-      id: 'digets',
+      id: 'digest',
       label: 'Digest',
       icon: Newspaper,
       href: '/blog',
-      active: getNavItemActive(resolvedPathname, 'blog'),
+      active: getNavItemActive(resolvedPathname, 'digest'),
     },
     {
       id: 'about',
@@ -277,7 +358,7 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
             {simplifiedLogo}
           </Link>
         </div>
-        <div className="h-10 w-10" aria-hidden="true" />
+        <PlayerToggleCompact />
       </div>
 
       <div
@@ -308,7 +389,12 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
         >
           <div className="flex h-full flex-col">
             <div className="flex h-16 items-center justify-between border-b border-white/10 px-4">
-              <Link href="/" id={mobileDialogTitleId} className="flex items-center" aria-label="Home">
+              <Link
+                href="/"
+                id={mobileDialogTitleId}
+                className="flex items-center"
+                aria-label="Home"
+              >
                 {logo}
               </Link>
               <button
@@ -326,6 +412,9 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
               currentPath={resolvedPathname}
               onNavigate={closeMobile}
             />
+            <div className="border-t border-white/10 p-4">
+              <PlayerToggle />
+            </div>
             {/* {isAuthenticated && <SidebarAccount onNavigate={closeMobile} />} */}
           </div>
         </aside>
@@ -339,6 +428,9 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
             </Link>
           </div>
           <SidebarNav navItems={navItems} currentPath={resolvedPathname} />
+          <div className="border-t border-white/10 p-4">
+            <PlayerToggle />
+          </div>
           {/* <SidebarAccount /> */}
         </div>
       </aside>
