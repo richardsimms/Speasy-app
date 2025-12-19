@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { GeistMono } from 'geist/font/mono';
@@ -11,11 +11,32 @@ import { notFound } from 'next/navigation';
 
 import { PostHogProvider } from '@/components/analytics/PostHogProvider';
 import { LocaleSwitcher } from '@/components/LocaleSwitcher';
+import { IOSInstallPrompt, PWAProvider, PWAUpdateToast } from '@/components/pwa';
 import { routing } from '@/libs/I18nRouting';
 import { BaseTemplate } from '@/templates/BaseTemplate';
 import '@/styles/global.css';
 
 export const metadata: Metadata = {
+  applicationName: 'Speasy',
+  title: {
+    default: 'Speasy - Turn Articles Into Podcasts',
+    template: '%s | Speasy',
+  },
+  description: 'Transform newsletters and saved articles into personal podcast-style audio you can listen to anytime.',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Speasy',
+    startupImage: [
+      {
+        url: '/apple-touch-icon.png',
+        media: '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)',
+      },
+    ],
+  },
+  formatDetection: {
+    telephone: false,
+  },
   icons: [
     {
       rel: 'apple-touch-icon',
@@ -38,13 +59,20 @@ export const metadata: Metadata = {
       url: '/favicon.ico',
     },
   ],
+  manifest: '/manifest.webmanifest',
+  other: {
+    'mobile-web-app-capable': 'yes',
+  },
 };
 
-export function generateViewport() {
-  return {
-    themeColor: '#0a090c',
-  };
-}
+export const viewport: Viewport = {
+  themeColor: '#0a090c',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+};
 
 export function generateStaticParams() {
   return routing.locales.map(locale => ({ locale }));
@@ -88,80 +116,84 @@ export default async function RootLayout(props: {
       <body className="font-sans antialiased">
         <NextIntlClientProvider>
           <PostHogProvider>
-            <SpeedInsights />
-            {isMarketingRoute
-              ? (
-                // Marketing routes: render children directly (they have their own layout with sidebar)
-                  <div>{props.children}</div>
-                )
-              : (
-                // Other routes: use BaseTemplate with navigation
-                  <BaseTemplate
-                    leftNav={(
-                      <>
-                        <li>
-                          <Link
-                            href="/"
-                            className="border-none text-gray-700 hover:text-gray-900"
-                          >
-                            {t('home_link')}
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/about/"
-                            className="border-none text-gray-700 hover:text-gray-900"
-                          >
-                            {t('about_link')}
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            href="/portfolio/"
-                            className="border-none text-gray-700 hover:text-gray-900"
-                          >
-                            {t('portfolio_link')}
-                          </Link>
-                        </li>
-                        <li>
-                          <a
-                            className="border-none text-gray-700 hover:text-gray-900"
-                            href="https://github.com/ixartz/Next-js-Boilerplate"
-                          >
-                            GitHub
-                          </a>
-                        </li>
-                      </>
-                    )}
-                    rightNav={(
-                      <>
-                        <li>
-                          <Link
-                            href="/sign-in/"
-                            className="border-none text-gray-700 hover:text-gray-900"
-                          >
-                            {t('sign_in_link')}
-                          </Link>
-                        </li>
+            <PWAProvider>
+              <SpeedInsights />
+              {isMarketingRoute
+                ? (
+                  // Marketing routes: render children directly (they have their own layout with sidebar)
+                    <div>{props.children}</div>
+                  )
+                : (
+                  // Other routes: use BaseTemplate with navigation
+                    <BaseTemplate
+                      leftNav={(
+                        <>
+                          <li>
+                            <Link
+                              href="/"
+                              className="border-none text-gray-700 hover:text-gray-900"
+                            >
+                              {t('home_link')}
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              href="/about/"
+                              className="border-none text-gray-700 hover:text-gray-900"
+                            >
+                              {t('about_link')}
+                            </Link>
+                          </li>
+                          <li>
+                            <Link
+                              href="/portfolio/"
+                              className="border-none text-gray-700 hover:text-gray-900"
+                            >
+                              {t('portfolio_link')}
+                            </Link>
+                          </li>
+                          <li>
+                            <a
+                              className="border-none text-gray-700 hover:text-gray-900"
+                              href="https://github.com/ixartz/Next-js-Boilerplate"
+                            >
+                              GitHub
+                            </a>
+                          </li>
+                        </>
+                      )}
+                      rightNav={(
+                        <>
+                          <li>
+                            <Link
+                              href="/sign-in/"
+                              className="border-none text-gray-700 hover:text-gray-900"
+                            >
+                              {t('sign_in_link')}
+                            </Link>
+                          </li>
 
-                        <li>
-                          <Link
-                            href="/sign-up/"
-                            className="border-none text-gray-700 hover:text-gray-900"
-                          >
-                            {t('sign_up_link')}
-                          </Link>
-                        </li>
+                          <li>
+                            <Link
+                              href="/sign-up/"
+                              className="border-none text-gray-700 hover:text-gray-900"
+                            >
+                              {t('sign_up_link')}
+                            </Link>
+                          </li>
 
-                        <li>
-                          <LocaleSwitcher />
-                        </li>
-                      </>
-                    )}
-                  >
-                    <div className="py-0 text-[0px] [&_p]:my-6">{props.children}</div>
-                  </BaseTemplate>
-                )}
+                          <li>
+                            <LocaleSwitcher />
+                          </li>
+                        </>
+                      )}
+                    >
+                      <div className="py-0 text-[0px] [&_p]:my-6">{props.children}</div>
+                    </BaseTemplate>
+                  )}
+              <PWAUpdateToast />
+              <IOSInstallPrompt />
+            </PWAProvider>
           </PostHogProvider>
         </NextIntlClientProvider>
       </body>
