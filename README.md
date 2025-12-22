@@ -50,7 +50,6 @@ Built with modern, production-ready technologies:
 - 🚓 Commitlint for commit message validation
 - 🦺 Unit testing with Vitest
 - 🧪 E2E testing with Playwright
-- 🎉 Storybook for component development
 - 🔍 Knip for unused dependency detection
 - 🌍 i18n-check for translation validation
 
@@ -172,7 +171,6 @@ The project uses DrizzleORM for type-safe database access. See the [Database Sch
 ├── README.md                       # This file
 ├── CLAUDE.md                       # Development guidelines and best practices
 ├── .github                         # GitHub Actions workflows
-├── .storybook                      # Storybook configuration
 ├── .vscode                         # VSCode settings and extensions
 ├── migrations                      # Database migrations
 ├── public                          # Static assets
@@ -264,12 +262,6 @@ Then open [https://local.drizzle.studio](https://local.drizzle.studio) in your b
 - `pnpm run test` - Run unit tests with Vitest
 - `pnpm run test:e2e` - Run E2E tests with Playwright
 - `npx playwright install` - Install Playwright browsers (first time only)
-
-### Storybook
-
-- `pnpm run storybook` - Start Storybook on port 6006
-- `pnpm run storybook:test` - Run Storybook tests
-- `pnpm run build-storybook` - Build Storybook for production
 
 ### Database
 
