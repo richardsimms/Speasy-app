@@ -19,6 +19,8 @@ const config: KnipConfig = {
   // Dependencies to ignore during analysis
   ignoreDependencies: [
     'conventional-changelog-conventionalcommits',
+    // Used via git hooks configuration (not imported in code)
+    'lefthook',
     // These are used but knip doesn't detect them properly
     'drizzle-orm', // Used in src/utils/DBConnection.ts and src/libs/DB.ts
     'pg', // Used in src/utils/DBConnection.ts
