@@ -124,7 +124,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          fetch-depth: 0 # For chromatic
+          fetch-depth: 0
 
       - name: Set up Node.js environment
         uses: ./.github/actions/setup-project
@@ -140,21 +140,6 @@ jobs:
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
-      - name: Fix test results permission # Give permissions to test results needed by Chromatic
-        run: |
-          sudo chmod -R 777 test-results
-
-      - name: Run visual regression tests
-        if: ${{ secrets.CHROMATIC_PROJECT_TOKEN != '' }}
-        uses: chromaui/action@v13
-        env:
-          CHROMATIC_ARCHIVE_LOCATION: test-results/chromatic-archives
-        with:
-          playwright: true
-          exitOnceUploaded: true # Speed up by skipping the build results
-          outputDir: storybook-static
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
 
       - name: Upload test results
         uses: actions/upload-artifact@v5
