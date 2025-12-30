@@ -1,7 +1,7 @@
 'use client';
 
 import type { LucideIcon } from 'lucide-react';
-import { FileText, Home, Menu, Newspaper, Radio, X } from 'lucide-react';
+import { FileText, Heart, Home, Menu, Newspaper, Radio, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useId, useState } from 'react';
@@ -55,11 +55,17 @@ function getNavItemActive(pathname: string, navItemId: string) {
   }
 
   if (navItemId === 'digest') {
-    return normalizedPathname === '/blog' || normalizedPathname.startsWith('/blog/');
+    return (
+      normalizedPathname === '/blog' || normalizedPathname.startsWith('/blog/')
+    );
   }
 
   if (navItemId === 'about') {
     return normalizedPathname === '/about';
+  }
+
+  if (navItemId === 'manifesto') {
+    return normalizedPathname === '/manifesto';
   }
 
   return false;
@@ -107,7 +113,8 @@ function PlayerToggleCompact() {
       onClick={playback.togglePlayerEnabled}
       className={cn(
         'inline-flex h-10 w-10 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-white/5 hover:text-white',
-        playback.playerEnabled && 'bg-gradient-to-r from-blue-500/20 to-purple-500/20',
+        playback.playerEnabled
+        && 'bg-gradient-to-r from-blue-500/20 to-purple-500/20',
       )}
       aria-label={
         playback.playerEnabled
@@ -117,10 +124,7 @@ function PlayerToggleCompact() {
       aria-pressed={playback.playerEnabled}
     >
       <Radio
-        className={cn(
-          'h-5 w-5',
-          playback.playerEnabled && 'text-blue-400',
-        )}
+        className={cn('h-5 w-5', playback.playerEnabled && 'text-blue-400')}
       />
     </button>
   );
@@ -219,6 +223,13 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
       icon: FileText,
       href: '/about',
       active: getNavItemActive(resolvedPathname, 'about'),
+    },
+    {
+      id: 'manifesto',
+      label: 'Manifesto',
+      icon: Heart,
+      href: '/manifesto',
+      active: getNavItemActive(resolvedPathname, 'manifesto'),
     },
   ];
 
