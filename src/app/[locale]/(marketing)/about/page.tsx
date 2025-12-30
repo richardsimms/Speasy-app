@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   BookOpen,
@@ -11,12 +11,12 @@ import {
   Target,
   Users,
   Zap,
-} from 'lucide-react';
-import Link from 'next/link';
-import { Footer } from '@/components/footer';
-import { ScrollProgress } from '@/components/scroll-progress';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+} from "lucide-react";
+import Link from "next/link";
+import { Footer } from "@/components/footer";
+import { ScrollProgress } from "@/components/scroll-progress";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 export default function AboutPage() {
   return (
@@ -34,8 +34,8 @@ export default function AboutPage() {
               className="h-full w-full"
               style={{
                 backgroundImage:
-                  'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
-                backgroundSize: '80px 80px',
+                  "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
+                backgroundSize: "80px 80px",
               }}
             />
           </div>
@@ -51,8 +51,7 @@ export default function AboutPage() {
               }}
               className="pb-2 text-4xl leading-[1.1] font-bold tracking-tighter text-balance text-white md:text-6xl lg:text-7xl"
             >
-              Reclaim your time.
-              {' '}
+              Reclaim your time.{" "}
               <span className="bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent">
                 Rewrite your story.
               </span>
@@ -85,7 +84,7 @@ export default function AboutPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
+              viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-6 text-center"
             >
@@ -108,7 +107,7 @@ export default function AboutPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: '-50px' }}
+              viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8"
             >
@@ -131,8 +130,7 @@ export default function AboutPage() {
 
                 <p>
                   Reading needs stillness, focus, and a screen. Most days do not
-                  offer that.
-                  {' '}
+                  offer that.{" "}
                   <span className="font-medium text-white">
                     Listening does.
                   </span>
@@ -167,7 +165,7 @@ export default function AboutPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: '-50px' }}
+              viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-12"
             >
@@ -184,16 +182,16 @@ export default function AboutPage() {
                   {[
                     {
                       icon: Target,
-                      text: 'Fresh content from the topics you choose',
+                      text: "Fresh content from the topics you choose",
                     },
-                    { icon: Zap, text: 'Clean, studio-quality voices' },
+                    { icon: Zap, text: "Clean, studio-quality voices" },
                     {
                       icon: BookOpen,
-                      text: 'Delivered through a simple web player and podcast feeds',
+                      text: "Delivered through a simple web player and podcast feeds",
                     },
                     {
                       icon: Sparkles,
-                      text: 'Works with Apple Podcasts, Overcast, and more',
+                      text: "Works with Apple Podcasts, Overcast, and more",
                     },
                   ].map((item, index) => (
                     <motion.div
@@ -230,7 +228,7 @@ export default function AboutPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: '-50px' }}
+              viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8"
             >
@@ -244,9 +242,9 @@ export default function AboutPage() {
 
               <div className="grid gap-4 md:grid-cols-3">
                 {[
-                  'Turn written content into audio you can use anywhere',
-                  'Save time without lowering quality',
-                  'Respect your attention, privacy, and pace',
+                  "Turn written content into audio you can use anywhere",
+                  "Save time without lowering quality",
+                  "Respect your attention, privacy, and pace",
                 ].map((mission, index) => (
                   <motion.div
                     key={index}
@@ -281,11 +279,10 @@ export default function AboutPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: '-50px' }}
+              viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8"
             >
-
               <Card className="group relative border border-gray-800/50 bg-gradient-to-br from-gray-900/50 to-gray-900/30 p-8 shadow-2xl shadow-purple-500/5 backdrop-blur-sm transition-all duration-500 hover:border-gray-700 hover:shadow-purple-500/10 md:p-12">
                 <h2 className="text-center text-3xl font-bold tracking-tight text-balance text-white md:text-4xl">
                   Who Speasy is for
@@ -297,18 +294,18 @@ export default function AboutPage() {
 
                 <div className="grid gap-6 md:grid-cols-2">
                   {[
-                    { icon: Users, text: 'Busy professionals aged 25–45' },
+                    { icon: Users, text: "Busy professionals aged 25–45" },
                     {
                       icon: Brain,
-                      text: 'Founders, makers, and knowledge workers',
+                      text: "Founders, makers, and knowledge workers",
                     },
                     {
                       icon: BookOpen,
-                      text: 'People who already listen to podcasts',
+                      text: "People who already listen to podcasts",
                     },
                     {
                       icon: Clock,
-                      text: 'Anyone with a growing backlog of saved reads',
+                      text: "Anyone with a growing backlog of saved reads",
                     },
                   ].map((item, index) => (
                     <motion.div
@@ -345,7 +342,7 @@ export default function AboutPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: '-50px' }}
+              viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8"
             >
@@ -356,21 +353,21 @@ export default function AboutPage() {
               <div className="space-y-4">
                 {[
                   {
-                    q: 'Does it save time?',
-                    a: 'Yes. You use time that already exists.',
+                    q: "Does it save time?",
+                    a: "Yes. You use time that already exists.",
                   },
                   {
-                    q: 'Is the audio good?',
-                    a: 'Yes. Clear, natural voices designed for long listening.',
+                    q: "Is the audio good?",
+                    a: "Yes. Clear, natural voices designed for long listening.",
                   },
-                  { q: 'Is it simple?', a: 'Yes. Choose topics. Press play.' },
+                  { q: "Is it simple?", a: "Yes. Choose topics. Press play." },
                   {
-                    q: 'Is my data safe?',
-                    a: 'Yes. Your feed is private and yours alone.',
+                    q: "Is my data safe?",
+                    a: "Yes. Your feed is private and yours alone.",
                   },
                   {
-                    q: 'Will it stay useful?',
-                    a: 'Yes. You control what goes in.',
+                    q: "Will it stay useful?",
+                    a: "Yes. You control what goes in.",
                   },
                 ].map((item, index) => (
                   <motion.div
@@ -397,13 +394,84 @@ export default function AboutPage() {
           </div>
         </section>
 
+        {/* About the Maker */}
+        <section className="relative px-4 py-20">
+          <div className="pointer-events-none absolute top-0 left-1/2 h-px w-1/2 -translate-x-1/2 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
+
+          <div className="mx-auto max-w-4xl">
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="space-y-8"
+            >
+              <h2 className="text-left text-3xl font-bold tracking-tight text-balance text-white md:text-4xl">
+                About the maker
+              </h2>
+
+              <div className="space-y-6 text-lg leading-relaxed text-gray-200">
+                <p>
+                  Speasy is made by{" "}
+                  <a
+                    href="https://rsimms.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-white underline decoration-purple-500/50 underline-offset-4 transition-colors hover:decoration-purple-400"
+                  >
+                    Richard Simms
+                  </a>
+                  .
+                </p>
+
+                <p>
+                  I&apos;ve spent years designing digital products used by
+                  millions of people. Along the way, I ran into the same issue
+                  as everyone else around me: more to read, less time to think.
+                </p>
+
+                <p className="font-medium text-white">
+                  Speasy started as something I built for myself.
+                </p>
+
+                <p>
+                  A quiet fix to a real problem.
+                  <br />A tool that respects time, focus, and everyday life.
+                </p>
+
+                <p>
+                  If you want to understand the thinking behind Speasy — how I
+                  approach learning, tools, and building things that last — you
+                  can read the manifesto.
+                </p>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: 0.2 }}
+                  className="pt-2"
+                >
+                  <Link
+                    href="/manifesto"
+                    className="group inline-flex items-center gap-2 font-medium text-white transition-colors hover:text-purple-300"
+                  >
+                    Read the manifesto
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
         {/* Values */}
         <section className="relative px-4 py-20">
           <div className="mx-auto max-w-5xl">
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: '-50px' }}
+              viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-12"
             >
@@ -415,34 +483,34 @@ export default function AboutPage() {
                 {[
                   {
                     icon: Zap,
-                    title: 'Simplicity',
-                    description: 'The best tools stay out of the way.',
-                    color: 'from-violet-500/20 to-purple-500/20',
+                    title: "Simplicity",
+                    description: "The best tools stay out of the way.",
+                    color: "from-violet-500/20 to-purple-500/20",
                   },
                   {
                     icon: Heart,
-                    title: 'Respect',
-                    description: 'Your time and focus matter.',
-                    color: 'from-pink-500/20 to-rose-500/20',
+                    title: "Respect",
+                    description: "Your time and focus matter.",
+                    color: "from-pink-500/20 to-rose-500/20",
                   },
                   {
                     icon: Sparkles,
-                    title: 'Care',
-                    description: 'Quality over noise, always.',
-                    color: 'from-blue-500/20 to-cyan-500/20',
+                    title: "Care",
+                    description: "Quality over noise, always.",
+                    color: "from-blue-500/20 to-cyan-500/20",
                   },
                   {
                     icon: Target,
-                    title: 'Growth',
-                    description: 'Learning should support life, not crowd it.',
-                    color: 'from-emerald-500/20 to-teal-500/20',
+                    title: "Growth",
+                    description: "Learning should support life, not crowd it.",
+                    color: "from-emerald-500/20 to-teal-500/20",
                   },
                 ].map((value, index) => (
                   <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: '-50px' }}
+                    viewport={{ once: true, margin: "-50px" }}
                     transition={{
                       duration: 0.5,
                       delay: index * 0.1,
@@ -483,8 +551,8 @@ export default function AboutPage() {
                           className="pointer-events-none absolute inset-0 opacity-[0.02]"
                           style={{
                             backgroundImage:
-                              'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)',
-                            backgroundSize: '24px 24px',
+                              "radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)",
+                            backgroundSize: "24px 24px",
                           }}
                         />
                       </Card>
@@ -502,7 +570,7 @@ export default function AboutPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: '-50px' }}
+              viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-8 text-center"
             >
@@ -512,9 +580,7 @@ export default function AboutPage() {
 
               <div className="space-y-6">
                 <p className="mx-auto max-w-2xl text-lg leading-relaxed text-balance text-gray-200 md:text-xl">
-                  You are not trying to read more.
-                  {' '}
-                  <br />
+                  You are not trying to read more. <br />
                   You are trying to live well and stay sharp.
                 </p>
 
