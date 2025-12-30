@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import type { LucideIcon } from 'lucide-react';
-import { FileText, Home, Menu, Newspaper, Radio, X } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect, useId, useState } from 'react';
-import { usePlaybackOptional } from '@/components/audio/playback-provider';
-import { cn } from '@/libs/utils';
+import type { LucideIcon } from "lucide-react";
+import { FileText, Heart, Home, Menu, Newspaper, Radio, X } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useId, useState } from "react";
+import { usePlaybackOptional } from "@/components/audio/playback-provider";
+import { cn } from "@/libs/utils";
 
 type SidebarProps = {
   currentPath?: string;
@@ -27,39 +27,45 @@ type SidebarNavProps = {
 };
 
 function normalizePathname(pathname: string) {
-  const trimmed = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
-  const segments = trimmed.split('/').filter(Boolean);
+  const trimmed = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+  const segments = trimmed.split("/").filter(Boolean);
 
   if (segments.length === 0) {
-    return '/';
+    return "/";
   }
 
   const [first, ...rest] = segments;
-  const looksLikeLocale = /^[a-z]{2}(?:-[a-z]{2})?$/i.test(first ?? '');
+  const looksLikeLocale = /^[a-z]{2}(?:-[a-z]{2})?$/i.test(first ?? "");
   if (!looksLikeLocale) {
-    return `/${segments.join('/')}`;
+    return `/${segments.join("/")}`;
   }
 
   if (rest.length === 0) {
-    return '/';
+    return "/";
   }
 
-  return `/${rest.join('/')}`;
+  return `/${rest.join("/")}`;
 }
 
 function getNavItemActive(pathname: string, navItemId: string) {
   const normalizedPathname = normalizePathname(pathname);
 
-  if (navItemId === 'home') {
-    return normalizedPathname === '/' || normalizedPathname === '/dashboard';
+  if (navItemId === "home") {
+    return normalizedPathname === "/" || normalizedPathname === "/dashboard";
   }
 
-  if (navItemId === 'digest') {
-    return normalizedPathname === '/blog' || normalizedPathname.startsWith('/blog/');
+  if (navItemId === "digest") {
+    return (
+      normalizedPathname === "/blog" || normalizedPathname.startsWith("/blog/")
+    );
   }
 
-  if (navItemId === 'about') {
-    return normalizedPathname === '/about';
+  if (navItemId === "about") {
+    return normalizedPathname === "/about";
+  }
+
+  if (navItemId === "manifesto") {
+    return normalizedPathname === "/manifesto";
   }
 
   return false;
@@ -78,11 +84,11 @@ function SidebarNav({ navItems, currentPath, onNavigate }: SidebarNavProps) {
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
-              'hover:bg-white/5 active:scale-95',
+              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+              "hover:bg-white/5 active:scale-95",
               isActive
-                ? 'bg-white/10 text-white'
-                : 'text-white/60 hover:text-white',
+                ? "bg-white/10 text-white"
+                : "text-white/60 hover:text-white",
             )}
           >
             <Icon className="h-5 w-5 shrink-0" />
@@ -106,21 +112,19 @@ function PlayerToggleCompact() {
       type="button"
       onClick={playback.togglePlayerEnabled}
       className={cn(
-        'inline-flex h-10 w-10 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-white/5 hover:text-white',
-        playback.playerEnabled && 'bg-gradient-to-r from-blue-500/20 to-purple-500/20',
+        "inline-flex h-10 w-10 items-center justify-center rounded-lg text-white/80 transition-colors hover:bg-white/5 hover:text-white",
+        playback.playerEnabled &&
+          "bg-gradient-to-r from-blue-500/20 to-purple-500/20",
       )}
       aria-label={
         playback.playerEnabled
-          ? 'Turn off radio player'
-          : 'Turn on radio player'
+          ? "Turn off radio player"
+          : "Turn on radio player"
       }
       aria-pressed={playback.playerEnabled}
     >
       <Radio
-        className={cn(
-          'h-5 w-5',
-          playback.playerEnabled && 'text-blue-400',
-        )}
+        className={cn("h-5 w-5", playback.playerEnabled && "text-blue-400")}
       />
     </button>
   );
@@ -138,31 +142,31 @@ function PlayerToggle({ className }: { className?: string }) {
       type="button"
       onClick={playback.togglePlayerEnabled}
       className={cn(
-        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
-        'hover:bg-white/5 active:scale-95',
+        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+        "hover:bg-white/5 active:scale-95",
         playback.playerEnabled
-          ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white'
-          : 'text-white/60 hover:text-white',
+          ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white"
+          : "text-white/60 hover:text-white",
         className,
       )}
       aria-label={
         playback.playerEnabled
-          ? 'Turn off radio player'
-          : 'Turn on radio player'
+          ? "Turn off radio player"
+          : "Turn on radio player"
       }
       aria-pressed={playback.playerEnabled}
     >
       <Radio
         className={cn(
-          'h-5 w-5 shrink-0',
-          playback.playerEnabled && 'text-blue-400',
+          "h-5 w-5 shrink-0",
+          playback.playerEnabled && "text-blue-400",
         )}
       />
       <span>Radio</span>
       <span
         className={cn(
-          'ml-auto h-2 w-2 rounded-full transition-colors',
-          playback.playerEnabled ? 'bg-green-500' : 'bg-white/20',
+          "ml-auto h-2 w-2 rounded-full transition-colors",
+          playback.playerEnabled ? "bg-green-500" : "bg-white/20",
         )}
         aria-hidden="true"
       />
@@ -174,7 +178,7 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const mobileDialogTitleId = useId();
   const pathname = usePathname();
-  const resolvedPathname = currentPath ?? pathname ?? '/dashboard';
+  const resolvedPathname = currentPath ?? pathname ?? "/dashboard";
 
   useEffect(() => {
     if (!isMobileOpen) {
@@ -182,43 +186,50 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
     }
 
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
 
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         setIsMobileOpen(false);
       }
     };
 
-    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener("keydown", onKeyDown);
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener("keydown", onKeyDown);
     };
   }, [isMobileOpen]);
 
   const navItems: NavItem[] = [
     {
-      id: 'home',
-      label: 'Home',
+      id: "home",
+      label: "Home",
       icon: Home,
-      href: '/',
-      active: getNavItemActive(resolvedPathname, 'home'),
+      href: "/",
+      active: getNavItemActive(resolvedPathname, "home"),
     },
     {
-      id: 'digest',
-      label: 'Digest',
+      id: "digest",
+      label: "Digest",
       icon: Newspaper,
-      href: '/blog',
-      active: getNavItemActive(resolvedPathname, 'digest'),
+      href: "/blog",
+      active: getNavItemActive(resolvedPathname, "digest"),
     },
     {
-      id: 'about',
-      label: 'About',
+      id: "about",
+      label: "About",
       icon: FileText,
-      href: '/about',
-      active: getNavItemActive(resolvedPathname, 'about'),
+      href: "/about",
+      active: getNavItemActive(resolvedPathname, "about"),
+    },
+    {
+      id: "manifesto",
+      label: "Manifesto",
+      icon: Heart,
+      href: "/manifesto",
+      active: getNavItemActive(resolvedPathname, "manifesto"),
     },
   ];
 
@@ -363,8 +374,8 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
 
       <div
         className={cn(
-          'fixed inset-0 z-50 md:hidden',
-          isMobileOpen ? 'pointer-events-auto' : 'pointer-events-none',
+          "fixed inset-0 z-50 md:hidden",
+          isMobileOpen ? "pointer-events-auto" : "pointer-events-none",
         )}
         aria-hidden={!isMobileOpen}
       >
@@ -373,8 +384,8 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
           aria-label="Close menu"
           onClick={closeMobile}
           className={cn(
-            'absolute inset-0 bg-black/60 transition-opacity',
-            isMobileOpen ? 'opacity-100' : 'opacity-0',
+            "absolute inset-0 bg-black/60 transition-opacity",
+            isMobileOpen ? "opacity-100" : "opacity-0",
           )}
         />
 
@@ -383,8 +394,8 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
           aria-modal="true"
           aria-labelledby={mobileDialogTitleId}
           className={cn(
-            'absolute inset-y-0 left-0 w-72 border-r border-white/10 bg-[#100e12] shadow-xl transition-transform',
-            isMobileOpen ? 'translate-x-0' : '-translate-x-full',
+            "absolute inset-y-0 left-0 w-72 border-r border-white/10 bg-[#100e12] shadow-xl transition-transform",
+            isMobileOpen ? "translate-x-0" : "-translate-x-full",
           )}
         >
           <div className="flex h-full flex-col">
