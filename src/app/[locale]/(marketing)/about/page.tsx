@@ -543,7 +543,7 @@ export default function AboutPage() {
                 <Link href="/">
                   <Button
                     size="lg"
-                    className="group rounded-full px-8 py-6 text-lg"
+                    className="group rounded-full bg-white px-8 py-6 text-lg text-gray-900 hover:bg-gray-100"
                   >
                     Get started
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
