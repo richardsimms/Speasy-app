@@ -84,6 +84,15 @@ const manifestoItems = [
   },
 ];
 
+/**
+ * Render a decorative gradient placeholder used as a visual stand-in for images or illustrations.
+ *
+ * The `variant` controls the gradient palette and overall tint; `className` is appended to the root container for sizing or positioning.
+ *
+ * @param className - Optional additional Tailwind CSS classes applied to the root element
+ * @param variant - Visual style to use; `"hero"` for a richer hero gradient, `"section"` for a subtler section gradient
+ * @returns The placeholder JSX element to display in place of an image or illustration
+ */
 function PlaceholderImage({
   className,
   variant = 'hero',
@@ -117,6 +126,15 @@ function PlaceholderImage({
   );
 }
 
+/**
+ * Render the Manifesto marketing page for the app.
+ *
+ * Renders a multi-section page describing the product manifesto, including
+ * an animated hero, opening statement, a responsive grid of manifesto items,
+ * feature and control sections, a closing call-to-action, and the site footer.
+ *
+ * @returns The React element for the Manifesto marketing page.
+ */
 export default function ManifestoPage() {
   return (
     <>

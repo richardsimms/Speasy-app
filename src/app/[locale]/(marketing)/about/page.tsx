@@ -17,6 +17,15 @@ import { Footer } from '@/components/footer';
 import { ScrollProgress } from '@/components/scroll-progress';
 import { Button } from '@/components/ui/button';
 
+/**
+ * Renders the Speasy About page composed of multiple informational sections with animated reveals.
+ *
+ * The page includes a hero, problem statement, story, features, mission, audience, rationale,
+ * maker bio, values, a final call-to-action, and a footer. Visuals use subtle gradients, icons,
+ * responsive layout, and framer-motion for section animations.
+ *
+ * @returns The JSX element for the About page layout
+ */
 export default function AboutPage() {
   return (
     <>

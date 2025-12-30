@@ -47,6 +47,18 @@ function normalizePathname(pathname: string) {
   return `/${rest.join('/')}`;
 }
 
+/**
+ * Determines whether a navigation item should be considered active for the given pathname.
+ *
+ * @param pathname - The URL pathname to evaluate (may include locale segments or trailing slashes)
+ * @param navItemId - The navigation item id to test (`'home'`, `'digest'`, `'about'`, or `'manifesto'`)
+ * @returns `true` if the pathname corresponds to the nav item's active route:
+ * - `'home'`: `/` or `/dashboard`
+ * - `'digest'`: `/blog` or any `/blog/...` subpath
+ * - `'about'`: `/about`
+ * - `'manifesto'`: `/manifesto`
+ * otherwise `false`
+ */
 function getNavItemActive(pathname: string, navItemId: string) {
   const normalizedPathname = normalizePathname(pathname);
 
@@ -100,6 +112,13 @@ function SidebarNav({ navItems, currentPath, onNavigate }: SidebarNavProps) {
   );
 }
 
+/**
+ * Renders a compact radio player toggle used in tight layouts.
+ *
+ * When a playback context is available, displays a 40×40 toggle button that reflects and toggles the player's enabled state and exposes appropriate accessible labels and pressed state. When no playback context is present, renders a same-sized inert placeholder element to preserve layout.
+ *
+ * @returns A React element: either the compact radio toggle button (interactive) or a non-interactive placeholder div for layout.
+ */
 function PlayerToggleCompact() {
   const playback = usePlaybackOptional();
 
@@ -174,6 +193,14 @@ function PlayerToggle({ className }: { className?: string }) {
   );
 }
 
+/**
+ * Render the responsive dashboard sidebar with navigation links, a radio player toggle, and a mobile slide-in menu.
+ *
+ * When the mobile menu is open this component prevents body scrolling and closes the menu on Escape.
+ *
+ * @param currentPath - Optional pathname to use for determining active navigation items instead of the current router pathname.
+ * @returns The dashboard sidebar element (desktop sidebar plus mobile header and slide-in mobile menu).
+ */
 export function DashboardSidebar({ currentPath }: SidebarProps) {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const mobileDialogTitleId = useId();
