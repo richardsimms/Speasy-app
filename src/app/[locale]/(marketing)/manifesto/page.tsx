@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
+import { motion } from 'framer-motion';
 import {
   ArrowRight,
   Clock,
@@ -12,88 +12,88 @@ import {
   Sparkles,
   Target,
   Zap,
-} from "lucide-react";
-import Link from "next/link";
-import { Footer } from "@/components/footer";
-import { ScrollProgress } from "@/components/scroll-progress";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+} from 'lucide-react';
+import Link from 'next/link';
+import { Footer } from '@/components/footer';
+import { ScrollProgress } from '@/components/scroll-progress';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 
 const manifestoItems = [
   {
-    title: "Time matters",
+    title: 'Time matters',
     description:
-      "Time is the one thing you never get back. Speasy exists to respect it.",
+      'Time is the one thing you never get back. Speasy exists to respect it.',
     icon: Clock,
-    color: "from-violet-500/20 to-purple-500/20",
+    color: 'from-violet-500/20 to-purple-500/20',
   },
   {
-    title: "Knowledge should fit your life",
+    title: 'Knowledge should fit your life',
     description:
-      "Learning should work around your day, not fight it. If reading does not fit, listening should.",
+      'Learning should work around your day, not fight it. If reading does not fit, listening should.',
     icon: Compass,
-    color: "from-blue-500/20 to-cyan-500/20",
+    color: 'from-blue-500/20 to-cyan-500/20',
   },
   {
-    title: "No guilt, no backlog",
+    title: 'No guilt, no backlog',
     description:
-      "Saved articles are not a failure. They are good intent stuck in the wrong format.",
+      'Saved articles are not a failure. They are good intent stuck in the wrong format.',
     icon: Heart,
-    color: "from-pink-500/20 to-rose-500/20",
+    color: 'from-pink-500/20 to-rose-500/20',
   },
   {
-    title: "Listen when it suits you",
-    description: "Walking, commuting, cooking, resting. Speasy moves with you.",
+    title: 'Listen when it suits you',
+    description: 'Walking, commuting, cooking, resting. Speasy moves with you.',
     icon: Ear,
-    color: "from-emerald-500/20 to-teal-500/20",
+    color: 'from-emerald-500/20 to-teal-500/20',
   },
   {
-    title: "Simple over clever",
+    title: 'Simple over clever',
     description:
-      "Clear audio. Few steps. No clutter. If it takes effort, it is wrong.",
+      'Clear audio. Few steps. No clutter. If it takes effort, it is wrong.',
     icon: Zap,
-    color: "from-amber-500/20 to-orange-500/20",
+    color: 'from-amber-500/20 to-orange-500/20',
   },
   {
-    title: "Quality earns trust",
+    title: 'Quality earns trust',
     description:
-      "Audio should sound calm and human. Sources should be clear. Nothing hidden.",
+      'Audio should sound calm and human. Sources should be clear. Nothing hidden.',
     icon: Shield,
-    color: "from-indigo-500/20 to-violet-500/20",
+    color: 'from-indigo-500/20 to-violet-500/20',
   },
   {
-    title: "You stay in control",
+    title: 'You stay in control',
     description:
-      "Your interests. Your pace. Your feed. Speasy does not decide for you.",
+      'Your interests. Your pace. Your feed. Speasy does not decide for you.',
     icon: Target,
-    color: "from-rose-500/20 to-pink-500/20",
+    color: 'from-rose-500/20 to-pink-500/20',
   },
   {
-    title: "Learning without pressure",
+    title: 'Learning without pressure',
     description:
-      "No chasing streaks. No noise. Just steady progress, your way.",
+      'No chasing streaks. No noise. Just steady progress, your way.',
     icon: Lightbulb,
-    color: "from-cyan-500/20 to-blue-500/20",
+    color: 'from-cyan-500/20 to-blue-500/20',
   },
   {
-    title: "Reclaim your time",
+    title: 'Reclaim your time',
     description:
-      "Not to do more work, but to think, grow, and live a bit better.",
+      'Not to do more work, but to think, grow, and live a bit better.',
     icon: Sparkles,
-    color: "from-purple-500/20 to-violet-500/20",
+    color: 'from-purple-500/20 to-violet-500/20',
   },
 ];
 
 function PlaceholderImage({
   className,
-  variant = "hero",
+  variant = 'hero',
 }: {
   className?: string;
-  variant?: "hero" | "section";
+  variant?: 'hero' | 'section';
 }) {
   const gradients = {
-    hero: "from-purple-600/30 via-blue-600/20 to-cyan-600/30",
-    section: "from-violet-500/20 via-purple-500/10 to-blue-500/20",
+    hero: 'from-purple-600/30 via-blue-600/20 to-cyan-600/30',
+    section: 'from-violet-500/20 via-purple-500/10 to-blue-500/20',
   };
 
   return (
@@ -105,8 +105,8 @@ function PlaceholderImage({
           className="h-full w-full"
           style={{
             backgroundImage:
-              "radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)",
-            backgroundSize: "32px 32px",
+              'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)',
+            backgroundSize: '32px 32px',
           }}
         />
       </div>
@@ -133,8 +133,8 @@ export default function ManifestoPage() {
               className="h-full w-full"
               style={{
                 backgroundImage:
-                  "linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)",
-                backgroundSize: "80px 80px",
+                  'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
+                backgroundSize: '80px 80px',
               }}
             />
           </div>
@@ -150,7 +150,8 @@ export default function ManifestoPage() {
               }}
               className="text-4xl leading-[1.1] font-bold tracking-tight text-white md:text-5xl lg:text-6xl"
             >
-              What we{" "}
+              What we
+              {' '}
               <span className="bg-gradient-to-r from-white via-white to-gray-400 bg-clip-text text-transparent">
                 believe in
               </span>
@@ -183,7 +184,7 @@ export default function ManifestoPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="grid gap-12 md:grid-cols-2 md:items-center"
             >
@@ -221,7 +222,7 @@ export default function ManifestoPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-12"
             >
@@ -231,7 +232,7 @@ export default function ManifestoPage() {
                     key={item.title}
                     initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
+                    viewport={{ once: true, margin: '-50px' }}
                     transition={{
                       duration: 0.5,
                       delay: index * 0.08,
@@ -277,7 +278,7 @@ export default function ManifestoPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="grid gap-12 md:grid-cols-2 md:items-center"
             >
@@ -313,7 +314,7 @@ export default function ManifestoPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="grid gap-12 md:grid-cols-2 md:items-center"
             >
@@ -352,7 +353,7 @@ export default function ManifestoPage() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
+              viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-6"
             >
