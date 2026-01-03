@@ -55,7 +55,8 @@ Ensure the existing table has proper structure:
 ```
 
 #### 1.3 Create `pending_preferences` Table
-Store preferences for anonymous users before signup (keyed by session/anonymous ID):
+Store preferences for anonymous users before signup (keyed by session/anonymous ID).
+**Note**: Short expiry (1 hour) creates urgency - user must complete signup promptly.
 
 ```sql
 CREATE TABLE pending_preferences (
@@ -63,7 +64,7 @@ CREATE TABLE pending_preferences (
   anonymous_id VARCHAR(255) NOT NULL UNIQUE,
   category_ids UUID[] NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  expires_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() + INTERVAL '7 days'
+  expires_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() + INTERVAL '1 hour'
 );
 
 CREATE INDEX idx_pending_preferences_anonymous ON pending_preferences(anonymous_id);
@@ -78,6 +79,7 @@ Location: `src/components/category-picker.tsx`
 Features:
 - Displays available categories as pill-style buttons (per Perplexity design)
 - Multi-select with visual feedback (checkmark icon, color change)
+- **Minimum 1 category required** - disable submit until at least one selected
 - Optional custom interest input field ("I'm curious about...")
 - Responsive grid layout
 - Accessible (keyboard navigation, ARIA labels)
@@ -88,10 +90,15 @@ type CategoryPickerProps = {
   categories: Array<{ id: string; name: string; icon?: string }>;
   selectedIds: string[];
   onSelectionChange: (ids: string[]) => void;
+  minSelections?: number; // Default: 1
   maxSelections?: number;
   showCustomInput?: boolean;
 };
 ```
+
+Validation:
+- Submit button disabled until `selectedIds.length >= minSelections`
+- Visual hint: "Select at least 1 topic to continue"
 
 #### 2.2 Create API Endpoint for Categories
 Location: `src/app/api/categories/route.ts`
@@ -114,16 +121,29 @@ Triggers:
 Modal content:
 - "Make it yours" heading
 - "Select topics and interests to customize your Discover experience"
-- CategoryPicker component
-- "Save Interests" button (triggers signup if not authenticated)
+- CategoryPicker component (min 1 selection required)
+- "Continue" button → **redirects to signup page**
+
+**Key Flow**: User MUST sign up after selecting categories to access personalized dashboard.
+The modal stores preferences in cookie (1 hour expiry) then redirects to `/sign-up`.
 
 #### 3.2 Create Anonymous Preference Storage Hook
 Location: `src/hooks/useAnonymousPreferences.ts`
 
 Features:
-- Generates/stores anonymous ID in localStorage
-- Saves selected categories to `pending_preferences` table
-- Retrieves preferences for authenticated users to merge
+- Generates unique anonymous ID
+- Stores selected category IDs in **cookie** with **1 hour expiry**
+- Also saves to `pending_preferences` table (server-side backup)
+- On signup completion, reads cookie to transfer preferences to user account
+
+Cookie specification:
+```typescript
+// Cookie name: speasy_pending_prefs
+// Value: JSON { anonymousId: string, categoryIds: string[] }
+// Max-Age: 3600 (1 hour)
+// HttpOnly: false (needs client-side read for signup flow)
+// SameSite: Lax
+```
 
 ### Phase 4: Signup Flow Integration
 
@@ -340,9 +360,15 @@ src/
 
 ---
 
+## Design Decisions (Resolved)
+
+1. **Minimum category selections**: Yes, **minimum 1 category required** to proceed
+2. **Signup requirement**: User **must sign up** after selecting categories to access personalized dashboard
+3. **Anonymous preference expiry**: **1 hour** cookie expiry - creates urgency to complete signup
+4. **"For You" fallback**: If user has no preferences (shouldn't happen with required onboarding), show prompt to set preferences
+
 ## Open Questions
 
-1. Should we require a minimum number of category selections?
-2. Should "For You" fall back to all content if user has no preferences?
-3. How long should we retain anonymous preferences before expiry?
-4. Should we show a "customize" prompt on first dashboard visit if no preferences set?
+1. Should we show a "customize" prompt on first dashboard visit if preferences were somehow skipped?
+2. Should existing users without preferences be prompted to set them on next login?
+3. What analytics events should we track for the preference selection funnel?
