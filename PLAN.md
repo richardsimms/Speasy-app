@@ -110,24 +110,75 @@ Response: { categories: Array<{ id: string; name: string }> }
 
 ### Phase 3: Pre-Signup Preference Capture
 
-#### 3.1 Create Preference Modal Component
-Location: `src/components/preference-modal.tsx`
+#### 3.1 Responsive Preference UI
+
+**Desktop (≥1024px): Sticky Sidebar**
+Location: `src/components/preference-sidebar.tsx`
+
+- Fixed position on the right side of the feed
+- Follows user as they scroll (`position: sticky; top: 24px`)
+- "Make it yours" card with CategoryPicker inline
+- Dismissible with X button (stores dismissal in localStorage, re-shows after 24h)
+- Always visible while scrolling through feed content
+
+Layout structure:
+```
+┌─────────────────────────────────────────────────────┐
+│  Feed Content (2/3 width)  │  Sticky Sidebar (1/3)  │
+│  ┌─────────┐ ┌─────────┐   │  ┌──────────────────┐  │
+│  │ Card 1  │ │ Card 2  │   │  │ Make it yours  X │  │
+│  └─────────┘ └─────────┘   │  │                  │  │
+│  ┌─────────┐ ┌─────────┐   │  │ [Tech] [Finance] │  │
+│  │ Card 3  │ │ Card 4  │   │  │ [Design] [News]  │  │
+│  └─────────┘ └─────────┘   │  │                  │  │
+│  ...scrolling...           │  │ [Save Interests] │  │
+│                            │  └──────────────────┘  │
+└─────────────────────────────────────────────────────┘
+```
+
+**Mobile (<1024px): Floating Action Button + Bottom Sheet**
+Location: `src/components/preference-fab.tsx`, `src/components/preference-sheet.tsx`
+
+- Small floating button in bottom-right corner (doesn't obstruct feed)
+- Icon: sparkles/personalize icon with subtle pulse animation
+- Tap opens bottom sheet modal (slides up from bottom)
+- Bottom sheet contains full CategoryPicker
+- Sheet can be dismissed by swiping down or tapping backdrop
+- FAB hides when user is actively scrolling (re-appears on scroll stop)
+
+Mobile flow:
+```
+┌────────────────┐     ┌────────────────┐
+│   Feed Cards   │     │   Feed Cards   │
+│   ┌────────┐   │     │   (dimmed)     │
+│   │ Card 1 │   │     ├────────────────┤
+│   └────────┘   │     │ Make it yours  │
+│   ┌────────┐   │     │                │
+│   │ Card 2 │   │ --> │ [Categories]   │
+│   └────────┘   │     │                │
+│            [✨]│     │ [Continue]     │
+└────────────────┘     └────────────────┘
+   FAB button            Bottom sheet
+```
+
+#### 3.2 Create Preference Components
+Location: `src/components/preference-modal.tsx` (shared logic)
 
 Triggers:
-- After user views 3+ content items (engagement trigger)
-- When user clicks "Personalize" button on dashboard
-- Manual trigger from marketing page CTA
+- Automatic: After user views 3+ content items (engagement trigger)
+- Manual: When user clicks FAB (mobile) or interacts with sidebar (desktop)
+- Marketing: CTA buttons on landing pages
 
-Modal content:
+Shared content:
 - "Make it yours" heading
 - "Select topics and interests to customize your Discover experience"
 - CategoryPicker component (min 1 selection required)
 - "Continue" button → **redirects to signup page**
 
 **Key Flow**: User MUST sign up after selecting categories to access personalized dashboard.
-The modal stores preferences in cookie (1 hour expiry) then redirects to `/sign-up`.
+The component stores preferences in cookie (1 hour expiry) then redirects to `/sign-up`.
 
-#### 3.2 Create Anonymous Preference Storage Hook
+#### 3.3 Create Anonymous Preference Storage Hook
 Location: `src/hooks/useAnonymousPreferences.ts`
 
 Features:
@@ -302,8 +353,11 @@ src/
 │               └── route.ts              # NEW: listen tracking
 ├── components/
 │   ├── category-picker.tsx               # NEW: reusable picker
-│   ├── preference-modal.tsx              # NEW: modal wrapper
-│   └── discover-grid.tsx                 # Updated: personalized For You
+│   ├── preference-sidebar.tsx            # NEW: desktop sticky sidebar
+│   ├── preference-fab.tsx                # NEW: mobile floating action button
+│   ├── preference-sheet.tsx              # NEW: mobile bottom sheet
+│   ├── preference-modal.tsx              # NEW: shared modal logic
+│   └── discover-grid.tsx                 # Updated: personalized For You + layout
 ├── hooks/
 │   ├── useAnonymousPreferences.ts        # NEW: anonymous storage
 │   └── useListenHistory.ts               # NEW: listen tracking
