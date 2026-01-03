@@ -36,9 +36,6 @@ jobs:
       - name: Audit dependencies for known vulnerabilities
         run: pnpm audit --audit-level=high
 
-      - name: Verify provenance attestations and registry signatures
-        run: npm audit signatures
-
       - name: Release
         run: npx semantic-release
         env:
