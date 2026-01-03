@@ -2,51 +2,58 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-ALWAYS USE .claude/.mcp.json to access SUPABASE Database
+## Quick Reference
 
-# Claude Code Guidelines by Sabrina Ramonov
+**Database Access**: Use MCP server configured in `.claude/.mcp.json` for Supabase database operations
+**Package Manager**: `pnpm` (uses catalog mode - see `pnpm-workspace.yaml`)
+**Next.js Version**: 16.0.10
+**React Version**: 19.2.3
+**TypeScript**: Strict mode enabled
+**Path Aliases**: `@/*` maps to `./src/*`, `@/public/*` maps to `./public/*`
 
-## Implementation Best Practices
+---
 
-### 0 — Purpose  
+# Implementation Best Practices
 
-These rules ensure maintainability, safety, and developer velocity. 
+## 0 — Purpose
+
+These rules ensure maintainability, safety, and developer velocity.
 **MUST** rules are enforced by CI; **SHOULD** rules are strongly recommended.
 
 ---
 
-### 1 — Before Coding
+## 1 — Before Coding
 
 - **BP-1 (MUST)** Ask the user clarifying questions.
-- **BP-2 (SHOULD)** Draft and confirm an approach for complex work.  
+- **BP-2 (SHOULD)** Draft and confirm an approach for complex work.
 - **BP-3 (SHOULD)** If ≥ 2 approaches exist, list clear pros and cons.
 
 ---
 
-### 2 — While Coding
+## 2 — While Coding
 
 - **C-1 (MUST)** Follow TDD: scaffold stub -> write failing test -> implement.
-- **C-2 (MUST)** Name functions with existing domain vocabulary for consistency.  
-- **C-3 (SHOULD NOT)** Introduce classes when small testable functions suffice.  
+- **C-2 (MUST)** Name functions with existing domain vocabulary for consistency.
+- **C-3 (SHOULD NOT)** Introduce classes when small testable functions suffice.
 - **C-4 (SHOULD)** Prefer simple, composable, testable functions.
 - **C-5 (MUST)** Prefer branded `type`s for IDs
   ```ts
   type UserId = Brand<string, 'UserId'>   // ✅ Good
   type UserId = string                    // ❌ Bad
-  ```  
+  ```
 - **C-6 (MUST)** Use `import type { … }` for type-only imports.
 - **C-7 (SHOULD NOT)** Add comments except for critical caveats; rely on self‑explanatory code.
-- **C-8 (SHOULD)** Default to `type`; use `interface` only when more readable or interface merging is required. 
+- **C-8 (SHOULD)** Default to `type`; use `interface` only when more readable or interface merging is required.
 - **C-9 (SHOULD NOT)** Extract a new function unless it will be reused elsewhere, is the only way to unit-test otherwise untestable logic, or drastically improves readability of an opaque block.
 
 ---
 
-### 3 — Testing
+## 3 — Testing
 
-- **T-1 (MUST)** For a simple function, colocate unit tests in `*.spec.ts` in same directory as source file.
-- **T-2 (MUST)** For any API change, add/extend integration tests in `/tests/integration/*.spec.ts`.
-- **T-3 (MUST)** ALWAYS separate pure-logic unit tests from DB-touching integration tests.
-- **T-4 (SHOULD)** Prefer integration tests over heavy mocking.  
+- **T-1 (MUST)** For a simple function, colocate unit tests in `*.test.ts` in same directory as source file.
+- **T-2 (MUST)** For any API change, add/extend integration tests in `/tests/e2e/*.e2e.ts`.
+- **T-3 (MUST)** ALWAYS separate pure-logic unit tests from integration tests.
+- **T-4 (SHOULD)** Prefer integration tests over heavy mocking.
 - **T-5 (SHOULD)** Unit-test complex algorithms thoroughly.
 - **T-6 (SHOULD)** Test the entire structure in one assertion if possible
   ```ts
@@ -58,39 +65,42 @@ These rules ensure maintainability, safety, and developer velocity.
 
 ---
 
-### 4 — Database
+## 4 — Database
 
-- **D-1 (MUST)** All database access MUST go through the Data Access Layer (DAL) at `/lib/dal/`.
-- **D-2 (MUST)** Use Supabase client patterns: `/utils/supabase/server.ts` for server components, `/utils/supabase/client.ts` for client components.
-- **D-3 (MUST)** Never bypass DAL authentication checks - all data access must be user-scoped.
-
----
-
-### 5 — Code Organization
-
-- **O-1 (MUST)** Place shared utilities in `/lib/utils/` and shared components in `/components/`.
-- **O-2 (MUST)** Use `/lib/services/` for external service integrations.
-- **O-3 (MUST)** Keep mobile-specific code in `/mobile-app/` directory.
+- **D-1 (MUST)** Use Drizzle ORM for database operations - schema defined in `src/models/Schema.ts`
+- **D-2 (MUST)** For Supabase operations, use `src/libs/Supabase.ts` which provides `getSupabaseAdmin()` and `userOperations`
+- **D-3 (MUST)** Use Clerk for authentication - accessed via `@clerk/nextjs/server` in server components
+- **D-4 (MUST)** All user data must be scoped to authenticated user via Clerk's `auth()` or `currentUser()`
 
 ---
 
-### 6 — Tooling Gates
+## 5 — Code Organization
 
-- **G-1 (MUST)** `prettier --check` passes.  
-- **G-2 (MUST)** `npm run lint` passes.
-- **G-3 (MUST)** TypeScript compilation passes.
-- **G-4 (SHOULD)** Run `npm test` to ensure tests pass.
-
----
-
-### 7 - Git
-
-- **GH-1 (MUST)** Use Conventional Commits format when writing commit messages: https://www.conventionalcommits.org/en/v1.0.0
-- **GH-2 (SHOULD NOT)** Refer to Claude or Anthropic in commit messages.
+- **O-1 (MUST)** Place shared utilities in `src/utils/` and shared components in `src/components/`
+- **O-2 (MUST)** Use `src/libs/` for third-party library configurations and integrations
+- **O-3 (MUST)** Place blog content in `src/blog/` directory
+- **O-4 (MUST)** Use `@/` path alias for all internal imports (e.g., `import { Env } from '@/libs/Env'`)
 
 ---
 
-## Writing Functions Best Practices
+## 6 — Tooling Gates
+
+- **G-1 (MUST)** ESLint passes - run `pnpm run lint` or `pnpm run lint:fix`
+- **G-2 (MUST)** TypeScript compilation passes - run `pnpm run check:types`
+- **G-3 (SHOULD)** Run `pnpm test` to ensure tests pass
+- **G-4 (SHOULD)** Validate dependencies with `pnpm run check:deps` (Knip)
+
+---
+
+## 7 - Git
+
+- **GH-1 (MUST)** Use Conventional Commits format: https://www.conventionalcommits.org/en/v1.0.0
+- **GH-2 (SHOULD NOT)** Refer to Claude or Anthropic in commit messages
+- **GH-3 (MUST)** Lefthook runs automatically on pre-commit (lint + type check) and commit-msg (commitlint)
+
+---
+
+# Writing Functions Best Practices
 
 When evaluating whether a function you implemented is good or not, use this checklist:
 
@@ -108,7 +118,7 @@ IMPORTANT: you SHOULD NOT refactor out a separate function unless there is a com
   - the refactored function is easily unit testable while the original function is not AND you can't test it any other way
   - the original function is extremely hard to follow and you resort to putting comments everywhere just to explain it
 
-## Writing Tests Best Practices
+# Writing Tests Best Practices
 
 When evaluating whether a test you've implemented is good or not, use this checklist:
 
@@ -116,71 +126,393 @@ When evaluating whether a test you've implemented is good or not, use this check
 2. SHOULD NOT add a test unless it can fail for a real defect. Trivial asserts (e.g., expect(2).toBe(2)) are forbidden.
 3. SHOULD ensure the test description states exactly what the final expect verifies. If the wording and assert don't align, rename or rewrite.
 4. SHOULD compare results to independent, pre-computed expectations or to properties of the domain, never to the function's output re-used as the oracle.
-5. SHOULD follow the same lint, type-safety, and style rules as prod code (prettier, ESLint, strict types).
-6. SHOULD express invariants or axioms (e.g., commutativity, idempotence, round-trip) rather than single hard-coded cases whenever practical. Use `fast-check` library e.g.
-```
-import fc from 'fast-check';
-import { describe, expect, test } from 'vitest';
-import { getCharacterCount } from './string';
-
-describe('properties', () => {
-  test('concatenation functoriality', () => {
-    fc.assert(
-      fc.property(
-        fc.string(),
-        fc.string(),
-        (a, b) =>
-          getCharacterCount(a + b) ===
-          getCharacterCount(a) + getCharacterCount(b)
-      )
-    );
-  });
-});
-```
-
+5. SHOULD follow the same lint, type-safety, and style rules as prod code (ESLint, strict types).
+6. SHOULD express invariants or axioms (e.g., commutativity, idempotence, round-trip) rather than single hard-coded cases whenever practical. Use `fast-check` library if beneficial.
 7. Unit tests for a function should be grouped under `describe(functionName, () => ...`.
 8. Use `expect.any(...)` when testing for parameters that can be anything (e.g. variable ids).
 9. ALWAYS use strong assertions over weaker ones e.g. `expect(x).toEqual(1)` instead of `expect(x).toBeGreaterThanOrEqual(1)`.
 10. SHOULD test edge cases, realistic input, unexpected input, and value boundaries.
 11. SHOULD NOT test conditions that are caught by the type checker.
 
-## Code Organization
+---
 
-This is a **Next.js 15 application** (not a monorepo) with the following structure:
+# Code Organization
 
-- `/app/` - Next.js 15 App Router application
-  - `/app/(app)/` - Authenticated routes (dashboard, content, player, settings, onboarding)
-  - `/app/(pages)/` - Public marketing routes (about, blog, FAQ, privacy)
-  - `/app/api/` - API routes (auth, webhooks, analytics, feeds)
-- `/components/` - React components
-  - `/components/ui/` - Shadcn/UI base components
-  - `/components/sections/` - Landing page sections
-  - `/components/analytics/` - Dashboard analytics components
-  - `/components/player/` - Audio player components
-- `/lib/` - Core application logic
-  - `/lib/dal/` - **Data Access Layer (CRITICAL - see below)**
-  - `/lib/services/` - External service integrations
-  - `/lib/utils/` - Utility functions
-- `/tests/` - Test files
-  - `/tests/integration/` - API and integration tests
-  - `/tests/unit/` - Unit tests for utilities
-- `/mobile-app/` - React Native Expo mobile application
+This is a **Next.js 16 application** using the App Router with the following structure:
 
-## Remember Shortcuts
+```
+/home/user/Speasy-app/
+├── .claude/                    # Claude Code configuration
+│   ├── .mcp.json              # MCP servers (Supabase, Pipedream)
+│   ├── agents/                # Custom agents
+│   └── commands/              # Slash commands
+├── .github/                   # GitHub Actions workflows
+│   ├── actions/               # Reusable actions
+│   └── workflows/             # CI/CD workflows
+├── migrations/                # Drizzle ORM migrations
+├── public/                    # Static assets
+│   ├── assets/               # Images, fonts, etc.
+│   ├── sw.js                 # Service worker (PWA)
+│   ├── manifest.json         # PWA manifest
+│   └── offline.html          # Offline fallback
+├── scripts/                   # Build and utility scripts
+├── src/
+│   ├── app/                  # Next.js 16 App Router
+│   │   ├── [locale]/         # Internationalized routes
+│   │   │   ├── (auth)/       # Auth routes (sign-in, sign-up, dashboard)
+│   │   │   │   ├── (center)/ # Centered auth pages
+│   │   │   │   └── dashboard/# Protected dashboard
+│   │   │   └── (marketing)/  # Public marketing pages
+│   │   │       ├── page.tsx  # Landing page
+│   │   │       ├── about/    # About page
+│   │   │       ├── blog/     # Blog listing and posts
+│   │   │       ├── content/  # Content detail pages
+│   │   │       ├── manifesto/# Manifesto page
+│   │   │       ├── original/ # Original content
+│   │   │       └── portfolio/# Portfolio pages
+│   │   ├── api/              # API routes
+│   │   │   ├── feeds/        # RSS/Podcast feed generation
+│   │   │   ├── push/         # Push notification endpoints
+│   │   │   ├── users/        # User sync endpoints
+│   │   │   └── webhooks/     # Webhook handlers (Clerk, Stripe)
+│   │   ├── offline/          # Offline page
+│   │   ├── global-error.tsx  # Global error handler
+│   │   ├── manifest.ts       # PWA manifest generator
+│   │   ├── robots.ts         # robots.txt generator
+│   │   └── sitemap.ts        # sitemap.xml generator
+│   ├── blog/                 # Blog markdown content
+│   ├── components/           # React components
+│   │   ├── ui/              # Base UI components (shadcn/ui)
+│   │   ├── analytics/       # Analytics components
+│   │   ├── audio/           # Audio player components
+│   │   └── pwa/             # PWA-specific components
+│   ├── hooks/                # Custom React hooks
+│   ├── libs/                 # Third-party library configs
+│   │   ├── Arcjet.ts        # Arcjet security client
+│   │   ├── Env.ts           # Environment variable validation
+│   │   ├── I18n.ts          # Internationalization config
+│   │   ├── Logger.ts        # LogTape logger setup
+│   │   ├── Supabase.ts      # Supabase client and operations
+│   │   ├── blog.ts          # Blog utilities
+│   │   ├── feed-generator.ts# RSS/Podcast feed generator
+│   │   └── server-only.ts   # Server-only utilities
+│   ├── locales/              # Translation files
+│   │   ├── en.json          # English
+│   │   └── fr.json          # French
+│   ├── models/               # Database models
+│   │   └── Schema.ts        # Drizzle ORM schema
+│   ├── styles/               # Global styles
+│   ├── templates/            # Page templates
+│   ├── types/                # TypeScript type definitions
+│   └── utils/                # Utility functions
+│       ├── AppConfig.ts     # App configuration
+│       ├── DBConnection.ts  # Database connection helper
+│       └── Helpers.ts       # General helpers
+├── tests/
+│   └── e2e/                  # Playwright E2E tests
+│       └── *.e2e.ts         # E2E test files
+│       └── *.check.e2e.ts   # Checkly monitoring tests
+├── middleware.ts             # Next.js middleware (Clerk, Arcjet, i18n)
+├── next.config.ts            # Next.js configuration
+├── tsconfig.json             # TypeScript configuration
+├── vitest.config.mts         # Vitest test configuration
+├── playwright.config.ts      # Playwright E2E config
+├── lefthook.yml              # Git hooks configuration
+├── pnpm-workspace.yaml       # pnpm catalog configuration
+└── package.json              # Dependencies and scripts
+```
 
-Remember the following shortcuts which the user may invoke at any time.
+## Architecture Overview
 
-### QNEW
+### Next.js 16 App Router Structure
 
-When I type "qnew", this means:
+- **`src/app/[locale]`**: Internationalized routes using next-intl
+  - **`(auth)`**: Authentication and protected routes
+    - **`(center)`**: Centered layout for sign-in/sign-up pages
+    - **`dashboard`**: Protected dashboard area requiring authentication
+  - **`(marketing)`**: Public marketing pages (landing, about, blog, etc.)
+- **`src/app/api`**: API routes for webhooks, feeds, user sync, push notifications
+- **`src/app/offline`**: PWA offline fallback page
 
+### Authentication & Authorization
+
+**Primary Auth**: Clerk (`@clerk/nextjs`)
+- Middleware: `src/middleware.ts` handles auth routing
+- Protected routes: Match pattern `/dashboard(.*)` and `/:locale/dashboard(.*)`
+- Auth pages: `/sign-in`, `/sign-up` and localized versions
+- Server auth: Use `auth()` from `@clerk/nextjs/server` in Server Components
+- Client auth: Use `useAuth()`, `useUser()` from `@clerk/nextjs`
+
+```typescript
+// Server Component
+import { auth, currentUser } from '@clerk/nextjs/server';
+
+export default async function Page() {
+  const { userId } = await auth();
+  const user = await currentUser();
+  // ...
+}
+
+// API Route
+import { auth } from '@clerk/nextjs/server';
+
+export async function GET() {
+  const { userId } = await auth();
+  if (!userId) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+  // ...
+}
+```
+
+### Database
+
+**ORM**: Drizzle ORM (`drizzle-orm`)
+- Schema: `src/models/Schema.ts`
+- Local dev: PGlite (file-based `local.db`)
+- Production: PostgreSQL
+- Migrations: Auto-applied via `instrumentation.ts` or manual `pnpm run db:migrate`
+
+**Supabase** (Optional):
+- Used for specific features requiring Supabase
+- Admin client: `getSupabaseAdmin()` from `src/libs/Supabase.ts`
+- User operations: `userOperations` object with CRUD methods
+- MCP server configured in `.claude/.mcp.json` for database queries
+
+```typescript
+// Using Drizzle ORM
+import { db } from '@/utils/DBConnection';
+import { usersSchema } from '@/models/Schema';
+
+// Using Supabase
+import { getSupabaseAdmin, userOperations } from '@/libs/Supabase';
+
+const supabase = getSupabaseAdmin();
+const user = await userOperations.getUserByEmail(email);
+```
+
+### Key Integrations
+
+#### Clerk (Authentication)
+- **Middleware**: `src/middleware.ts` - Route protection and auth flow
+- **Webhooks**: `src/app/api/webhooks/clerk/route.ts` - User sync webhook
+- **Env vars**: `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+
+#### Supabase (Optional Database)
+- **Client**: `src/libs/Supabase.ts` - Admin client and user operations
+- **MCP**: `.claude/.mcp.json` - Database access for AI assistant
+- **Env vars**: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (optional)
+
+#### Arcjet (Security)
+- **Client**: `src/libs/Arcjet.ts`
+- **Middleware**: Bot detection and WAF protection
+- **Env vars**: `ARCJET_KEY` (optional)
+
+#### Stripe (Payments - Optional)
+- **Webhooks**: `src/app/api/webhooks/stripe/route.ts`
+- **Env vars**: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`
+
+#### Sentry (Error Monitoring)
+- **Config**: `next.config.ts` - Conditionally enabled
+- **Env vars**: `SENTRY_ORGANIZATION`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`
+- **Dev**: Spotlight at `http://localhost:8969`
+
+#### PostHog (Analytics)
+- **Env vars**: `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`
+
+#### LogTape (Logging)
+- **Config**: `src/libs/Logger.ts`
+- **Production**: Better Stack integration
+- **Env vars**: `NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN`, `NEXT_PUBLIC_BETTER_STACK_INGESTING_HOST`
+
+### UI Components
+
+- **Base components**: `src/components/ui/` - Shadcn/ui components (button, card, select, badge)
+- **Radix UI**: Headless UI primitives for accessible components
+- **Tailwind CSS 4**: Utility-first CSS framework
+- **Theming**: `next-themes` for dark/light mode support
+- **Icons**: `lucide-react`
+- **Fonts**: Geist font family
+
+### Internationalization (i18n)
+
+- **Library**: `next-intl`
+- **Config**: `src/libs/I18n.ts`, `src/libs/I18nRouting.ts`, `src/libs/I18nNavigation.ts`
+- **Locales**: `src/locales/en.json`, `src/locales/fr.json`
+- **Supported**: English (en), French (fr)
+- **Route structure**: `/[locale]/...` for all pages
+
+### PWA Support
+
+- **Service Worker**: `public/sw.js`
+- **Manifest**: Generated via `src/app/manifest.ts`
+- **Offline**: `src/app/offline/page.tsx`
+- **Components**: `src/components/pwa/`
+
+### Security & Validation
+
+- **Arcjet**: Bot detection and WAF in `src/middleware.ts`
+- **Env validation**: Type-safe env vars via `@t3-oss/env-nextjs` in `src/libs/Env.ts`
+- **CSRF**: Handled by Next.js and Clerk
+- **Webhooks**: Validated via Clerk and Stripe webhook signatures
+
+---
+
+# Common Commands
+
+### Development
+```bash
+pnpm run dev              # Start dev server with PGlite + Sentry Spotlight
+pnpm run dev:next         # Start only Next.js dev server
+pnpm run dev:spotlight    # Start Sentry Spotlight
+pnpm run build            # Production build
+pnpm run build-local      # Build with in-memory database (for testing)
+pnpm run start            # Start production server
+```
+
+### Code Quality
+```bash
+pnpm run lint             # Run ESLint
+pnpm run lint:fix         # Auto-fix ESLint issues
+pnpm run check:types      # TypeScript type checking
+pnpm run check:deps       # Check unused dependencies (Knip)
+```
+
+### Testing
+```bash
+pnpm test                 # Run Vitest unit tests
+pnpm run test:e2e         # Run Playwright E2E tests
+```
+
+### Database
+```bash
+pnpm run db:generate      # Generate migration from schema changes
+pnpm run db:migrate       # Apply migrations
+pnpm run db:studio        # Open Drizzle Studio
+pnpm run db-server:file   # Start PGlite server (file-based)
+pnpm run db-server:memory # Start PGlite server (in-memory)
+```
+
+### Other
+```bash
+pnpm run build-stats      # Analyze bundle size
+pnpm run commit           # Interactive conventional commit
+pnpm run clean            # Remove build artifacts
+```
+
+---
+
+# Testing Infrastructure
+
+### Vitest Configuration
+
+The project uses Vitest with two test projects:
+
+1. **Unit tests** (`*.test.ts`):
+   - Environment: Node.js
+   - Location: Co-located with source files (e.g., `src/utils/Helpers.test.ts`)
+   - Exclude: React hooks and component tests
+
+2. **UI tests** (`*.test.tsx` and hooks):
+   - Environment: Browser (Playwright provider)
+   - Location: Component files and `src/hooks/`
+   - Browser: Chromium (headless)
+
+```typescript
+// Unit test example
+import { describe, expect, test } from 'vitest';
+import { helperFunction } from './Helpers';
+
+describe('helperFunction', () => {
+  test('should return expected value', () => {
+    expect(helperFunction('input')).toBe('expected');
+  });
+});
+
+// UI test example (*.test.tsx)
+import { render, screen } from 'vitest-browser-react';
+import { describe, expect, test } from 'vitest';
+import { Button } from './button';
+
+describe('Button', () => {
+  test('renders with text', async () => {
+    render(<Button>Click me</Button>);
+    await expect.element(screen.getByText('Click me')).toBeInTheDocument();
+  });
+});
+```
+
+### E2E Tests
+
+- **Framework**: Playwright
+- **Location**: `tests/e2e/*.e2e.ts`
+- **Monitoring**: `*.check.e2e.ts` files run on Checkly
+- **Config**: `playwright.config.ts`
+
+---
+
+# Environment Variables
+
+Validated via `@t3-oss/env-nextjs` in `src/libs/Env.ts`.
+
+### Required
+```bash
+CLERK_SECRET_KEY=sk_test_...
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+DATABASE_URL=postgresql://localhost:5433/postgres
+```
+
+### Optional - Services
+```bash
+# Supabase
+SUPABASE_URL=https://xxx.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJhbG...
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...
+
+# Stripe
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_PRICE_ID=price_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+
+# Sentry
+NEXT_PUBLIC_SENTRY_DSN=https://...@sentry.io/...
+SENTRY_ORGANIZATION=your-org
+SENTRY_PROJECT=your-project
+SENTRY_AUTH_TOKEN=sntrys_...
+
+# PostHog
+NEXT_PUBLIC_POSTHOG_KEY=phc_...
+NEXT_PUBLIC_POSTHOG_HOST=https://app.posthog.com
+
+# Arcjet
+ARCJET_KEY=ajkey_...
+
+# Better Stack (Logging)
+NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN=...
+NEXT_PUBLIC_BETTER_STACK_INGESTING_HOST=in.logs.betterstack.com
+
+# Other
+OPENAI_KEY=sk-...
+UNSPLASH_ACCESS_KEY=...
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+CLERK_WEBHOOK_SIGNING_SECRET=whsec_...
+VAPID_PRIVATE_KEY=...
+VAPID_SUBJECT=mailto:...
+```
+
+---
+
+# Remember Shortcuts
+
+## QNEW
 ```
 Understand all BEST PRACTICES listed in CLAUDE.md.
 Your code SHOULD ALWAYS follow these best practices.
 ```
 
-### QPLAN
-When I type "qplan", this means:
+## QPLAN
 ```
 Analyze similar parts of the codebase and determine whether your plan:
 - is consistent with rest of codebase
@@ -189,20 +521,14 @@ Analyze similar parts of the codebase and determine whether your plan:
 ```
 
 ## QCODE
-
-When I type "qcode", this means:
-
 ```
 Implement your plan and make sure your new tests pass.
 Always run tests to make sure you didn't break anything else.
-Always run `prettier` on the newly created files to ensure standard formatting.
-Always run `npm run lint` to make sure type checking and linting passes.
+Always run ESLint to ensure code quality.
+Always run TypeScript type checking.
 ```
 
-### QCHECK
-
-When I type "qcheck", this means:
-
+## QCHECK
 ```
 You are a SKEPTICAL senior software engineer.
 Perform this analysis for every MAJOR code change you introduced (skip minor changes):
@@ -212,10 +538,7 @@ Perform this analysis for every MAJOR code change you introduced (skip minor cha
 3. CLAUDE.md checklist Implementation Best Practices.
 ```
 
-### QCHECKF
-
-When I type "qcheckf", this means:
-
+## QCHECKF
 ```
 You are a SKEPTICAL senior software engineer.
 Perform this analysis for every MAJOR function you added or edited (skip minor changes):
@@ -223,10 +546,7 @@ Perform this analysis for every MAJOR function you added or edited (skip minor c
 1. CLAUDE.md checklist Writing Functions Best Practices.
 ```
 
-### QCHECKT
-
-When I type "qcheckt", this means:
-
+## QCHECKT
 ```
 You are a SKEPTICAL senior software engineer.
 Perform this analysis for every MAJOR test you added or edited (skip minor changes):
@@ -234,377 +554,179 @@ Perform this analysis for every MAJOR test you added or edited (skip minor chang
 1. CLAUDE.md checklist Writing Tests Best Practices.
 ```
 
-### QUX
-
-When I type "qux", this means:
-
+## QUX
 ```
-Imagine you are a human UX tester of the feature you implemented. 
+Imagine you are a human UX tester of the feature you implemented.
 Output a comprehensive list of scenarios you would test, sorted by highest priority.
 ```
 
-### QGIT
-
-When I type "qgit", this means:
-
+## QGIT
 ```
 Add all changes to staging, create a commit, and push to remote.
 
 Follow this checklist for writing your commit message:
-- SHOULD use Conventional Commits format: https://www.conventionalcommits.org/en/v1.0.0
-- SHOULD NOT refer to Claude or Anthropic in the commit message.
-- SHOULD structure commit message as follows:
-<type>[optional scope]: <description>
-[optional body]
-[optional footer(s)]
-- commit SHOULD contain the following structural elements to communicate intent: 
-fix: a commit of the type fix patches a bug in your codebase (this correlates with PATCH in Semantic Versioning).
-feat: a commit of the type feat introduces a new feature to the codebase (this correlates with MINOR in Semantic Versioning).
-BREAKING CHANGE: a commit that has a footer BREAKING CHANGE:, or appends a ! after the type/scope, introduces a breaking API change (correlating with MAJOR in Semantic Versioning). A BREAKING CHANGE can be part of commits of any type.
-types other than fix: and feat: are allowed, for example @commitlint/config-conventional (based on the Angular convention) recommends build:, chore:, ci:, docs:, style:, refactor:, perf:, test:, and others.
-footers other than BREAKING CHANGE: <description> may be provided and follow a convention similar to git trailer format.
+- MUST use Conventional Commits format
+- MUST NOT refer to Claude or Anthropic
+- Structure: <type>[optional scope]: <description>
+
+Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore
 ```
-
-## Common Commands
-
-### Development
-- `npm run dev` - Start development server on localhost:3000
-- `npm run build` - Build production version
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm test` - Run Vitest tests
-
-### Testing
-- `npm test` - Run Vitest tests
-- Test setup: Uses Vitest with happy-dom environment
-- Integration tests located in `/tests/integration/`
-- Unit tests located in `/tests/unit/`
-
-### Storybook
-- `npm run storybook` - Start Storybook development server on port 6006
-- `npm run build-storybook` - Build Storybook for production
-
-### Mobile Development
-- `npx expo start` - Start React Native development server (from `/mobile-app/`)
-
-## Architecture Overview
-
-### Next.js 15 App Router Structure
-- **`/app`**: Main application with two route groups:
-  - **`(app)`**: Authenticated user dashboard pages (dashboard, content, player, settings, onboarding)
-  - **`(pages)`**: Public marketing pages (about, blog, FAQ, privacy, terms)
-- **App Router**: Uses Next.js 15 App Router with server components
-- **Authentication**: Required for all routes under `(app)` group
-
-### Data Access Layer (DAL)
-**CRITICAL**: All database access MUST go through the DAL at `/lib/dal/`.
-
-```typescript
-import { dal } from '@/lib/dal';
-
-// Get user's content
-const content = await dal.content.getUserContent();
-
-// Get authenticated user
-const user = await dal.auth.getAuthenticatedUser();
-```
-
-The DAL ensures:
-- User authentication before data access
-- Users only access their own data
-- Subscription requirements are enforced
-- Proper authorization for all queries
-
-### Key Integrations
-
-#### Supabase (Database & Auth)
-- **Client**: Uses `/utils/supabase/client.ts` for client components
-- **Server**: Uses `/utils/supabase/server.ts` for server components
-- **Middleware**: Session refresh handled in `/middleware.ts`
-- **Legacy Support**: `/lib/supabase.ts` provides backward compatibility
-
-#### Stripe (Payments)
-- Subscription payments with webhooks at `/api/webhooks/stripe/route.ts`
-- Environment variables required: `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`
-
-#### UI Components
-- **Radix UI**: Extensive use of Radix primitives
-- **Tailwind CSS**: Utility-first styling with custom theme
-- **Shadcn/UI**: Component system in `/components/ui/`
-- **Theme Support**: Dark/light mode via `next-themes`
-
-### Security & Validation
-- **CSRF Protection**: Implemented in `/middleware/csrf.ts`
-- **Security Monitoring**: Logging and monitoring in `/lib/security-monitoring.ts`
-- **Input Validation**: Zod schemas in `/lib/schemas.ts` and `/lib/validation.ts`
-
-### Key Services
-- **Audio Processing**: Audio player components and waveform visualization
-- **Feed Generation**: RSS/podcast feed generation in `/lib/feed-generator.ts`
-- **Email**: Resend integration for transactional emails
-- **Analytics**: Vercel Analytics and custom analytics tracking
-
-### Mobile App
-- React Native Expo app in `/mobile-app/` directory
-- `npx expo start` - Start development server on localhost:8081
-- Shares authentication and API with web app
-- Offline audio playback capabilities
-
-### Important Notes
-- **Next.js 15 Compatibility**: Uses modern Supabase client patterns
-- **TypeScript**: Strict TypeScript configuration
-- **Build Configuration**: ESLint and TypeScript errors ignored during builds (see `next.config.mjs`)
-- **Font Loading**: Custom Eudoxus Sans font with variable weight support
-- **PWA Support**: Service worker and manifest configured
-
-
-### Important Documents
-- Tasks that have been done ~/tasks
-- Tests that need to pass ~/tests
-- Important documents ~/docs
-- Business model and speasy purpose ~/docs/speasy
 
 ---
 
-## Technical Debt Prevention and Quality Assurance
+# Key Technical Details
 
-Based on comprehensive technical debt remediation completed in 2025, this section outlines proven prevention strategies and quality assurance practices.
+### TypeScript Configuration
+- **Strict mode**: Enabled with all strict checks
+- **Additional checks**: `noUncheckedIndexedAccess`, `noImplicitReturns`, `noUnusedLocals`, `noUnusedParameters`
+- **Path aliases**: `@/*` → `./src/*`, `@/public/*` → `./public/*`
+- **Target**: ES2017
+- **Module**: ESNext with bundler resolution
 
-### 8 — Quality Gates and Prevention
+### ESLint Configuration
+- **Base**: `@antfu/eslint-config` (v6.6.1)
+- **Plugins**: Next.js, React, React Hooks, Tailwind CSS, JSX a11y, Playwright
+- **Format**: Integrated with ESLint plugin for formatting
 
-**CRITICAL**: The following quality gates are enforced automatically to prevent technical debt accumulation:
+### Git Hooks (Lefthook)
+- **pre-commit**: ESLint auto-fix + TypeScript type check
+- **commit-msg**: Commitlint validation (Conventional Commits)
 
-- **QG-1 (MUST)** Pre-commit hooks execute automatically on every commit attempt.
-- **QG-2 (MUST)** Console statements are blocked in non-script files (use structured logging via `/lib/logger.ts`).
-- **QG-3 (MUST)** All files are automatically formatted with Prettier before commit.
-- **QG-4 (MUST)** ESLint issues are fixed automatically where possible, blocks commit if manual fixes needed.
-- **QG-5 (MUST)** Tests must pass before commit (use `pnpm test` for verification).
-- **QG-6 (MUST)** TypeScript compilation must succeed before commit (use `pnpm run typecheck`).
-- **QG-7 (SHOULD)** Bundle size increases >15% trigger CI warnings and require justification.
-- **QG-8 (MUST)** Security vulnerabilities of moderate+ severity block CI/CD pipeline.
+### Package Management
+- **Manager**: pnpm with catalog mode
+- **Catalog**: Centralized dependency versions in `pnpm-workspace.yaml`
+- **Shell emulator**: Enabled for cross-platform compatibility
 
-#### Console Statement Policy
+### Build & Performance
+- **React Compiler**: Enabled (`reactCompiler: true`)
+- **Turbopack**: File system cache enabled for dev
+- **Bundle analyzer**: Available via `ANALYZE=true pnpm run build-stats`
+- **Image optimization**: Remote patterns for Unsplash and Supabase
+
+---
+
+# Common Patterns
+
+### Server Component with Auth
 ```typescript
-// ❌ Prohibited in production code
-console.log('Debug info');
-console.error('Error occurred');
+import { auth, currentUser } from '@clerk/nextjs/server';
 
-// ✅ Required structured logging
-import { log } from '@/lib/logger';
-log.debug('Debug info');
-log.error('Error occurred');
+export default async function DashboardPage() {
+  const { userId } = await auth();
+  if (!userId) {
+    redirect('/sign-in');
+  }
 
-// ✅ Exception: Scripts directory (allowed for CLI output)
-// scripts/build-check.js - console.log() permitted for script output
+  const user = await currentUser();
+  // Fetch user-specific data
+  return <div>Dashboard for {user.firstName}</div>;
+}
 ```
 
-#### Quality Gates Bypass (Emergency Only)
-```bash
-# Only use in critical production incidents
-git commit --no-verify -m "emergency: critical production fix"
-
-# MUST follow up within 24 hours with proper fix
-git commit -m "fix: resolve quality gate issues from emergency commit"
-```
-
-### 9 — Performance and Bundle Management
-
-- **P-1 (MUST)** Bundle size target is <650kB first load JS (current: ~765kB acceptable).
-- **P-2 (SHOULD)** Core Web Vitals must meet "Good" thresholds: FCP <1.5s, LCP <2.5s, FID <100ms, CLS <0.1.
-- **P-3 (MUST)** Performance monitoring is active on all pages via `/lib/performance-monitor.ts`.
-- **P-4 (SHOULD)** Heavy components use dynamic imports with `React.lazy()` and `Suspense`.
-- **P-5 (MUST)** Images use `next/image` with proper optimization (AVIF/WebP formats).
-- **P-6 (SHOULD)** Bundle analysis runs automatically in CI/CD to detect regressions.
-
-#### Performance Budget Enforcement
+### API Route with Auth
 ```typescript
-// Automatic performance budget validation
-const PERFORMANCE_BUDGET = {
-  FCP: 1500,  // 1.5 seconds
-  LCP: 2500,  // 2.5 seconds  
-  FID: 100,   // 100 milliseconds
-  CLS: 0.1,   // 0.1 score
-  TTFB: 600   // 600 milliseconds
-};
+import { auth } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
-// Usage in components
-import { performanceMonitor } from '@/lib/performance-monitor';
-performanceMonitor.startMeasure('component-name');
-// ... component logic
-performanceMonitor.endMeasure('component-name');
+export async function GET() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Handle authenticated request
+  return NextResponse.json({ success: true });
+}
 ```
 
-### 10 — Dependency Management and Security
-
-- **DM-1 (MUST)** Dependabot automatically creates security update PRs weekly.
-- **DM-2 (MUST)** High/critical vulnerabilities must be addressed within 24 hours.
-- **DM-3 (SHOULD)** Major dependency updates require dedicated testing sprint with rollback plan.
-- **DM-4 (MUST)** Package-lock file (`pnpm-lock.yaml`) is committed and verified in CI.
-- **DM-5 (SHOULD)** New dependencies must be justified and documented for supply chain security.
-
-#### Dependency Update Strategy
-| Update Type | Risk Level | Process | Timeline |
-|-------------|------------|---------|----------|
-| **Patch (x.y.Z)** | Low | Auto-merge after CI | Immediate |
-| **Minor (x.Y.z)** | Medium | Manual review + testing | 48 hours |
-| **Major (X.y.z)** | High | Dedicated sprint | 1-2 weeks |
-
-### 11 — Import Path Consistency
-
-**CRITICAL**: Import path consistency prevents test failures and build issues.
-
-- **IP-1 (MUST)** Use `@/` prefix for all internal imports: `import { util } from '@/lib/utils/util'`.
-- **IP-2 (MUST)** Never mix `@/utils/` and `utils/` patterns in the same file.
-- **IP-3 (MUST)** Use `import type { ... }` for type-only imports (enforced by ESLint).
-- **IP-4 (SHOULD)** Configure IDE to suggest `@/` prefix for auto-imports.
-
+### Using Environment Variables
 ```typescript
-// ❌ Inconsistent import patterns (causes test failures)
-import { isDemoMode } from 'utils/demo-helpers';
-import { otherUtil } from '@/lib/utils/other';
+import { Env } from '@/libs/Env';
 
-// ✅ Consistent import patterns
-import { isDemoMode } from '@/utils/demo-helpers';
-import { otherUtil } from '@/lib/utils/other';
-import type { User } from '@/types/user';
+// Env is type-safe and validated
+const apiKey = Env.OPENAI_KEY; // string | undefined
+const dbUrl = Env.DATABASE_URL; // string (required, always present)
 ```
 
-### 12 — Testing Infrastructure Standards
-
-Based on test infrastructure remediation, follow these patterns:
-
-- **TI-1 (MUST)** Mock server-only modules in `tests/setup.ts` for client-side test execution.
-- **TI-2 (MUST)** Use Vitest patterns, not Jest patterns: `import { vi } from 'vitest'` not `jest.fn()`.
-- **TI-3 (MUST)** Separate client and server tests to avoid module execution conflicts.
-- **TI-4 (SHOULD)** Use current Supabase auth patterns, not deprecated `@supabase/auth-helpers-nextjs`.
-
-#### Test Organization Best Practices
+### Database Query (Drizzle)
 ```typescript
-// Unit tests - co-located with source
-// components/my-component.spec.ts
+import { db } from '@/utils/DBConnection';
+import { usersSchema } from '@/models/Schema';
+import { eq } from 'drizzle-orm';
 
-// Integration tests - dedicated directory  
-// tests/integration/api-endpoints.spec.ts
-
-// Server-only test mocking
-// tests/setup.ts
-vi.mock('server-only', () => ({}));
-vi.mock('@/lib/dal/auth', () => ({
-  getAuthenticatedUser: vi.fn().mockResolvedValue({ id: 'test-user' }),
-}));
+const user = await db.select()
+  .from(usersSchema)
+  .where(eq(usersSchema.id, userId))
+  .limit(1);
 ```
 
-### 13 — Structured Logging Standards
-
-**CRITICAL**: Console statements in production code are automatically blocked by quality gates.
-
-- **SL-1 (MUST)** Use Pino logger from `/lib/logger.ts` for all application logging.
-- **SL-2 (MUST)** Never use `console.log()`, `console.error()`, `console.warn()` in production code.
-- **SL-3 (SHOULD)** Use appropriate log levels: `debug`, `info`, `warn`, `error`.
-- **SL-4 (SHOULD)** Include contextual information in log messages for debugging.
-
+### Supabase User Operations
 ```typescript
-// ❌ Blocked by pre-commit hooks
-console.log('User logged in');
+import { userOperations } from '@/libs/Supabase';
 
-// ✅ Required structured logging
-import { log } from '@/lib/logger';
-log.info('User authenticated', { userId, timestamp: Date.now() });
-log.error('Authentication failed', { error: error.message, userId });
+// Get user by email
+const user = await userOperations.getUserByEmail('user@example.com');
+
+// Create or update user
+const user = await userOperations.upsertUser('user@example.com', {
+  stripe_customer_id: 'cus_xxx',
+  subscription_status: 'active',
+});
 ```
 
-### 14 — React and Next.js Patterns
-
-Updated patterns based on Next.js 15 and React 19 compatibility:
-
-- **RN-1 (MUST)** Use Next.js `<Link>` components instead of `<a>` tags for internal navigation.
-- **RN-2 (MUST)** Use `next/image` instead of `<img>` tags for optimized loading.
-- **RN-3 (SHOULD)** Remove ESLint suppressions by fixing underlying issues, not ignoring them.
-- **RN-4 (MUST)** Include all dependencies in React Hook dependency arrays (enforced by ESLint).
-- **RN-5 (SHOULD)** Use Server Components by default, Client Components only when needed.
-
+### Internationalization
 ```typescript
-// ❌ Unoptimized navigation and images
-<a href="/dashboard">Dashboard</a>
-<img src="/hero.jpg" alt="Hero" />
+// Server Component
+import { getTranslations } from 'next-intl/server';
 
-// ✅ Optimized Next.js patterns
-<Link href="/dashboard">Dashboard</Link>
-<Image src="/hero.jpg" alt="Hero" width={800} height={400} priority />
+export default async function Page() {
+  const t = await getTranslations('HomePage');
+  return <h1>{t('title')}</h1>;
+}
+
+// Client Component
+'use client';
+import { useTranslations } from 'next-intl';
+
+export default function Component() {
+  const t = useTranslations('HomePage');
+  return <h1>{t('title')}</h1>;
+}
 ```
 
-## Lessons Learned from Technical Debt Remediation
+---
 
-### Critical Success Factors
+# Important Notes
 
-1. **Prevention Over Cleanup**: Quality gates prevent 20+ hours/month of manual cleanup.
-2. **Automated Enforcement**: Tools enforce standards better than documentation alone.
-3. **Gradual Implementation**: Incremental rollout prevents development velocity disruption.
-4. **Comprehensive Testing**: Test infrastructure must be solid before major changes.
-5. **Documentation**: Process documentation enables team scaling and knowledge transfer.
+- **No DAL layer**: This project does not use a Data Access Layer pattern. Use Clerk for auth and Drizzle/Supabase directly.
+- **Clerk primary auth**: While Supabase is available, Clerk is the primary authentication system.
+- **PGlite for local dev**: No need for external PostgreSQL in development - PGlite runs automatically.
+- **Catalog dependencies**: Use `catalog:` prefix in `package.json` - versions defined in `pnpm-workspace.yaml`.
+- **Service worker**: PWA functionality via `public/sw.js` - update carefully to avoid cache issues.
+- **Blog content**: Stored as markdown in `src/blog/` and processed by `src/libs/blog.ts`.
+- **Feed generation**: RSS/podcast feeds generated via `src/libs/feed-generator.ts` and `src/app/api/feeds/` routes.
 
-### Common Anti-Patterns to Avoid
+---
 
-1. **Console Statement Accumulation**: `console.log()` statements reach production without structured logging.
-2. **Import Path Inconsistency**: Mixed `@/` and relative imports cause test failures.
-3. **ESLint Suppression Overuse**: `// eslint-disable` comments instead of fixing root issues.
-4. **Test Infrastructure Neglect**: Broken tests block all other improvements.
-5. **Bundle Size Blindness**: No monitoring leads to performance regressions.
+# Troubleshooting
 
-### Emergency Procedures
+### Build fails with "Invalid environment variables"
+Check `src/libs/Env.ts` for required environment variables. At minimum, you need:
+- `CLERK_SECRET_KEY`
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- `DATABASE_URL`
 
-If quality gates block critical work:
+### PGlite port already in use
+Kill existing process: `lsof -ti:5433 | xargs kill -9`
 
-```bash
-# 1. Emergency bypass (document reason)
-git commit --no-verify -m "emergency: production hotfix for [issue]"
+### Tests fail with module errors
+Ensure you're using correct test file extensions:
+- Unit tests: `*.test.ts` (Node environment)
+- UI tests: `*.test.tsx` (Browser environment)
 
-# 2. Create immediate follow-up task
-echo "TODO: Fix quality gate violations from emergency commit" >> URGENT_TODO.md
+### Type errors after dependency update
+Run: `pnpm run check:types` to see all errors, then `rm -rf .next node_modules && pnpm install`
 
-# 3. Resolve quality issues within 24 hours
-# Fix console statements, tests, linting issues
-git commit -m "fix: resolve quality gate issues from emergency commit"
-```
-
-### Monitoring and Maintenance
-
-#### Weekly Quality Review
-- Review quality gate violation patterns
-- Analyze bundle size trends  
-- Check dependency security alerts
-- Update prevention strategies based on new issues
-
-#### Monthly Technical Health Check
-- Comprehensive performance audit
-- Dependency health assessment
-- Quality gate effectiveness review
-- Process refinement based on team feedback
-
-This prevention-focused approach has proven to eliminate technical debt accumulation while maintaining development velocity.
-
-
-## Visual Development
-
-### Design Principles
-- Comprehensive design checklist in `/docs/design-principles.md`
-- Brand style guide in `/context/style-guide.md`
-- When making visual (front-end, UI/UX) changes, always refer to these files for guidance
-
-### Quick Visual Check
-IMMEDIATELY after implementing any front-end change:
-1. **Identify what changed** - Review the modified components/pages
-2. **Navigate to affected pages** - Use `mcp__playwright__browser_navigate` to visit each changed view
-3. **Verify design compliance** - Compare against `/docs/design-principles.md` and `/docs/style-guide.md`
-4. **Validate feature implementation** - Ensure the change fulfills the user's specific request
-5. **Check acceptance criteria** - Review any provided context files or requirements
-6. **Capture evidence** - Take full page screenshot at desktop viewport (1440px) of each changed view
-7. **Check for errors** - Run `mcp__playwright__browser_console_messages`
-
-This verification ensures changes meet design standards and user requirements.
-
-### Comprehensive Design Review
-Invoke the `@agent-design-review` subagent for thorough design validation when:
-- Completing significant UI/UX features
-- Before finalizing PRs with visual changes
-- Needing comprehensive accessibility and responsiveness testing
+### Lefthook not running
+Install hooks: `npx lefthook install`

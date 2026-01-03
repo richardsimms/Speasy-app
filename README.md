@@ -6,39 +6,53 @@
 
 🌐 **Live Site**: [speasy.app](https://www.speasy.app)
 📧 **Contact**: hello@speasy.app
+☁️ **Hosting**: Deployed on [Vercel](https://vercel.com)
 
 ## What is Speasy?
 
 Speasy solves the modern reader's dilemma: too much content, too little time. Instead of staring at an overflowing inbox or a growing "read later" list, Speasy automatically converts your newsletters and saved articles into podcast-style audio using advanced AI text-to-speech technology.
 
+The production application at [speasy.app](https://speasy.app) uses Supabase for content storage, audio conversion processing, and database management, ensuring reliable and scalable content delivery.
+
 ### Key Features
 
-- 🎙️ **Automatic Audio Conversion**: High-quality text-to-speech conversion of newsletters and articles
+- 🎙️ **Automatic Audio Conversion**: High-quality text-to-speech conversion powered by Supabase Edge Functions
 - 📱 **PWA Support**: Install as an app, listen offline with service worker support
 - 🎧 **Universal Compatibility**: Works with Apple Podcasts, Spotify, Overcast, and other podcast apps via RSS feeds
+- 🗄️ **Supabase Backend**: Content storage, audio processing, and PostgreSQL database
 - 🌍 **Multi-language Support**: Available in English and French (with more languages coming)
 - 🔒 **Secure Authentication**: Powered by Clerk with passwordless options, MFA, and social auth
 - 💳 **Subscription Management**: Integrated Stripe billing for premium features
 - 🎨 **Modern UI**: Beautiful, responsive design with dark/light mode support
 - 📊 **Analytics**: PostHog integration for user insights
 - 🚨 **Error Monitoring**: Sentry integration for production error tracking
+- ☁️ **Vercel Deployment**: Global edge network for optimal performance
 
 ## Tech Stack
 
 Built with modern, production-ready technologies:
 
+### Core Framework
 - ⚡ [Next.js 16](https://nextjs.org) with App Router
 - ⚛️ [React 19](https://react.dev) with TypeScript
 - 🎨 [Tailwind CSS 4](https://tailwindcss.com) for styling
-- 🔒 [Clerk](https://clerk.com) for authentication
-- 🗄️ [DrizzleORM](https://orm.drizzle.team) with PostgreSQL
-- 💾 [PGlite](https://github.com/electric-sql/pglite) for local development database
-- 💳 [Stripe](https://stripe.com) for payments
-- 🌐 [next-intl](https://next-intl-docs.vercel.app) for internationalization
-- 📝 [LogTape](https://logtape.logtape.dev) for structured logging
-- 🚨 [Sentry](https://sentry.io) for error monitoring
-- 🔐 [Arcjet](https://arcjet.com) for security and bot protection
-- 📊 [PostHog](https://posthog.com) for analytics
+- ☁️ [Vercel](https://vercel.com) for hosting and deployment
+
+### Backend & Database
+- 🗄️ [Supabase](https://supabase.com) - Production database, content storage, and audio conversion
+- 🗄️ [DrizzleORM](https://orm.drizzle.team) - Type-safe database queries
+- 💾 [PGlite](https://github.com/electric-sql/pglite) - Local development database
+
+### Authentication & Payments
+- 🔒 [Clerk](https://clerk.com) - Authentication and user management
+- 💳 [Stripe](https://stripe.com) - Subscription billing
+
+### Infrastructure & Monitoring
+- 🌐 [next-intl](https://next-intl-docs.vercel.app) - Internationalization
+- 📝 [LogTape](https://logtape.logtape.dev) - Structured logging
+- 🚨 [Sentry](https://sentry.io) - Error monitoring
+- 🔐 [Arcjet](https://arcjet.com) - Security and bot protection
+- 📊 [PostHog](https://posthog.com) - Product analytics
 
 ### Developer Experience
 
@@ -121,7 +135,7 @@ ARCJET_KEY=ajkey_your_arcjet_key
 NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN=your_better_stack_token
 NEXT_PUBLIC_BETTER_STACK_INGESTING_HOST=your_better_stack_host
 
-# Optional - Supabase (if using Supabase features)
+# Production - Supabase (required for production content conversion and storage)
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
@@ -154,13 +168,25 @@ Clerk provides a complete authentication system including sign up, sign in, pass
 
 ### Set Up Database
 
-For local development, PGlite is automatically used—no setup required.
+**Local Development:**
+PGlite is automatically used—no setup required. It runs a local PostgreSQL-compatible database on port 5433.
 
-For production, you'll need a PostgreSQL database. You can use any PostgreSQL provider:
+**Production:**
+The production site at [speasy.app](https://speasy.app) uses Supabase for:
+- PostgreSQL database hosting
+- Content storage and management
+- Audio file processing and conversion
+- Real-time subscriptions
 
-1. Create a PostgreSQL database
-2. Get the connection string
-3. Add `DATABASE_URL` to your `.env.local` file
+To set up Supabase for your deployment:
+
+1. Create a [Supabase](https://supabase.com) project
+2. Get your project credentials from the Supabase dashboard
+3. Add the following to your production environment variables:
+   - `SUPABASE_URL` - Your Supabase project URL
+   - `SUPABASE_SERVICE_ROLE_KEY` - Service role key for server-side operations
+   - `NEXT_PUBLIC_SUPABASE_URL` - Public Supabase URL for client-side access
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Anonymous key for client-side access
 
 The project uses DrizzleORM for type-safe database access. See the [Database Schema](#database-schema) section for more details.
 
@@ -303,26 +329,65 @@ npx playwright install
 
 ## Deployment
 
+### Production Hosting
+
+The production site [speasy.app](https://speasy.app) is deployed on **Vercel**, leveraging:
+- Global edge network for optimal performance
+- Automatic deployments from the `main` branch
+- Preview deployments for pull requests
+- Built-in analytics and performance monitoring
+- Serverless functions for API routes
+
+### Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/richardsimms/Speasy-app)
+
+Or deploy manually:
+
+```shell
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy to production
+vercel --prod
+```
+
 ### Production Build
 
-Generate a production build:
+Generate a production build locally:
 
 ```shell
 pnpm run build
 ```
 
-Database migrations are automatically executed during the build process. Ensure `DATABASE_URL` is set in your environment variables.
+Database migrations are automatically executed during the build process.
 
-### Environment Variables for Production
+### Required Environment Variables for Production
 
-Make sure to set all required environment variables in your hosting provider:
+Configure these in your Vercel project settings:
 
-- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
-- `CLERK_SECRET_KEY`
-- `DATABASE_URL`
-- `STRIPE_SECRET_KEY` (if using payments)
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (if using payments)
-- `STRIPE_WEBHOOK_SECRET` (if using payments)
+**Authentication:**
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - Clerk publishable key
+- `CLERK_SECRET_KEY` - Clerk secret key
+- `CLERK_WEBHOOK_SIGNING_SECRET` - Clerk webhook secret
+
+**Database (Supabase):**
+- `SUPABASE_URL` - Supabase project URL
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key
+- `NEXT_PUBLIC_SUPABASE_URL` - Public Supabase URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
+- `DATABASE_URL` - PostgreSQL connection string from Supabase
+
+**Payments (Optional):**
+- `STRIPE_SECRET_KEY` - Stripe secret key
+- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` - Stripe publishable key
+- `STRIPE_WEBHOOK_SECRET` - Stripe webhook secret
+- `STRIPE_PRICE_ID` - Stripe price ID for subscriptions
+
+**Monitoring (Optional):**
+- `NEXT_PUBLIC_SENTRY_DSN` - Sentry DSN
+- `NEXT_PUBLIC_POSTHOG_KEY` - PostHog project key
+- `ARCJET_KEY` - Arcjet security key
 
 ## Monitoring & Observability
 
