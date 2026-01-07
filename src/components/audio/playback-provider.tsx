@@ -16,7 +16,7 @@ import {
   useRef,
   useState,
 } from 'react';
-
+import { useContentAnalytics } from '@/hooks/useContentAnalytics';
 import { PLAYBACK_STORAGE_KEYS } from '@/types/audio';
 
 const PlaybackContext = createContext<PlaybackContextValue | null>(null);
@@ -25,6 +25,7 @@ const PlaybackContext = createContext<PlaybackContextValue | null>(null);
  * Hook to access the global playback context
  * @throws Error if used outside of PlaybackProvider
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function usePlayback(): PlaybackContextValue {
   const context = use(PlaybackContext);
   if (!context) {
@@ -36,6 +37,7 @@ export function usePlayback(): PlaybackContextValue {
 /**
  * Optional hook that returns null if outside provider (for conditional usage)
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function usePlaybackOptional(): PlaybackContextValue | null {
   return use(PlaybackContext);
 }
@@ -53,6 +55,18 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const restoreRef = useRef<{ trackId?: string; timeSec?: number }>({});
   const pendingSeekRef = useRef<number | undefined>(undefined);
+  const hasTrackedPlayStartRef = useRef<string | null>(null);
+
+  // Analytics
+  const {
+    trackContentPlayStarted,
+    trackContentPlayCompleted,
+    trackAudioNextAuto,
+    trackAudioNextManual,
+    trackAudioPrevManual,
+    trackAudioComplete,
+    trackSeek,
+  } = useContentAnalytics();
 
   // State
   const [uiMode, setUIMode] = useState<PlayerUIMode>('inline');
@@ -158,10 +172,46 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
       setIsPlaying(false);
       setCurrentTimeSec(0);
 
+      // Track play completion
+      if (activeTrack) {
+        trackContentPlayCompleted({
+          content_name: activeTrack.title,
+          content_category: activeTrack.category,
+          content_id: activeTrack.id,
+          surface: 'dashboard',
+        });
+
+        trackAudioComplete({
+          content_id: activeTrack.id,
+          source: visibleQueueContext?.source || 'latest',
+          category_id: visibleQueueContext?.categoryId,
+          queue_enabled: playerEnabled,
+          position_in_queue: activeIndex + 1,
+          queue_length: queue.length,
+        });
+
+        // Reset play start tracking for next playthrough
+        hasTrackedPlayStartRef.current = null;
+      }
+
       // Auto-advance to next track if available (works even when player is closed)
       if (activeIndex < queue.length - 1) {
+        // Track auto-advance
+        if (activeTrack) {
+          trackAudioNextAuto({
+            content_id: activeTrack.id,
+            source: visibleQueueContext?.source || 'latest',
+            category_id: visibleQueueContext?.categoryId,
+            queue_enabled: playerEnabled,
+            position_in_queue: activeIndex + 1,
+            queue_length: queue.length,
+          });
+        }
+
         // Play next track
         const nextIndex = activeIndex + 1;
+        // Reset play start tracking for new track
+        hasTrackedPlayStartRef.current = null;
         setActiveIndex(nextIndex);
         const nextTrack = queue[nextIndex];
         if (nextTrack && audio) {
@@ -184,6 +234,20 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
 
     const handlePlay = () => {
       setIsPlaying(true);
+
+      // Track play start (only once per track session)
+      if (
+        activeTrack
+        && hasTrackedPlayStartRef.current !== activeTrack.id
+      ) {
+        trackContentPlayStarted({
+          content_name: activeTrack.title,
+          content_category: activeTrack.category,
+          content_id: activeTrack.id,
+          surface: 'dashboard',
+        });
+        hasTrackedPlayStartRef.current = activeTrack.id;
+      }
     };
 
     const handlePause = () => {
@@ -214,7 +278,17 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
       audio.removeEventListener('pause', handlePause);
       audio.removeEventListener('error', handleError);
     };
-  }, [activeIndex, queue]);
+  }, [
+    activeIndex,
+    queue,
+    activeTrack,
+    visibleQueueContext,
+    playerEnabled,
+    trackContentPlayCompleted,
+    trackContentPlayStarted,
+    trackAudioNextAuto,
+    trackAudioComplete,
+  ]);
 
   // Persist currentTimeSec and activeTrackId
   useEffect(() => {
@@ -279,6 +353,9 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
           setActiveIndex(trackIndex);
           const track = tracks[trackIndex];
           if (track) {
+            // Reset play start tracking for new track
+            hasTrackedPlayStartRef.current = null;
+
             // Change audio source
             audio.src = track.audioUrl;
             audio.play().catch(() => {
@@ -305,6 +382,9 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
               setIsPlaying(true);
             } else {
               // Different track, change source
+              // Reset play start tracking for new track
+              hasTrackedPlayStartRef.current = null;
+
               setActiveIndex(trackIndex);
               audio.src = track.audioUrl;
               audio.play().catch(() => {
@@ -351,13 +431,29 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
   const seek = useCallback(
     (timeSec: number) => {
       const audio = audioRef.current;
-      if (audio && durationSec) {
+      if (audio && durationSec && activeTrack) {
+        const seekFrom = currentTimeSec;
         const clampedTime = Math.max(0, Math.min(timeSec, durationSec));
+
+        // Only track if seeking more than 2 seconds (to avoid tracking every small adjustment)
+        if (Math.abs(clampedTime - seekFrom) > 2) {
+          trackSeek({
+            content_id: activeTrack.id,
+            source: visibleQueueContext?.source || 'latest',
+            category_id: visibleQueueContext?.categoryId,
+            queue_enabled: playerEnabled,
+            position_in_queue: activeIndex + 1,
+            queue_length: queue.length,
+            seek_to_sec: clampedTime,
+            seek_from_sec: seekFrom,
+          });
+        }
+
         audio.currentTime = clampedTime;
         setCurrentTimeSec(clampedTime);
       }
     },
-    [durationSec],
+    [durationSec, activeTrack, currentTimeSec, visibleQueueContext, playerEnabled, activeIndex, queue.length, trackSeek],
   );
 
   const openPlayer = useCallback(() => {
@@ -376,7 +472,22 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
     }
 
     if (activeIndex < queue.length - 1) {
+      // Track manual next
+      if (activeTrack) {
+        trackAudioNextManual({
+          content_id: activeTrack.id,
+          source: visibleQueueContext?.source || 'latest',
+          category_id: visibleQueueContext?.categoryId,
+          queue_enabled: playerEnabled,
+          position_in_queue: activeIndex + 1,
+          queue_length: queue.length,
+        });
+      }
+
       const nextIndex = activeIndex + 1;
+      // Reset play start tracking for new track
+      hasTrackedPlayStartRef.current = null;
+
       setActiveIndex(nextIndex);
       const nextTrack = queue[nextIndex];
       if (nextTrack) {
@@ -390,7 +501,7 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
         }
       }
     }
-  }, [activeIndex, queue, isPlaying]);
+  }, [activeIndex, queue, isPlaying, activeTrack, visibleQueueContext, playerEnabled, trackAudioNextManual]);
 
   const prev = useCallback(() => {
     const audio = audioRef.current;
@@ -400,6 +511,19 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
 
     // If more than 3 seconds into track, restart current track
     if (currentTimeSec > 3) {
+      // Track as seek to start
+      if (activeTrack && durationSec) {
+        trackSeek({
+          content_id: activeTrack.id,
+          source: visibleQueueContext?.source || 'latest',
+          category_id: visibleQueueContext?.categoryId,
+          queue_enabled: playerEnabled,
+          position_in_queue: activeIndex + 1,
+          queue_length: queue.length,
+          seek_to_sec: 0,
+          seek_from_sec: currentTimeSec,
+        });
+      }
       audio.currentTime = 0;
       setCurrentTimeSec(0);
       return;
@@ -407,7 +531,22 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
 
     // Otherwise go to previous track
     if (activeIndex > 0) {
+      // Track manual previous
+      if (activeTrack) {
+        trackAudioPrevManual({
+          content_id: activeTrack.id,
+          source: visibleQueueContext?.source || 'latest',
+          category_id: visibleQueueContext?.categoryId,
+          queue_enabled: playerEnabled,
+          position_in_queue: activeIndex + 1,
+          queue_length: queue.length,
+        });
+      }
+
       const prevIndex = activeIndex - 1;
+      // Reset play start tracking for new track
+      hasTrackedPlayStartRef.current = null;
+
       setActiveIndex(prevIndex);
       const prevTrack = queue[prevIndex];
       if (prevTrack) {
@@ -422,10 +561,22 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
       }
     } else {
       // At first track, just restart
+      if (activeTrack && durationSec) {
+        trackSeek({
+          content_id: activeTrack.id,
+          source: visibleQueueContext?.source || 'latest',
+          category_id: visibleQueueContext?.categoryId,
+          queue_enabled: playerEnabled,
+          position_in_queue: activeIndex + 1,
+          queue_length: queue.length,
+          seek_to_sec: 0,
+          seek_from_sec: currentTimeSec,
+        });
+      }
       audio.currentTime = 0;
       setCurrentTimeSec(0);
     }
-  }, [activeIndex, queue, isPlaying, currentTimeSec]);
+  }, [activeIndex, queue, isPlaying, currentTimeSec, activeTrack, visibleQueueContext, playerEnabled, durationSec, trackAudioPrevManual, trackSeek]);
 
   const setQueueContext = useCallback(
     (context: VisibleQueueContext, tracks: Track[]) => {
@@ -453,6 +604,8 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
           return;
         }
 
+        // Reset play start tracking for new context
+        hasTrackedPlayStartRef.current = null;
         setActiveIndex(0);
         audio.src = firstTrack.audioUrl;
         pendingSeekRef.current = undefined;
@@ -481,6 +634,8 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
           return;
         }
 
+        // Reset play start tracking for initial load
+        hasTrackedPlayStartRef.current = null;
         setActiveIndex(nextIndex);
         audio.src = nextTrack.audioUrl;
 

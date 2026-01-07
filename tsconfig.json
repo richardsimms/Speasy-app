@@ -83,7 +83,8 @@
     "**/*.spec.ts",
     "**/*.e2e.ts",
     "src/blog/**/*.md",
-    "**/*.md"
+    "**/*.md",
+    ".next/dev/types/validator.ts"
   ],
   "include": [
     "next-env.d.ts",
