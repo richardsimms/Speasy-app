@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { getTranslations } from 'next-intl/server';
 import { DiscoverGrid } from '@/components/discover-grid';
+import { RadioToggle } from '@/components/radio-toggle';
 import { Env } from '@/libs/Env';
 import { getSupabaseAdmin } from '@/libs/Supabase';
 
@@ -277,6 +278,13 @@ export default async function Dashboard(props: {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 lg:px-8">
+      {/* Radio Toggle - Prominent placement on Dashboard */}
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+        </div>
+        <RadioToggle variant="button" />
+      </div>
       <DiscoverGrid
         categories={categories}
         locale={locale}
