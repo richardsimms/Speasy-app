@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  ChevronRight,
   Cpu,
   DollarSign,
   Palette,
@@ -33,6 +32,8 @@ type DiscoverGridProps = {
   surface?: 'home' | 'dashboard';
   userId?: string;
   experimentVariant?: string;
+  forYouItems?: ContentItem[]; // Pre-filtered personalized items for "For You" tab
+  showEmptyState?: boolean; // Show empty state with CTA if no content matches
 };
 
 // Map category names to icons
@@ -63,9 +64,14 @@ export function DiscoverGrid({
   surface = 'dashboard',
   userId,
   experimentVariant,
+  forYouItems,
+  showEmptyState = false,
 }: DiscoverGridProps) {
-  // Get all items for "For You" (all content)
+  // Get all items for fallback (all content)
   const allItems = categories.flatMap(cat => cat.items);
+
+  // Use provided forYouItems or fall back to allItems
+  const personalizedForYouItems = forYouItems || allItems;
 
   // Get "Latest" items (most recent, limit to 20)
   const latestItems = [...allItems]
@@ -78,7 +84,7 @@ export function DiscoverGrid({
 
   // Create tabs: For You, Latest, then categories
   const tabs = [
-    { id: 'for-you', label: 'For You', icon: Star, items: allItems },
+    { id: 'for-you', label: 'For You', icon: Star, items: personalizedForYouItems },
     { id: 'latest', label: 'Latest', icon: Star, items: latestItems },
     ...categories.map(cat => ({
       id: cat.categoryName.toLowerCase().replace(/\s+/g, '-'),
@@ -161,7 +167,7 @@ export function DiscoverGrid({
   if (categories.length === 0) {
     return (
       <div className="py-20 text-center">
-        <p className="text-muted-foreground">
+        <p className="text-white/70">
           No content available yet. Check back soon!
         </p>
       </div>
@@ -170,17 +176,23 @@ export function DiscoverGrid({
 
   return (
     <div className="space-y-8">
+      {/* Header */}
+      <div className="mb-2">
+        <h1 className="mb-3 font-serif text-5xl leading-tight text-white">
+          Discover
+        </h1>
+      </div>
       {/* Tab Navigation */}
       <div
         role="tablist"
         aria-label="Content categories"
-        className="-mx-4 flex items-center overflow-x-auto px-4 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mx-4 flex w-full max-w-full items-center overflow-x-auto px-4 pt-2 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         <div className="relative flex items-center gap-8">
           {/* Animated hover/active background */}
           {indicatorStyle.width > 0 && (
             <div
-              className="pointer-events-none absolute inset-y-0 rounded-lg border border-white/20 bg-white/10 transition-all duration-300 ease-out"
+              className="pointer-events-none absolute inset-y-0 cursor-pointer rounded-lg border border-white/20 bg-white/10 transition-all duration-300 ease-out"
               style={{
                 transform: `translateX(${indicatorStyle.left}px)`,
                 width: `${indicatorStyle.width}px`,
@@ -233,21 +245,14 @@ export function DiscoverGrid({
                     'h-4 w-4 shrink-0 transition-colors',
                     isActive || isHovered ? 'text-white' : 'text-white/70',
                   )}
+                  aria-hidden="true"
                 />
-                <span>{tab.label}</span>
+                <span className="inline-block text-sm leading-none font-medium">{tab.label}</span>
               </button>
             );
           })}
         </div>
 
-        {/* Scroll indicator */}
-        <button
-          type="button"
-          aria-label="Scroll to see more categories"
-          className="ml-8 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/10 text-white/70 transition-colors hover:border-white/20 hover:text-white"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
       </div>
 
       {/* Content Grid - Masonry Layout */}
@@ -258,9 +263,25 @@ export function DiscoverGrid({
           aria-labelledby={`tab-${selectedTab}`}
           className="py-20 text-center"
         >
-          <p className="text-muted-foreground">
-            No content available in this category. Check back soon!
-          </p>
+          {selectedTab === 'for-you' && showEmptyState
+            ? (
+                <div className="space-y-4">
+                  <p className="text-white/70">
+                    No new content matches your interests right now.
+                  </p>
+                  <a
+                    href={`/${locale}/dashboard/settings/preferences`}
+                    className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                  >
+                    Add more interests
+                  </a>
+                </div>
+              )
+            : (
+                <p className="text-white/70">
+                  No content available in this category. Check back soon!
+                </p>
+              )}
         </div>
       )}
       {displayedItems.length > 0 && (

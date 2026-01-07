@@ -16,10 +16,13 @@ export default async function AuthLayout(props: {
   let dashboardUrl = '/dashboard';
   let afterSignOutUrl = '/';
 
+  let onboardingUrl = '/onboarding';
+
   if (locale !== routing.defaultLocale) {
     signInUrl = `/${locale}${signInUrl}`;
     signUpUrl = `/${locale}${signUpUrl}`;
     dashboardUrl = `/${locale}${dashboardUrl}`;
+    onboardingUrl = `/${locale}${onboardingUrl}`;
     afterSignOutUrl = `/${locale}${afterSignOutUrl}`;
   }
 
@@ -32,7 +35,7 @@ export default async function AuthLayout(props: {
       signInUrl={signInUrl}
       signUpUrl={signUpUrl}
       signInFallbackRedirectUrl={dashboardUrl}
-      signUpFallbackRedirectUrl={dashboardUrl}
+      signUpFallbackRedirectUrl={onboardingUrl}
       afterSignOutUrl={afterSignOutUrl}
     >
       {props.children}

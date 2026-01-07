@@ -56,5 +56,15 @@
     "dashboard_link": "Dashboard",
     "user_profile_link": "Manage your account",
     "sign_out": "Sign out"
+  },
+  "Onboarding": {
+    "meta_title": "Customize Your Experience",
+    "meta_description": "Select your interests to personalize your feed"
+  },
+  "Settings": {
+    "meta_title": "Settings",
+    "meta_description": "Manage your account settings and preferences",
+    "preferences_meta_title": "Preferences",
+    "preferences_meta_description": "Manage your content preferences"
   }
 }

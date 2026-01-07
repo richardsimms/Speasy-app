@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { Webhook } from 'svix';
 import { Env } from '@/libs/Env';
 import { logger } from '@/libs/Logger';
-import { userOperations } from '@/libs/Supabase';
+import { getSupabaseAdmin, userOperations } from '@/libs/Supabase';
 
 // Disable body parsing, we need the raw body for webhook verification
 export const runtime = 'nodejs';
@@ -131,6 +131,28 @@ async function handleUserCreated(evt: UserCreatedEvent) {
       email: primaryEmail,
     });
 
+    // Part of Phase 4.3: Sync preferences from pending_preferences if available
+    // Check for anonymous ID in Clerk public metadata
+    const anonymousId = (userData as any).public_metadata?.anonymousId as
+      | string
+      | undefined;
+
+    if (anonymousId) {
+      try {
+        await syncPendingPreferences(supabaseUser.id, anonymousId);
+      } catch (prefError) {
+        // Non-critical - preferences can be set in onboarding page
+        logger.warn('Failed to sync pending preferences in webhook', {
+          error:
+            prefError instanceof Error
+              ? prefError.message
+              : String(prefError),
+          userId: supabaseUser.id,
+          anonymousId,
+        });
+      }
+    }
+
     return NextResponse.json({
       message: 'User created successfully',
       userId: supabaseUser.id,
@@ -150,6 +172,75 @@ async function handleUserCreated(evt: UserCreatedEvent) {
       { status: 500 },
     );
   }
+}
+
+/**
+ * Syncs pending preferences from anonymous session to user account
+ * Part of Phase 4.3 of the Category Preferences Signup Conversion Plan
+ */
+async function syncPendingPreferences(
+  userId: string,
+  anonymousId: string,
+): Promise<void> {
+  const supabase = getSupabaseAdmin();
+
+  // Get pending preferences
+  const { data: pendingPrefs, error: fetchError } = await supabase
+    .from('pending_preferences')
+    .select('category_ids, expires_at')
+    .eq('anonymous_id', anonymousId)
+    .single();
+
+  if (fetchError || !pendingPrefs) {
+    // No pending preferences found, that's okay
+    return;
+  }
+
+  // Check if expired
+  if (new Date(pendingPrefs.expires_at) < new Date()) {
+    // Expired, delete it
+    await supabase
+      .from('pending_preferences')
+      .delete()
+      .eq('anonymous_id', anonymousId);
+    return;
+  }
+
+  // Transfer to user_category_subscriptions
+  const categoryIds = pendingPrefs.category_ids || [];
+  if (categoryIds.length === 0) {
+    return;
+  }
+
+  const subscriptions = categoryIds.map((categoryId: string) => ({
+    user_id: userId,
+    category_id: categoryId,
+  }));
+
+  const { error: insertError } = await supabase
+    .from('user_category_subscriptions')
+    .insert(subscriptions);
+
+  if (insertError) {
+    logger.error('Error syncing preferences to user account', {
+      error: insertError.message,
+      userId,
+      anonymousId,
+    });
+    throw new Error('Failed to sync preferences');
+  }
+
+  // Delete pending preferences entry
+  await supabase
+    .from('pending_preferences')
+    .delete()
+    .eq('anonymous_id', anonymousId);
+
+  logger.info('Successfully synced pending preferences to user account', {
+    userId,
+    anonymousId,
+    categoryCount: categoryIds.length,
+  });
 }
 
 async function handleUserUpdated(evt: UserUpdatedEvent) {

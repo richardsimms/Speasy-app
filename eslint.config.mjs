@@ -32,6 +32,7 @@ export default antfu(
       'src/components/audio-demo.tsx',
       'src/components/theme-provider.tsx',
       'CLAUDE.md',
+      '.claude/PLAN.md',
     ],
   },
   // --- Accessibility Rules ---

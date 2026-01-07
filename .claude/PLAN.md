@@ -104,8 +104,10 @@ Validation:
 Location: `src/app/api/categories/route.ts`
 
 ```typescript
-GET /api/categories
-Response: { categories: Array<{ id: string; name: string }> }
+GET / api / categories;
+Response: {
+  categories: Array<{ id: string; name: string }>;
+}
 ```
 
 ### Phase 3: Pre-Signup Preference Capture
@@ -213,7 +215,7 @@ Flow:
 Modify `src/app/[locale]/(auth)/layout.tsx`:
 
 ```typescript
-signUpFallbackRedirectUrl: `/${locale}/onboarding`
+signUpFallbackRedirectUrl: `/${locale}/onboarding`;
 ```
 
 #### 4.3 Create Preference Sync Webhook

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { ContentGridDiscover } from '@/components/content-grid-discover';
+import { PreferenceIntegrationWrapper } from '@/components/preference-integration-wrapper';
 import { Env } from '@/libs/Env';
 import { logger } from '@/libs/Logger';
 import { getSupabaseAdmin } from '@/libs/Supabase';
@@ -200,13 +201,31 @@ export default async function Dashboard(props: {
   // Ensure we always pass an array, even if empty
   const safeCategories = categories || [];
 
+  // Fetch all categories for preference selection
+  const { data: allCategories } = await supabase
+    .from('categories')
+    .select('id, name, slug, description, image_url')
+    .order('name', { ascending: true });
+
+  const preferenceCategories = allCategories || [];
+
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 lg:px-8">
-      <ContentGridDiscover
-        categories={safeCategories}
-        locale={locale}
-        surface="home"
-      />
-    </div>
+    <>
+      <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 lg:px-8">
+        <ContentGridDiscover
+          categories={safeCategories}
+          locale={locale}
+          surface="home"
+        />
+      </div>
+
+      {/* Preference components for anonymous users */}
+      {preferenceCategories.length > 0 && (
+        <PreferenceIntegrationWrapper
+          categories={preferenceCategories}
+          locale={locale}
+        />
+      )}
+    </>
   );
 }

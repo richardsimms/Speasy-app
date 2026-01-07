@@ -306,7 +306,7 @@ export function ContentGridDiscover({
           aria-labelledby={`tab-${selectedTab}`}
           className="py-20 text-center"
         >
-          <p className="text-muted-foreground">
+          <p className="text-white/70">
             No content available in this category. Check back soon!
           </p>
         </div>
