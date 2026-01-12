@@ -116,7 +116,14 @@ export function MiniPlayer() {
       className="fixed right-0 bottom-0 left-0 z-40 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl md:ml-64"
     >
       {/* Progress bar at top */}
-      <div className="absolute top-0 right-0 left-0 h-[2px] bg-white/10">
+      <div
+        className="absolute top-0 right-0 left-0 h-[2px] bg-white/10"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={progress}
+        aria-label="Playback progress"
+      >
         <motion.div
           className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
           initial={{ width: 0 }}
@@ -177,7 +184,7 @@ export function MiniPlayer() {
           whileTap={{ scale: 0.95 }}
           onClick={handlePlayButtonClick}
           className={cn(
-            'flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-all',
+            'flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all',
             isPlaying
               ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)]'
               : 'bg-white/10 text-white hover:bg-white hover:text-black',

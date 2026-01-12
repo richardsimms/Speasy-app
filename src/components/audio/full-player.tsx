@@ -103,6 +103,10 @@ export function FullPlayer() {
         seek(Math.max(0, currentTimeSec - 5));
       } else if (e.key === 'ArrowRight') {
         seek(Math.min(durationSec ?? currentTimeSec, currentTimeSec + 5));
+      } else if (e.key === 'Home') {
+        seek(0);
+      } else if (e.key === 'End') {
+        seek(durationSec ?? currentTimeSec);
       }
     },
     [seek, currentTimeSec, durationSec],
@@ -134,7 +138,10 @@ export function FullPlayer() {
         transition={{ duration: 0.2 }}
         className="fixed inset-0 bg-black/80 backdrop-blur-sm"
         onClick={handleClose}
-        aria-hidden="true"
+        onKeyDown={e => e.key === 'Escape' && handleClose()}
+        role="button"
+        tabIndex={0}
+        aria-label="Close player"
         style={{
           position: 'fixed',
           top: 0,
@@ -166,6 +173,10 @@ export function FullPlayer() {
         <div
           className="flex h-6 cursor-grab items-center justify-center active:cursor-grabbing"
           onPointerDown={e => dragControls.start(e)}
+          role="button"
+          tabIndex={0}
+          aria-label="Swipe down to close"
+          onKeyDown={e => e.key === 'Escape' && handleClose()}
         >
           <div className="h-1 w-12 rounded-full bg-white/30" />
         </div>
@@ -240,6 +251,7 @@ export function FullPlayer() {
                         aria-valuemin={0}
                         aria-valuemax={durationSec ?? 0}
                         aria-valuenow={currentTimeSec}
+                        aria-valuetext={`${formatTime(currentTimeSec)} of ${formatTime(durationSec ?? 0)}`}
                         tabIndex={0}
                         className="group h-2 w-full cursor-pointer overflow-hidden rounded-full bg-white/10"
                         onClick={handleSeek}
@@ -252,7 +264,7 @@ export function FullPlayer() {
                           transition={{ duration: 0.1 }}
                         />
                       </div>
-                      <div className="mt-2 flex justify-between text-xs text-white/60">
+                      <div className="mt-2 flex justify-between text-sm text-white/60">
                         <span>{formatTime(currentTimeSec)}</span>
                         <span>{formatTime(durationSec ?? 0)}</span>
                       </div>
