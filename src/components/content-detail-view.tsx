@@ -299,10 +299,10 @@ export function ContentDetailView({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="prose prose-invert prose-lg max-w-none"
+            className="overflow-hidden"
           >
             <div
-              className="leading-relaxed text-white/90"
+              className="content-body break-words leading-relaxed text-white/90 [overflow-wrap:anywhere]"
               // eslint-disable-next-line react-dom/no-dangerously-set-innerhtml -- Content is from trusted database
               dangerouslySetInnerHTML={{ __html: content.content }}
             />
@@ -336,7 +336,7 @@ export function ContentDetailView({
           initial={{ opacity: 0, y: 100 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
-          className="fixed right-0 bottom-0 left-0 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl md:pl-64"
+          className="fixed right-0 bottom-0 left-0 z-50 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl md:pl-64"
         >
           {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
           <audio ref={audioRef} src={content.audioUrl} preload="metadata" />
