@@ -48,12 +48,24 @@
     color: rgb(255 255 255 / 0.95);
   }
 
-  .content-body h1 { font-size: 2rem; }
-  .content-body h2 { font-size: 1.75rem; }
-  .content-body h3 { font-size: 1.5rem; }
-  .content-body h4 { font-size: 1.25rem; }
-  .content-body h5 { font-size: 1.125rem; }
-  .content-body h6 { font-size: 1rem; }
+  .content-body h1 {
+    font-size: 2rem;
+  }
+  .content-body h2 {
+    font-size: 1.75rem;
+  }
+  .content-body h3 {
+    font-size: 1.5rem;
+  }
+  .content-body h4 {
+    font-size: 1.25rem;
+  }
+  .content-body h5 {
+    font-size: 1.125rem;
+  }
+  .content-body h6 {
+    font-size: 1rem;
+  }
 
   /* Lists */
   .content-body ul,
