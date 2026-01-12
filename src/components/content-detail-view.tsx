@@ -299,10 +299,10 @@ export function ContentDetailView({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="prose prose-invert prose-lg max-w-none"
+            className="overflow-hidden"
           >
             <div
-              className="leading-relaxed text-white/90"
+              className="content-body break-words leading-relaxed text-white/90 [overflow-wrap:anywhere]"
               // eslint-disable-next-line react-dom/no-dangerously-set-innerhtml -- Content is from trusted database
               dangerouslySetInnerHTML={{ __html: content.content }}
             />
