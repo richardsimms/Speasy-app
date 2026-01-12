@@ -364,7 +364,7 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <div className="absolute left-1/2 -translate-x-1/2">
+        <div className="absolute left-1/2 z-10 -translate-x-1/2">
           <Link href="/" aria-label="Home">
             {simplifiedLogo}
           </Link>
