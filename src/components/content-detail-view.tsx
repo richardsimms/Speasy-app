@@ -244,10 +244,11 @@ export function ContentDetailView({
                         href={content.sourceLink}
                         target="_blank"
                         rel="noopener noreferrer"
+                        aria-label={`${content.sourceName} (opens in new tab)`}
                         className="flex items-center gap-1 hover:text-white"
                       >
                         {content.sourceName}
-                        <ExternalLink className="h-3 w-3" />
+                        <ExternalLink className="h-3 w-3" aria-hidden="true" />
                       </a>
                     )
                   : (
@@ -302,11 +303,30 @@ export function ContentDetailView({
             className="overflow-hidden"
           >
             <div
-              className="content-body break-words leading-relaxed text-white/90 [overflow-wrap:anywhere]"
+              className="content-body leading-relaxed [overflow-wrap:anywhere] break-words text-white/90"
               // eslint-disable-next-line react-dom/no-dangerously-set-innerhtml -- Content is from trusted database
               dangerouslySetInnerHTML={{ __html: content.content }}
             />
           </motion.div>
+        )}
+
+        {/* Transcript for audio accessibility */}
+        {content.audioUrl && content.content && (
+          <motion.details
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35 }}
+            className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6"
+          >
+            <summary className="cursor-pointer text-lg font-medium text-white hover:text-white/80">
+              Audio Transcript
+            </summary>
+            <div
+              className="content-body mt-4 leading-relaxed [overflow-wrap:anywhere] break-words text-white/70"
+              // eslint-disable-next-line react-dom/no-dangerously-set-innerhtml -- Content is from trusted database
+              dangerouslySetInnerHTML={{ __html: content.content }}
+            />
+          </motion.details>
         )}
 
         {/* Source link */}
@@ -321,10 +341,11 @@ export function ContentDetailView({
               href={content.sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="View original article (opens in new tab)"
               className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/70 transition-colors hover:border-white/20 hover:text-white"
             >
               <span>View original article</span>
-              <ExternalLink className="h-4 w-4" />
+              <ExternalLink className="h-4 w-4" aria-hidden="true" />
             </a>
           </motion.div>
         )}
@@ -358,14 +379,26 @@ export function ContentDetailView({
                 aria-valuemin={0}
                 aria-valuemax={duration}
                 aria-valuenow={currentTime}
+                aria-valuetext={`${formatTime(currentTime)} of ${formatTime(duration)}`}
                 tabIndex={0}
                 className="h-1 w-full cursor-pointer overflow-hidden rounded-full bg-white/10 align-middle"
                 onClick={handleSeek}
                 onKeyDown={(e) => {
+                  const audio = audioRef.current;
+                  if (!audio) {
+                    return;
+                  }
+
                   if (e.key === 'ArrowLeft') {
                     skipTime(-5);
                   } else if (e.key === 'ArrowRight') {
                     skipTime(5);
+                  } else if (e.key === 'Home') {
+                    audio.currentTime = 0;
+                    setCurrentTime(0);
+                  } else if (e.key === 'End') {
+                    audio.currentTime = duration;
+                    setCurrentTime(duration);
                   }
                 }}
               >
@@ -384,7 +417,7 @@ export function ContentDetailView({
                   onClick={togglePlay}
                   disabled={isLoading}
                   className={cn(
-                    'flex h-10 w-10 items-center justify-center rounded-full transition-all',
+                    'flex h-11 w-11 items-center justify-center rounded-full transition-all',
                     isPlaying
                       ? 'bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.3)]'
                       : 'bg-white/10 text-white hover:bg-white hover:text-black',
