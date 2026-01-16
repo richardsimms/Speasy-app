@@ -3,6 +3,8 @@
 import type { BlogPost } from '@/libs/blog';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { MOTION } from '@/libs/motion-config';
 
 type BlogPostListProps = {
   posts: BlogPost[];
@@ -19,13 +21,19 @@ function truncateExcerpt(excerpt: string | null | undefined, maxLength: number =
 }
 
 export function BlogPostList({ posts }: BlogPostListProps) {
+  const reducedMotion = useReducedMotion();
+
   if (posts.length === 0) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
+        initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+        whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+        viewport={MOTION.viewport}
+        transition={
+          reducedMotion
+            ? { duration: 0 }
+            : { duration: MOTION.duration.slow, ease: MOTION.easing.default }
+        }
         className="py-12 text-center"
       >
         <h3 className="text-lg font-medium text-white">No posts found</h3>
@@ -41,14 +49,18 @@ export function BlogPostList({ posts }: BlogPostListProps) {
       {posts.map((post, index) => (
         <motion.div
           key={post.id}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-50px' }}
-          transition={{
-            duration: 0.5,
-            delay: index * 0.05,
-            ease: [0.16, 1, 0.3, 1],
-          }}
+          initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+          whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+          viewport={MOTION.viewport}
+          transition={
+            reducedMotion
+              ? { duration: 0 }
+              : {
+                  duration: MOTION.duration.slow,
+                  delay: index * 0.05,
+                  ease: MOTION.easing.default,
+                }
+          }
           className="group relative"
         >
           <Link
