@@ -8,7 +8,9 @@ import Link from 'next/link';
 import { useCallback } from 'react';
 import { usePlaybackOptional } from '@/components/audio/playback-provider';
 import { useContentAnalytics } from '@/hooks/useContentAnalytics';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
+import { MOTION } from '@/libs/motion-config';
 import { cn } from '@/libs/utils';
 
 type ContentGridCardProps = {
@@ -53,6 +55,7 @@ export function ContentGridCard({
 }: ContentGridCardProps) {
   const { trackContentViewed, trackContentPlayStarted } = useContentAnalytics();
   const playback = usePlaybackOptional();
+  const reducedMotion = useReducedMotion();
 
   // Check if this track is currently playing
   const isCurrentTrack = playback?.activeTrack?.id === id;
@@ -162,14 +165,18 @@ export function ContentGridCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{
-        duration: 0.5,
-        delay: index * 0.05,
-        ease: [0.16, 1, 0.3, 1],
-      }}
+      initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+      whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={MOTION.viewport}
+      transition={
+        reducedMotion
+          ? { duration: 0 }
+          : {
+              duration: MOTION.duration.slow,
+              delay: index * 0.05,
+              ease: MOTION.easing.default,
+            }
+      }
       className="group relative"
     >
       <Link

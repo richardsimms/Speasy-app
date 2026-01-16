@@ -5,6 +5,8 @@ import { Pause, Play } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useRef } from 'react';
 
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { MOTION } from '@/libs/motion-config';
 import { cn } from '@/libs/utils';
 import { usePlayback } from './playback-provider';
 
@@ -24,6 +26,7 @@ export function MiniPlayer() {
     togglePlay,
     openPlayer,
   } = usePlayback();
+  const reducedMotion = useReducedMotion();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
@@ -109,10 +112,14 @@ export function MiniPlayer() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 100 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 100 }}
-      transition={{ duration: 0.3 }}
+      initial={reducedMotion ? undefined : { opacity: 0, y: 100 }}
+      animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+      exit={reducedMotion ? undefined : { opacity: 0, y: 100 }}
+      transition={
+        reducedMotion
+          ? { duration: 0 }
+          : { duration: MOTION.duration.normal, ease: MOTION.easing.default }
+      }
       className="fixed right-0 bottom-0 left-0 z-40 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl md:ml-64"
     >
       {/* Progress bar at top */}
@@ -126,9 +133,13 @@ export function MiniPlayer() {
       >
         <motion.div
           className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.1 }}
+          initial={reducedMotion ? false : { width: 0 }}
+          animate={reducedMotion ? { width: `${progress}%` } : { width: `${progress}%` }}
+          transition={
+            reducedMotion
+              ? { duration: 0 }
+              : { duration: MOTION.duration.instant }
+          }
         />
       </div>
 
@@ -180,8 +191,8 @@ export function MiniPlayer() {
         {/* Play/Pause button */}
         <motion.button
           type="button"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
+          whileHover={reducedMotion ? undefined : MOTION.gesture.hover}
+          whileTap={reducedMotion ? undefined : MOTION.gesture.tap}
           onClick={handlePlayButtonClick}
           className={cn(
             'flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all',
