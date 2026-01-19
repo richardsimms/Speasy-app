@@ -8,6 +8,8 @@ import Link from 'next/link';
 import { useCallback } from 'react';
 import { usePlaybackOptional } from '@/components/audio/playback-provider';
 import { useContentAnalytics } from '@/hooks/useContentAnalytics';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { MOTION } from '@/libs/motion-config';
 
 import { cn } from '@/libs/utils';
 
@@ -53,6 +55,7 @@ export function ContentGridCard({
 }: ContentGridCardProps) {
   const { trackContentViewed, trackContentPlayStarted } = useContentAnalytics();
   const playback = usePlaybackOptional();
+  const reducedMotion = useReducedMotion();
 
   // Check if this track is currently playing
   const isCurrentTrack = playback?.activeTrack?.id === id;
@@ -162,20 +165,26 @@ export function ContentGridCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+      whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+      whileTap={reducedMotion ? undefined : { scale: 0.98 }}
+      exit={reducedMotion ? undefined : { opacity: 0, y: -20 }}
       viewport={{ once: true, margin: '-50px' }}
-      transition={{
-        duration: 0.5,
-        delay: index * 0.05,
-        ease: [0.16, 1, 0.3, 1],
-      }}
+      transition={
+        reducedMotion
+          ? { duration: 0 }
+          : {
+              duration: MOTION.duration.slow,
+              delay: index * MOTION.stagger.cards,
+              ease: MOTION.easing.default,
+            }
+      }
       className="group relative"
     >
       <Link
         href={`/${locale}/content/${id}`}
         onClick={handleClick}
-        className="relative block overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-all duration-300 hover:border-white/30 hover:shadow-lg hover:shadow-white/5"
+        className="relative block overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-[border-color,box-shadow] duration-300 hover:border-white/30 hover:shadow-lg hover:shadow-white/5"
       >
         {/* Image Section */}
         {imageUrl && imageUrl.trim() !== ''
@@ -209,7 +218,7 @@ export function ContentGridCard({
                     whileTap={{ scale: 0.95 }}
                     onClick={handlePlayClick}
                     className={cn(
-                      'absolute left-3 bottom-3 flex h-10 w-10 items-center justify-center rounded-full transition-all',
+                      'absolute left-3 bottom-3 flex h-10 w-10 items-center justify-center rounded-full transition-[background-color,color,box-shadow,opacity] duration-200',
                       isPlaying
                         ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]'
                         : 'bg-black/70 text-white opacity-0 backdrop-blur-sm group-hover:opacity-100 hover:bg-white hover:text-black',
@@ -251,7 +260,7 @@ export function ContentGridCard({
                     whileTap={{ scale: 0.95 }}
                     onClick={handlePlayClick}
                     className={cn(
-                      'absolute left-3 bottom-3 flex h-10 w-10 items-center justify-center rounded-full transition-all',
+                      'absolute left-3 bottom-3 flex h-10 w-10 items-center justify-center rounded-full transition-[background-color,color,box-shadow,opacity] duration-200',
                       isPlaying
                         ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]'
                         : 'bg-black/70 text-white opacity-0 backdrop-blur-sm group-hover:opacity-100 hover:bg-white hover:text-black',

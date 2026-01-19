@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 import { cn } from '@/libs/utils';
 import { usePlayback } from './playback-provider';
@@ -31,6 +32,7 @@ export function FullPlayer() {
     next,
     prev,
   } = usePlayback();
+  const reducedMotion = useReducedMotion();
 
   const progressBarRef = useRef<HTMLDivElement>(null);
   const controls = useAnimation();
@@ -132,10 +134,10 @@ export function FullPlayer() {
       {/* Backdrop - must be rendered first for proper z-index stacking */}
       <motion.div
         key="backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
+        initial={reducedMotion ? undefined : { opacity: 0 }}
+        animate={reducedMotion ? undefined : { opacity: 1 }}
+        exit={reducedMotion ? undefined : { opacity: 0 }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 0.2 }}
         className="fixed inset-0 bg-black/80 backdrop-blur-sm"
         onClick={handleClose}
         onKeyDown={e => e.key === 'Escape' && handleClose()}
@@ -157,7 +159,7 @@ export function FullPlayer() {
         key="player-sheet"
         initial={{ y: '100%' }}
         animate={controls}
-        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+        transition={reducedMotion ? { duration: 0 } : { type: 'spring', damping: 30, stiffness: 300 }}
         drag="y"
         dragControls={dragControls}
         dragConstraints={{ top: 0, bottom: 0 }}
@@ -259,9 +261,9 @@ export function FullPlayer() {
                       >
                         <motion.div
                           className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${progress}%` }}
-                          transition={{ duration: 0.1 }}
+                          initial={reducedMotion ? undefined : { width: 0 }}
+                          animate={reducedMotion ? undefined : { width: `${progress}%` }}
+                          transition={reducedMotion ? { duration: 0 } : { duration: 0.1 }}
                         />
                       </div>
                       <div className="mt-2 flex justify-between text-sm text-white/60">
@@ -296,7 +298,7 @@ export function FullPlayer() {
                         onClick={togglePlay}
                         disabled={isLoading}
                         className={cn(
-                          'flex h-16 w-16 items-center justify-center rounded-full transition-all',
+                          'flex h-16 w-16 items-center justify-center rounded-full transition-[background-color,color,box-shadow,opacity] duration-200',
                           isPlaying
                             ? 'bg-white text-black shadow-[0_0_40px_rgba(255,255,255,0.4)]'
                             : 'bg-white/10 text-white hover:bg-white hover:text-black',

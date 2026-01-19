@@ -417,7 +417,7 @@ export function ContentDetailView({
                   onClick={togglePlay}
                   disabled={isLoading}
                   className={cn(
-                    'flex h-11 w-11 items-center justify-center rounded-full transition-all',
+                    'flex h-11 w-11 items-center justify-center rounded-full transition-[background-color,color,box-shadow,opacity] duration-200',
                     isPlaying
                       ? 'bg-white text-black shadow-[0_0_30px_rgba(255,255,255,0.3)]'
                       : 'bg-white/10 text-white hover:bg-white hover:text-black',

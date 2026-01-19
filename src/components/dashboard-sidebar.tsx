@@ -84,7 +84,7 @@ function SidebarNav({ navItems, currentPath, onNavigate }: SidebarNavProps) {
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
+              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-[background-color,color,transform] duration-200',
               'hover:bg-white/5 active:scale-95',
               isActive
                 ? 'bg-white/10 text-white'
@@ -142,7 +142,7 @@ function PlayerToggle({ className }: { className?: string }) {
       type="button"
       onClick={playback.togglePlayerEnabled}
       className={cn(
-        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
+        'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-[background-color,color,transform] duration-200',
         'hover:bg-white/5 active:scale-95',
         playback.playerEnabled
           ? 'bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white'

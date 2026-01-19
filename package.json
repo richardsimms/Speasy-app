@@ -107,7 +107,6 @@
     "rimraf": "catalog:",
     "semantic-release": "catalog:",
     "tailwindcss": "catalog:",
-    "tw-animate-css": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-tsconfig-paths": "catalog:",

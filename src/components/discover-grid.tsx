@@ -180,7 +180,7 @@ export function DiscoverGrid({
           {/* Animated hover/active background */}
           {indicatorStyle.width > 0 && (
             <div
-              className="pointer-events-none absolute inset-y-0 rounded-lg border border-white/20 bg-white/10 transition-all duration-300 ease-out"
+              className="pointer-events-none absolute inset-y-0 rounded-lg border border-white/20 bg-white/10 transition-[transform,width,border-color,background-color] duration-300 ease-out"
               style={{
                 transform: `translateX(${indicatorStyle.left}px)`,
                 width: `${indicatorStyle.width}px`,
@@ -280,7 +280,6 @@ export function DiscoverGrid({
               <div
                 key={item.id}
                 className={cn(
-                  'transition-all',
                   isFeatured
                     ? 'sm:col-span-2 lg:col-span-2'
                     : 'sm:col-span-1 lg:col-span-1',

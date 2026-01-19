@@ -16,8 +16,11 @@ import Link from 'next/link';
 import { Footer } from '@/components/footer';
 import { ScrollProgress } from '@/components/scroll-progress';
 import { Button } from '@/components/ui/button';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 export default function AboutPage() {
+  const reducedMotion = useReducedMotion();
+
   return (
     <>
       <ScrollProgress />
@@ -41,13 +44,17 @@ export default function AboutPage() {
 
           <div className="relative z-10 mx-auto w-full max-w-4xl space-y-6 py-16">
             <motion.h1
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.7,
-                delay: 0.1,
-                ease: [0.16, 1, 0.3, 1],
-              }}
+              initial={reducedMotion ? false : { opacity: 0, y: 12 }}
+              animate={reducedMotion ? false : { opacity: 1, y: 0 }}
+              transition={
+                reducedMotion
+                  ? { duration: 0 }
+                  : {
+                      duration: 0.7,
+                      delay: 0.1,
+                      ease: [0.16, 1, 0.3, 1],
+                    }
+              }
               className="text-4xl leading-[1.1] font-bold tracking-tight text-white md:text-5xl lg:text-6xl"
             >
               Reclaim your time.
@@ -58,13 +65,17 @@ export default function AboutPage() {
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.6,
-                delay: 0.25,
-                ease: [0.16, 1, 0.3, 1],
-              }}
+              initial={reducedMotion ? false : { opacity: 0, y: 10 }}
+              animate={reducedMotion ? false : { opacity: 1, y: 0 }}
+              transition={
+                reducedMotion
+                  ? { duration: 0 }
+                  : {
+                      duration: 0.6,
+                      delay: 0.25,
+                      ease: [0.16, 1, 0.3, 1],
+                    }
+              }
               className="max-w-xl text-lg leading-relaxed text-gray-300 md:text-xl"
             >
               Speasy helps you keep learning without needing more hours in the
@@ -82,10 +93,10 @@ export default function AboutPage() {
         <section className="relative px-6 py-16 md:px-8">
           <div className="mx-auto max-w-4xl">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+              whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              transition={reducedMotion ? { duration: 0 } : { duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-4"
             >
               <p className="text-xl leading-relaxed text-gray-300 md:text-2xl">

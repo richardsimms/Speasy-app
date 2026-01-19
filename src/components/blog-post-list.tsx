@@ -3,6 +3,8 @@
 import type { BlogPost } from '@/libs/blog';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { MOTION } from '@/libs/motion-config';
 
 type BlogPostListProps = {
   posts: BlogPost[];
@@ -19,13 +21,16 @@ function truncateExcerpt(excerpt: string | null | undefined, maxLength: number =
 }
 
 export function BlogPostList({ posts }: BlogPostListProps) {
+  const reducedMotion = useReducedMotion();
+
   if (posts.length === 0) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
+        initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+        whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+        exit={reducedMotion ? undefined : { opacity: 0, y: -20 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.5 }}
+        transition={reducedMotion ? { duration: 0 } : { duration: MOTION.duration.slow }}
         className="py-12 text-center"
       >
         <h3 className="text-lg font-medium text-white">No posts found</h3>
@@ -41,19 +46,25 @@ export function BlogPostList({ posts }: BlogPostListProps) {
       {posts.map((post, index) => (
         <motion.div
           key={post.id}
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+          whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+          whileTap={reducedMotion ? undefined : { scale: 0.98 }}
+          exit={reducedMotion ? undefined : { opacity: 0, y: -20 }}
           viewport={{ once: true, margin: '-50px' }}
-          transition={{
-            duration: 0.5,
-            delay: index * 0.05,
-            ease: [0.16, 1, 0.3, 1],
-          }}
+          transition={
+            reducedMotion
+              ? { duration: 0 }
+              : {
+                  duration: MOTION.duration.slow,
+                  delay: index * MOTION.stagger.cards,
+                  ease: MOTION.easing.default,
+                }
+          }
           className="group relative"
         >
           <Link
             href={`/blog/${post.slug}`}
-            className="relative block overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-all duration-300 hover:border-white/30 hover:shadow-lg hover:shadow-white/5"
+            className="relative block overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-[border-color,box-shadow] duration-300 hover:border-white/30 hover:shadow-lg hover:shadow-white/5"
           >
             {/* Content Section */}
             <div className="p-6">

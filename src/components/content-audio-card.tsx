@@ -139,7 +139,7 @@ export function ContentAudioCard({
         ease: [0.16, 1, 0.3, 1],
       }}
       whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
-      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-all duration-500 hover:border-white/20"
+      className="group relative overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-[border-color] duration-500 hover:border-white/20"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
@@ -189,7 +189,7 @@ export function ContentAudioCard({
                 {category}
               </span>
             </div>
-            <h3 className="text-2xl font-bold text-white transition-all group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-white/70 group-hover:bg-clip-text group-hover:text-transparent">
+            <h3 className="text-2xl font-bold text-white transition-[background,color] duration-300 group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-white/70 group-hover:bg-clip-text group-hover:text-transparent">
               {title}
             </h3>
             {summary && (
@@ -224,7 +224,7 @@ export function ContentAudioCard({
               whileTap={{ scale: 0.95 }}
               onClick={togglePlay}
               className={cn(
-                'w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300',
+                'w-12 h-12 rounded-full flex items-center justify-center transition-[background-color,color,transform,box-shadow] duration-300',
                 isPlaying
                   ? 'bg-white text-black scale-110 shadow-[0_0_30px_rgba(255,255,255,0.3)]'
                   : 'bg-white/10 text-white hover:bg-white hover:text-black',
