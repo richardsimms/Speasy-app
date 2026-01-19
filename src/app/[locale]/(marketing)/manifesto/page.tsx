@@ -243,7 +243,7 @@ export default function ManifestoPage() {
                       whileHover={{ y: -4, transition: { duration: 0.2 } }}
                       className="group h-full"
                     >
-                      <Card className="relative h-full overflow-hidden border border-gray-800/50 bg-gradient-to-br from-gray-900/50 to-gray-900/30 p-6 shadow-lg backdrop-blur-sm transition-all duration-500 hover:border-gray-700">
+                      <Card className="relative h-full overflow-hidden border border-gray-800/50 bg-gradient-to-br from-gray-900/50 to-gray-900/30 p-6 shadow-lg backdrop-blur-sm transition-[border-color,box-shadow] duration-500 hover:border-gray-700">
                         {/* Animated glow effect on hover */}
                         <motion.div
                           className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 transition-opacity duration-500 group-hover:opacity-100`}

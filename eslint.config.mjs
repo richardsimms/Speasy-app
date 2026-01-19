@@ -33,6 +33,10 @@ export default antfu(
       'src/components/theme-provider.tsx',
       'CLAUDE.md',
       'PLAN.md',
+      // Documentation files with code examples
+      'motion-review.md',
+      'animation-performance-audit.md',
+      '.claude/references/**/*.md',
     ],
   },
   // --- Accessibility Rules ---

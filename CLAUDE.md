@@ -100,6 +100,99 @@ These rules ensure maintainability, safety, and developer velocity.
 
 ---
 
+## 8 — Motion Design
+
+### Animation System
+- **A-1 (MUST)** Use Framer Motion for all declarative animations
+- **A-2 (MUST)** Import motion config from `@/libs/motion-config` for consistent timing and easing
+- **A-3 (MUST)** Add `useReducedMotion` check to all animated components for accessibility
+- **A-4 (SHOULD)** Use GPU-accelerated properties only (transform, opacity)
+- **A-5 (SHOULD NOT)** Animate layout properties (width, height, top, left) - use transform instead
+
+### Motion Configuration
+```typescript
+import { MOTION } from '@/libs/motion-config';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+
+// Standard animation pattern
+const reducedMotion = useReducedMotion();
+
+<motion.div
+  initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+  whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+  viewport={{ once: true, margin: '-50px' }}
+  transition={
+    reducedMotion
+      ? { duration: 0 }
+      : {
+          duration: MOTION.duration.slow,
+          ease: MOTION.easing.default,
+        }
+  }
+>
+  {children}
+</motion.div>
+```
+
+### Animation Patterns
+- **Entry**: `{ opacity: 0, y: 20 }` → `{ opacity: 1, y: 0 }`
+- **Exit**: `{ opacity: 1, y: 0 }` → `{ opacity: 0, y: -20 }`
+- **Hover Scale**: `whileHover={{ scale: 1.05 }}`
+- **Tap Feedback**: `whileTap={{ scale: 0.95 }}` or `active:scale-95` CSS class
+- **Stagger**: Use `delay: index * MOTION.stagger.cards`
+
+### Performance Guidelines
+- **P-1 (MUST)** Use specific CSS transition properties, never `transition-all`
+  ```typescript
+  // ✅ Good
+  transition-[background-color,border-color,color,opacity]
+
+  // ❌ Bad
+  transition-all
+  ```
+- **P-2 (MUST)** Set `viewport={{ once: true }}` on scroll-triggered animations
+- **P-3 (SHOULD)** Use `AnimatePresence` with `mode="wait"` for page transitions
+- **P-4 (SHOULD)** Keep animations under 500ms duration for perceived performance
+- **P-5 (SHOULD NOT)** Animate more than 5 elements simultaneously
+
+### Accessibility Requirements
+- **AC-1 (MUST)** Check `useReducedMotion()` in all components with motion
+- **AC-2 (MUST)** Disable all non-essential animations when `prefers-reduced-motion` is set
+  - Use `undefined` (not `false`) for animation props when reduced motion is enabled
+  - Pattern: `initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}`
+- **AC-3 (SHOULD)** Provide instant state changes as fallback (duration: 0)
+- **AC-4 (SHOULD)** Keep essential animations (progress indicators) but reduce intensity
+
+### Interactive Feedback
+- **I-1 (SHOULD)** Add `whileTap={{ scale: 0.98 }}` to clickable cards and large buttons
+- **I-2 (SHOULD)** Add `whileHover={{ scale: 1.05 }}` to play buttons and primary CTAs
+- **I-3 (SHOULD)** Use `active:scale-95` CSS class for links and nav items
+- **I-4 (SHOULD NOT)** Add haptic feedback to elements that already animate via other means
+
+### Common Mistakes to Avoid
+- ❌ Using `transition-all` (causes performance issues)
+- ❌ Animating without checking `useReducedMotion`
+- ❌ Forgetting `AnimatePresence` for exit animations
+- ❌ Missing `viewport={{ once: true }}` on scroll animations
+- ❌ Animating width/height instead of scale
+- ❌ Over-animating (too many simultaneous motions)
+- ❌ Animation durations > 700ms (feels sluggish)
+
+### Testing Animations
+- Run `pnpm run lint` to catch `transition-all` usage
+- Check browser DevTools Performance tab for 60 FPS
+- Test with "Prefers Reduced Motion" enabled in OS settings
+- Use `animation-performance-audit.md` checklist for comprehensive testing
+
+### Resources
+- Motion Config: `src/libs/motion-config.ts`
+- Reduced Motion Hook: `src/hooks/useReducedMotion.ts`
+- Performance Audit: `animation-performance-audit.md`
+- Design Audit: `motion-review.md`
+- Framer Motion Docs: https://www.framer.com/motion/
+
+---
+
 # Writing Functions Best Practices
 
 When evaluating whether a function you implemented is good or not, use this checklist:

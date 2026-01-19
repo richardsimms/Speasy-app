@@ -9,8 +9,8 @@ import { useCallback } from 'react';
 import { usePlaybackOptional } from '@/components/audio/playback-provider';
 import { useContentAnalytics } from '@/hooks/useContentAnalytics';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
-
 import { MOTION } from '@/libs/motion-config';
+
 import { cn } from '@/libs/utils';
 
 type ContentGridCardProps = {
@@ -167,13 +167,15 @@ export function ContentGridCard({
     <motion.div
       initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
       whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={MOTION.viewport}
+      whileTap={reducedMotion ? undefined : { scale: 0.98 }}
+      exit={reducedMotion ? undefined : { opacity: 0, y: -20 }}
+      viewport={{ once: true, margin: '-50px' }}
       transition={
         reducedMotion
           ? { duration: 0 }
           : {
               duration: MOTION.duration.slow,
-              delay: index * 0.05,
+              delay: index * MOTION.stagger.cards,
               ease: MOTION.easing.default,
             }
       }
@@ -182,7 +184,7 @@ export function ContentGridCard({
       <Link
         href={`/${locale}/content/${id}`}
         onClick={handleClick}
-        className="relative block overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-all duration-300 hover:border-white/30 hover:shadow-lg hover:shadow-white/5"
+        className="relative block overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-[border-color,box-shadow] duration-300 hover:border-white/30 hover:shadow-lg hover:shadow-white/5"
       >
         {/* Image Section */}
         {imageUrl && imageUrl.trim() !== ''
@@ -216,7 +218,7 @@ export function ContentGridCard({
                     whileTap={{ scale: 0.95 }}
                     onClick={handlePlayClick}
                     className={cn(
-                      'absolute left-3 bottom-3 flex h-10 w-10 items-center justify-center rounded-full transition-all',
+                      'absolute left-3 bottom-3 flex h-10 w-10 items-center justify-center rounded-full transition-[background-color,color,box-shadow,opacity] duration-200',
                       isPlaying
                         ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]'
                         : 'bg-black/70 text-white opacity-0 backdrop-blur-sm group-hover:opacity-100 hover:bg-white hover:text-black',
@@ -258,7 +260,7 @@ export function ContentGridCard({
                     whileTap={{ scale: 0.95 }}
                     onClick={handlePlayClick}
                     className={cn(
-                      'absolute left-3 bottom-3 flex h-10 w-10 items-center justify-center rounded-full transition-all',
+                      'absolute left-3 bottom-3 flex h-10 w-10 items-center justify-center rounded-full transition-[background-color,color,box-shadow,opacity] duration-200',
                       isPlaying
                         ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)]'
                         : 'bg-black/70 text-white opacity-0 backdrop-blur-sm group-hover:opacity-100 hover:bg-white hover:text-black',

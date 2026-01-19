@@ -28,12 +28,9 @@ export function BlogPostList({ posts }: BlogPostListProps) {
       <motion.div
         initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
         whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-        viewport={MOTION.viewport}
-        transition={
-          reducedMotion
-            ? { duration: 0 }
-            : { duration: MOTION.duration.slow, ease: MOTION.easing.default }
-        }
+        exit={reducedMotion ? undefined : { opacity: 0, y: -20 }}
+        viewport={{ once: true }}
+        transition={reducedMotion ? { duration: 0 } : { duration: MOTION.duration.slow }}
         className="py-12 text-center"
       >
         <h3 className="text-lg font-medium text-white">No posts found</h3>
@@ -51,13 +48,15 @@ export function BlogPostList({ posts }: BlogPostListProps) {
           key={post.id}
           initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
           whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-          viewport={MOTION.viewport}
+          whileTap={reducedMotion ? undefined : { scale: 0.98 }}
+          exit={reducedMotion ? undefined : { opacity: 0, y: -20 }}
+          viewport={{ once: true, margin: '-50px' }}
           transition={
             reducedMotion
               ? { duration: 0 }
               : {
                   duration: MOTION.duration.slow,
-                  delay: index * 0.05,
+                  delay: index * MOTION.stagger.cards,
                   ease: MOTION.easing.default,
                 }
           }
@@ -65,7 +64,7 @@ export function BlogPostList({ posts }: BlogPostListProps) {
         >
           <Link
             href={`/blog/${post.slug}`}
-            className="relative block overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-all duration-300 hover:border-white/30 hover:shadow-lg hover:shadow-white/5"
+            className="relative block overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-[border-color,box-shadow] duration-300 hover:border-white/30 hover:shadow-lg hover:shadow-white/5"
           >
             {/* Content Section */}
             <div className="p-6">

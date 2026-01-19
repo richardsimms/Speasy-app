@@ -3,9 +3,8 @@
 import { motion, useScroll } from 'framer-motion';
 
 /**
- * Scroll progress indicator component
- * Uses Framer Motion's useScroll for frame-synced, performant scroll tracking
- * Displays a horizontal progress bar at top of page showing scroll position
+ * Scroll progress indicator using Framer Motion's useScroll hook
+ * Provides frame-synced scroll tracking without manual event listeners
  */
 export function ScrollProgress() {
   const { scrollYProgress } = useScroll();
@@ -13,7 +12,7 @@ export function ScrollProgress() {
   return (
     <div className="bg-secondary fixed top-0 left-0 z-50 h-1 w-full">
       <motion.div
-        className="bg-primary h-full"
+        className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
         style={{
           scaleX: scrollYProgress,
           transformOrigin: '0%',
