@@ -13,6 +13,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useContentAnalytics } from '@/hooks/useContentAnalytics';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { MOTION } from '@/libs/motion-config';
 import { cn } from '@/libs/utils';
 
 type ContentDetailViewProps = {
@@ -43,6 +45,7 @@ export function ContentDetailView({
   userId,
   experimentVariant,
 }: ContentDetailViewProps) {
+  const reducedMotion = useReducedMotion();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(content.duration || 0);
@@ -212,9 +215,13 @@ export function ContentDetailView({
       <div className="mx-auto max-w-4xl px-4 pb-32">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+          animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+          transition={
+            reducedMotion
+              ? { duration: 0 }
+              : { duration: MOTION.duration.slow, ease: MOTION.easing.default }
+          }
           className="mb-8"
         >
 

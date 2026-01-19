@@ -14,13 +14,16 @@ const config: KnipConfig = {
     'src/components/content-audio-card.tsx', // Used by dashboard-content.tsx
     'src/utils/DBConnection.ts', // Used by src/libs/DB.ts
     'src/app/[locale]/(marketing)/globals.css', // CSS file - imported via global styles
+    // Motion design utility components (created for developer use, not yet consumed)
+    'src/components/page-transition.tsx', // Page transition wrapper for Next.js App Router
+    'src/components/ui/skeleton.tsx', // Skeleton loader component library
+    'src/libs/motion-config.ts', // Motion configuration and utility functions (public API)
     'tests/**/*.ts',
   ],
   // Dependencies to ignore during analysis
   ignoreDependencies: [
     'conventional-changelog-conventionalcommits',
-    // Used via git hooks configuration (not imported in code)
-    'lefthook',
+    'lefthook', // Used via lefthook.yml for git hooks (not imported in code)
     // These are used but knip doesn't detect them properly
     'drizzle-orm', // Used in src/utils/DBConnection.ts and src/libs/DB.ts
     'pg', // Used in src/utils/DBConnection.ts
@@ -30,7 +33,6 @@ const config: KnipConfig = {
     'react-hook-form', // Form library, may be used in future forms
     '@types/pg', // Type definitions for pg package (type-only imports not detected)
     '@faker-js/faker', // May be used for testing or data generation
-    'tw-animate-css', // May be used in Tailwind config or CSS
   ],
   // Binaries to ignore during analysis
   ignoreBinaries: [],
