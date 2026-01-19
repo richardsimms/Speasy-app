@@ -269,9 +269,13 @@ export function ContentDetailView({
         {/* Image */}
         {content.imageUrl && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            initial={reducedMotion ? undefined : { opacity: 0, scale: 0.95 }}
+            animate={reducedMotion ? undefined : { opacity: 1, scale: 1 }}
+            transition={
+              reducedMotion
+                ? { duration: 0 }
+                : { duration: MOTION.duration.slow, delay: 0.1, ease: MOTION.easing.default }
+            }
             className="mb-8 overflow-hidden rounded-2xl"
           >
             <div className="relative aspect-[16/9] w-full">
@@ -290,9 +294,13 @@ export function ContentDetailView({
         {/* Summary */}
         {content.summary && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+            animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={
+              reducedMotion
+                ? { duration: 0 }
+                : { duration: MOTION.duration.slow, delay: 0.2, ease: MOTION.easing.default }
+            }
             className="mb-8 rounded-2xl border border-white/10 bg-white/5 p-6"
           >
             <p className="text-lg leading-relaxed text-white/80">
@@ -304,9 +312,13 @@ export function ContentDetailView({
         {/* Content */}
         {content.content && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
+            initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+            animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={
+              reducedMotion
+                ? { duration: 0 }
+                : { duration: MOTION.duration.slow, delay: 0.3, ease: MOTION.easing.default }
+            }
             className="overflow-hidden"
           >
             <div
@@ -320,9 +332,13 @@ export function ContentDetailView({
         {/* Transcript for audio accessibility */}
         {content.audioUrl && content.content && (
           <motion.details
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.35 }}
+            initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+            animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={
+              reducedMotion
+                ? { duration: 0 }
+                : { duration: MOTION.duration.slow, delay: 0.35, ease: MOTION.easing.default }
+            }
             className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6"
           >
             <summary className="cursor-pointer text-lg font-medium text-white hover:text-white/80">
@@ -339,9 +355,13 @@ export function ContentDetailView({
         {/* Source link */}
         {content.sourceUrl && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+            animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+            transition={
+              reducedMotion
+                ? { duration: 0 }
+                : { duration: MOTION.duration.slow, delay: 0.4, ease: MOTION.easing.default }
+            }
             className="mt-8"
           >
             <a
@@ -361,9 +381,13 @@ export function ContentDetailView({
       {/* Fixed audio player at bottom */}
       {content.audioUrl && (
         <motion.div
-          initial={{ opacity: 0, y: 100 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
+          initial={reducedMotion ? undefined : { opacity: 0, y: 100 }}
+          animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+          transition={
+            reducedMotion
+              ? { duration: 0 }
+              : { duration: MOTION.duration.slow, delay: 0.5, ease: MOTION.easing.default }
+          }
           className="fixed right-0 bottom-0 left-0 z-50 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl md:pl-64"
         >
           {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
@@ -411,9 +435,9 @@ export function ContentDetailView({
               >
                 <motion.div
                   className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progress}%` }}
-                  transition={{ duration: 0.1 }}
+                  initial={reducedMotion ? undefined : { width: 0 }}
+                  animate={reducedMotion ? undefined : { width: `${progress}%` }}
+                  transition={reducedMotion ? { duration: 0 } : { duration: 0.1 }}
                 />
               </div>
               {/* Playback controls */}
