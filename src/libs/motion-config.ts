@@ -160,91 +160,49 @@ export function createStaggeredAnimation(
 
 /**
  * Motion configuration object combining all settings
+ * Centralized motion design configuration providing consistent animation durations,
+ * easing curves, and viewport settings across the entire application
  */
-export const MOTION = {
-  duration: DURATION,
-  easing: EASING,
-  viewport: VIEWPORT,
-  variants: VARIANTS,
-  interactions: INTERACTIONS,
-  stagger: STAGGER,
-  createTransition,
-  createStaggeredAnimation,
-} as const;
- * Centralized motion design configuration
- * Provides consistent animation durations, easing curves, and viewport settings
- * across the entire application
- */
-
 export const MOTION = {
   /**
    * Standard duration values in seconds
    * Use these instead of magic numbers for consistency
    */
-  duration: {
-    instant: 0.1,
-    fast: 0.2,
-    normal: 0.3,
-    moderate: 0.4,
-    slow: 0.5,
-    slower: 0.6,
-    slowest: 0.7,
-  },
+  duration: DURATION,
 
   /**
    * Easing curves (cubic-bezier values)
    * Default curve matches Apple's smooth spring-like motion
    */
-  easing: {
-    // Primary easing - smooth, organic feel (used throughout app)
-    default: [0.16, 1, 0.3, 1] as const,
-    // Alternative easings for specific use cases
-    spring: [0.25, 0.46, 0.45, 0.94] as const,
-    bounce: [0.68, -0.55, 0.265, 1.55] as const,
-    easeInOut: [0.4, 0, 0.2, 1] as const,
-    easeOut: [0, 0, 0.2, 1] as const,
-  },
+  easing: EASING,
 
   /**
    * Standard viewport intersection settings for scroll animations
    * Use these with whileInView for consistent behavior
    */
-  viewport: {
-    once: true, // Animate only once when element comes into view
-    margin: '-50px', // Trigger 50px before element enters viewport
-  },
+  viewport: VIEWPORT,
 
   /**
-   * Common animation presets
+   * Common animation variants
    * Use these for consistent entry/exit animations
    */
-  preset: {
-    fadeIn: {
-      initial: { opacity: 0 },
-      animate: { opacity: 1 },
-    },
-    slideUp: {
-      initial: { opacity: 0, y: 20 },
-      animate: { opacity: 1, y: 0 },
-    },
-    slideDown: {
-      initial: { opacity: 0, y: -20 },
-      animate: { opacity: 1, y: 0 },
-    },
-    scaleUp: {
-      initial: { opacity: 0, scale: 0.95 },
-      animate: { opacity: 1, scale: 1 },
-    },
-  },
+  variants: VARIANTS,
 
   /**
    * Interactive gesture scaling
    */
-  gesture: {
-    hover: { scale: 1.05 },
-    tap: { scale: 0.95 },
-    tapSubtle: { scale: 0.98 },
-  },
+  interactions: INTERACTIONS,
+
+  /**
+   * Stagger animation configuration
+   */
+  stagger: STAGGER,
+
+  /**
+   * Helper functions
+   */
+  createTransition,
+  createStaggeredAnimation,
 } as const;
 
 /**

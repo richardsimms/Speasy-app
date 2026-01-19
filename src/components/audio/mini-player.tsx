@@ -6,8 +6,6 @@ import Image from 'next/image';
 import { useCallback, useEffect, useRef } from 'react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
-import { useReducedMotion } from '@/hooks/useReducedMotion';
-import { MOTION } from '@/libs/motion-config';
 import { cn } from '@/libs/utils';
 import { usePlayback } from './playback-provider';
 
@@ -184,8 +182,8 @@ export function MiniPlayer() {
         {/* Play/Pause button */}
         <motion.button
           type="button"
-          whileHover={reducedMotion ? undefined : MOTION.gesture.hover}
-          whileTap={reducedMotion ? undefined : MOTION.gesture.tap}
+          whileHover={reducedMotion ? undefined : { scale: 1.05 }}
+          whileTap={reducedMotion ? undefined : { scale: 0.95 }}
           onClick={handlePlayButtonClick}
           className={cn(
             'flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-[background-color,color,box-shadow,opacity] duration-200',

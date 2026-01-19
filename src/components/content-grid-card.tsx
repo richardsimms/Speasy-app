@@ -11,7 +11,6 @@ import { useContentAnalytics } from '@/hooks/useContentAnalytics';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { MOTION } from '@/libs/motion-config';
 
-import { MOTION } from '@/libs/motion-config';
 import { cn } from '@/libs/utils';
 
 type ContentGridCardProps = {
