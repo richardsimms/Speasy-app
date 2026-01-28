@@ -179,12 +179,12 @@ export function ContentGridCard({
               ease: MOTION.easing.default,
             }
       }
-      className="group relative"
+      className="group relative overflow-hidden rounded-2xl"
     >
       <Link
         href={`/${locale}/content/${id}`}
         onClick={handleClick}
-        className="relative block overflow-hidden rounded-2xl border border-white/10 bg-[#0A0A0A] transition-[border-color,box-shadow] duration-300 hover:border-white/30 hover:shadow-lg hover:shadow-white/5"
+        className="relative block overflow-hidden rounded-2xl border border-white/20 bg-[#0A0A0A] transition-[border-color,box-shadow] duration-300 hover:border-white/40 hover:shadow-lg hover:shadow-white/5"
       >
         {/* Image Section */}
         {imageUrl && imageUrl.trim() !== ''
@@ -332,7 +332,7 @@ export function ContentGridCard({
         </div>
 
         {/* Hover indicator */}
-        <div className="absolute top-0 right-4 left-4 h-[2px] origin-left scale-x-0 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 transition-transform duration-300 group-hover:scale-x-100" />
+        <div className="absolute top-0 right-0 left-0 h-[2px] origin-left scale-x-0 rounded-t-2xl bg-linear-to-r from-blue-500 to-purple-500 transition-transform duration-300 group-hover:scale-x-100" />
       </Link>
     </motion.div>
   );

@@ -5,6 +5,7 @@ import { Pause, Play } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useRef } from 'react';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { MOTION } from '@/libs/motion-config';
 
 import { cn } from '@/libs/utils';
 import { usePlayback } from './playback-provider';
@@ -114,7 +115,14 @@ export function MiniPlayer() {
       initial={reducedMotion ? undefined : { opacity: 0, y: 100 }}
       animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
       exit={reducedMotion ? undefined : { opacity: 0, y: 100 }}
-      transition={reducedMotion ? { duration: 0 } : { duration: 0.3 }}
+      transition={
+        reducedMotion
+          ? { duration: 0 }
+          : {
+              duration: MOTION.duration.fast,
+              ease: MOTION.easing.default,
+            }
+      }
       className="fixed right-0 bottom-0 left-0 z-40 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl md:ml-64"
     >
       {/* Progress bar at top */}

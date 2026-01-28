@@ -1,4 +1,5 @@
 import { Analytics } from '@vercel/analytics/next';
+import { Agentation } from 'agentation';
 import { setRequestLocale } from 'next-intl/server';
 import { AudioPlayerLayout } from '@/components/audio/audio-player-layout';
 import { DashboardSidebar } from '@/components/dashboard-sidebar';
@@ -20,7 +21,10 @@ export default async function MarketingLayout(props: {
         </main>
         {/* <DashboardRightSidebar /> */}
         <Analytics />
+        {process.env.NODE_ENV === 'development' && <Agentation />}
+
       </div>
     </AudioPlayerLayout>
+
   );
 }
