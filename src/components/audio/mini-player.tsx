@@ -150,7 +150,7 @@ export function MiniPlayer() {
     >
       {/* Progress bar at top */}
       <div
-        className="absolute top-0 right-0 left-0 h-[2px] bg-white/10"
+        className="absolute top-0 right-0 left-0 h-[1px] bg-white/10"
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={100}
