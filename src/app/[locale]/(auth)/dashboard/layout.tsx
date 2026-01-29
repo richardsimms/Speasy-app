@@ -12,7 +12,7 @@ export default async function DashboardLayout(props: {
   return (
     <div style={{ backgroundColor: '#100e12', minHeight: '100vh' }}>
       <DashboardSidebar />
-      <main className="ml-0 min-h-screen md:ml-64">
+      <main className="ml-0 min-h-screen md:ml-20">
         {props.children}
       </main>
       {/* <DashboardRightSidebar /> */}

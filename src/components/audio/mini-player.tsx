@@ -3,10 +3,10 @@
 import { motion } from 'framer-motion';
 import { Pause, Play } from 'lucide-react';
 import Image from 'next/image';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSidebarOptional } from '@/components/sidebar-context';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { MOTION } from '@/libs/motion-config';
-
 import { cn } from '@/libs/utils';
 import { usePlayback } from './playback-provider';
 
@@ -27,6 +27,7 @@ export function MiniPlayer() {
     openPlayer,
   } = usePlayback();
   const reducedMotion = useReducedMotion();
+  const sidebar = useSidebarOptional();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | undefined>(undefined);
@@ -103,12 +104,33 @@ export function MiniPlayer() {
     openPlayer();
   }, [openPlayer]);
 
+  // Track if we're on desktop (md breakpoint = 768px)
+  // Initialize with a function to avoid SSR mismatch, then sync via effect
+  const [isDesktop, setIsDesktop] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+    return window.matchMedia('(min-width: 768px)').matches;
+  });
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 768px)');
+    // Only subscribe to changes, don't set initial value (already done in useState)
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
   // Don't render if player disabled, no active track, or if full player is open
   if (!playerEnabled || !activeTrack || uiMode === 'player') {
     return null;
   }
 
   const progress = durationSec ? (currentTimeSec / durationSec) * 100 : 0;
+
+  // Desktop left offset based on sidebar state: 78px closed, 190px open
+  const isDesktopOpen = sidebar?.isDesktopOpen ?? false;
+  const leftOffset = isDesktop ? (isDesktopOpen ? 190 : 78) : 0;
 
   return (
     <motion.div
@@ -123,7 +145,8 @@ export function MiniPlayer() {
               ease: MOTION.easing.default,
             }
       }
-      className="fixed right-0 bottom-0 left-0 z-40 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl md:ml-64"
+      className="fixed right-0 bottom-0 z-40 border-t border-white/10 bg-[#0A0A0A]/95 backdrop-blur-xl transition-[left] duration-200 ease-out"
+      style={{ left: leftOffset }}
     >
       {/* Progress bar at top */}
       <div
