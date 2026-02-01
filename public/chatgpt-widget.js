@@ -186,12 +186,17 @@
   // Determine what type of content we have and render
   let html = '';
 
-  if (Array.isArray(toolOutput)) {
-    // List of items
+  if (toolOutput.items && Array.isArray(toolOutput.items)) {
+    // Wrapped list with metadata (standard format from structuredContent)
+    const metadata = {
+      category_name: toolOutput.category || toolMeta?.category_name || 'Latest',
+      total_items: toolOutput.count || toolOutput.items.length,
+      ...toolMeta,
+    };
+    html = renderContentList(toolOutput.items, metadata);
+  } else if (Array.isArray(toolOutput)) {
+    // Legacy: direct array (shouldn't happen with new format)
     html = renderContentList(toolOutput, toolMeta);
-  } else if (toolOutput.items && Array.isArray(toolOutput.items)) {
-    // Wrapped list with metadata
-    html = renderContentList(toolOutput.items, toolOutput.metadata || toolMeta);
   } else if (toolOutput.id && toolOutput.title) {
     // Single item detail
     html = renderContentDetail(toolOutput);

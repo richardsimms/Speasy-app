@@ -775,8 +775,13 @@ async function handleToolCall(supabase: any, params: any) {
     }, 0);
 
     return {
-      // structuredContent is read by both the model AND the widget
-      structuredContent: data || [],
+      // structuredContent MUST be an object, not an array
+      structuredContent: {
+        items: data || [],
+        count: data?.length || 0,
+        category: categoryName,
+        total_duration_minutes: Math.round(totalDuration / 60),
+      },
       // content is narration for the model
       content: [
         {
@@ -841,7 +846,13 @@ async function handleToolCall(supabase: any, params: any) {
     }
 
     return {
-      structuredContent: data || [],
+      // structuredContent MUST be an object, not an array
+      structuredContent: {
+        items: data || [],
+        count: data?.length || 0,
+        query: args.query,
+        category: args.category_slug || 'all',
+      },
       content: [
         {
           type: 'text',
