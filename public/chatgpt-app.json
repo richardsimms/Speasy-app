@@ -1,0 +1,30 @@
+{
+  "schema_version": "v1",
+  "name": "Speasy",
+  "description": "Discover and listen to AI-curated audio newsletters",
+  "icon": "https://www.speasy.app/icon.png",
+  "author": {
+    "name": "Speasy",
+    "website": "https://www.speasy.app"
+  },
+  "capabilities": {
+    "conversation_starters": [
+      "What's new on Speasy today?",
+      "Show me AI news",
+      "Find articles about productivity",
+      "Browse Business stories"
+    ]
+  },
+  "ui": {
+    "url": "https://www.speasy.app/chat?mode=chatgpt",
+    "height": "tall"
+  },
+  "mcp": {
+    "servers": [
+      {
+        "url": "https://lmmobnqmxkcdwdhhpwwd.supabase.co/functions/v1/speasy-mcp",
+        "transport": "sse"
+      }
+    ]
+  }
+}

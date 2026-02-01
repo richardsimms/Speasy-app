@@ -658,6 +658,107 @@ type WidgetWithId = WidgetNode & { _id: string };
 
 let widgetIdCounter = 0;
 
+// Helper to build widget from MCP content list data
+function buildWidgetFromData(data: any[], categoryName: string): WidgetNode {
+  const totalDuration = data.reduce((sum, item) => {
+    const d = item.audio_files?.[0]?.duration;
+    return sum + (d || 0);
+  }, 0);
+  const durationMin = Math.round(totalDuration / 60);
+
+  const formatCategoryName = (name: string): string => {
+    const upper = ['ai', 'ux', 'ui', 'api'];
+    if (upper.includes(name.toLowerCase())) {
+      return name.toUpperCase();
+    }
+    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+  };
+
+  const subtitle = durationMin > 0
+    ? `${data.length} stories · ${durationMin} min listening`
+    : `${data.length} stories ready to play`;
+
+  return {
+    type: 'Card',
+    size: 'lg',
+    status: { text: `${formatCategoryName(categoryName)} Content`, icon: 'headphones' },
+    confirm: {
+      label: '▶ Play All',
+      action: {
+        type: 'link',
+        payload: {
+          action: 'play_all',
+          url: categoryName === 'Latest'
+            ? 'https://www.speasy.app/latest?autoplay=true'
+            : `https://www.speasy.app/category/${categoryName.toLowerCase()}?autoplay=true`,
+        },
+      },
+    },
+    children: [
+      { type: 'Caption', value: subtitle, size: 'md' },
+      { type: 'Divider' },
+      {
+        type: 'ListView',
+        limit: 10,
+        children: data.map(item => ({
+          type: 'ListViewItem',
+          onClickAction: {
+            type: 'link',
+            payload: {
+              action: 'play_item',
+              url: `https://www.speasy.app/content/${item.id}`,
+            },
+          },
+          children: [{
+            type: 'Row',
+            gap: 12,
+            align: 'start',
+            children: [
+              {
+                type: 'Image',
+                src: item.image_url || 'https://www.speasy.app/poster.png',
+                alt: item.title || 'Content',
+                width: 64,
+                height: 64,
+              },
+              {
+                type: 'Col',
+                flex: 1,
+                gap: 4,
+                children: [
+                  {
+                    type: 'Row',
+                    gap: 8,
+                    align: 'center',
+                    children: [
+                      ...(item.category?.name
+                        ? [{
+                            type: 'Badge',
+                            label: formatCategoryName(item.category.name),
+                            color: 'info',
+                          }]
+                        : []),
+                      ...(item.audio_files?.[0]?.duration
+                        ? [{
+                            type: 'Caption',
+                            value: `⏱️ ${Math.round(item.audio_files[0].duration / 60)} min`,
+                            size: 'sm',
+                          }]
+                        : []),
+                    ],
+                  },
+                  { type: 'Text', value: item.title || 'Untitled', size: 'md', weight: 'semibold', maxLines: 2 },
+                  { type: 'Caption', value: item.source_name || 'Speasy', size: 'sm' },
+                ],
+              },
+            ],
+          }],
+        })),
+      },
+    ],
+  };
+}
+
 /**
  * ChatGPT App UI - Renders widgets from MCP tool results
  * Used when page is loaded in ChatGPT App iframe with ?mode=chatgpt
@@ -665,39 +766,76 @@ let widgetIdCounter = 0;
 export function ChatGPTAppUI() {
   const [widgets, setWidgets] = useState<WidgetWithId[]>([]);
   const [isConnected, setIsConnected] = useState(false);
+  const [debugLog, setDebugLog] = useState<string[]>([]);
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
+    const log = (msg: string) => {
+      // eslint-disable-next-line no-console
+      console.log('[Speasy]', msg);
+      setDebugLog(prev => [...prev.slice(-9), msg]);
+    };
+
     // Listen for messages from ChatGPT parent frame
     const handleMessage = (event: MessageEvent) => {
-      // Accept messages from ChatGPT domains
+      log(`Message from ${event.origin}: ${JSON.stringify(event.data).slice(0, 100)}`);
+
+      // Accept messages from ChatGPT domains (or any for testing)
       const allowedOrigins = [
         'https://chat.openai.com',
         'https://chatgpt.com',
       ];
 
-      if (!allowedOrigins.some(origin => event.origin.startsWith(origin))) {
+      // In development, accept all origins for testing
+      const isDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+      if (!isDev && !allowedOrigins.some(origin => event.origin.startsWith(origin))) {
         return;
       }
 
       try {
         const data = event.data;
 
-        // Handle tool result messages
-        if (data?.type === 'tool_result' && data?.result?.ui) {
-          const widgetWithId: WidgetWithId = {
-            ...data.result.ui,
-            _id: `widget-${++widgetIdCounter}`,
-          };
-          setWidgets(prev => [...prev, widgetWithId]);
+        // Handle MCP tool result messages (ChatGPT format)
+        if (data?.type === 'mcp_tool_result') {
+          log('Received mcp_tool_result');
+          // Try to get UI from result.ui or parse content
+          if (data?.result?.ui) {
+            const widgetWithId: WidgetWithId = {
+              ...data.result.ui,
+              _id: `widget-${++widgetIdCounter}`,
+            };
+            setWidgets(prev => [...prev, widgetWithId]);
+          } else if (data?.content?.[0]?.text) {
+            // Parse JSON and build widget
+            const parsed = JSON.parse(data.content[0].text);
+            if (Array.isArray(parsed)) {
+              const widget = buildWidgetFromData(parsed, 'Latest');
+              setWidgets(prev => [...prev, { ...widget, _id: `widget-${++widgetIdCounter}` }]);
+            }
+          }
+          setIsConnected(true);
+        }
+
+        // Handle tool_result format
+        if (data?.type === 'tool_result') {
+          log('Received tool_result');
+          if (data?.result?.ui) {
+            const widgetWithId: WidgetWithId = {
+              ...data.result.ui,
+              _id: `widget-${++widgetIdCounter}`,
+            };
+            setWidgets(prev => [...prev, widgetWithId]);
+          }
+          setIsConnected(true);
         }
 
         // Handle connection acknowledgment
         if (data?.type === 'connected') {
+          log('Connected to ChatGPT');
           setIsConnected(true);
         }
-      } catch {
-        // Ignore parse errors from other messages
+      } catch (e) {
+        log(`Error: ${e}`);
       }
     };
 
@@ -705,17 +843,26 @@ export function ChatGPTAppUI() {
 
     // Signal to parent that we're ready
     if (window.parent !== window) {
-      window.parent.postMessage({ type: 'speasy_ready' }, '*');
+      window.parent.postMessage({ type: 'app_ready' }, '*');
+      log('Sent app_ready to parent');
     }
 
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   const handleWidgetAction = useCallback((action: WidgetAction) => {
+    // Handle link actions - open URL
     if (action.type === 'link' && action.payload?.url) {
       window.open(action.payload.url, '_blank');
-    } else if (action.type === 'custom') {
-      // Send action back to ChatGPT
+      return;
+    }
+    // Handle open_url actions
+    if (action.type === 'open_url' && typeof action === 'object' && 'url' in action) {
+      window.open((action as any).url, '_blank');
+      return;
+    }
+    // Handle custom actions - send back to ChatGPT
+    if (action.type === 'custom') {
       if (window.parent !== window) {
         window.parent.postMessage({
           type: 'speasy_action',
@@ -733,6 +880,16 @@ export function ChatGPTAppUI() {
         <p className="mt-1 text-xs text-white/30">
           {isConnected ? 'Connected to ChatGPT' : 'Connecting…'}
         </p>
+        {debugLog.length > 0 && (
+          <div className="mt-4 max-w-md text-left">
+            <p className="mb-1 text-xs text-white/40">Debug:</p>
+            {debugLog.map((log, i) => (
+              <p key={`log-${i}-${log.slice(0, 10)}`} className="truncate text-xs text-white/20">
+                {log}
+              </p>
+            ))}
+          </div>
+        )}
       </div>
     );
   }
