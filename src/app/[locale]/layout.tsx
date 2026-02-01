@@ -102,11 +102,16 @@ export default async function RootLayout(props: {
       || pathname === '/about/'
       || pathname === '/about'
       || pathname.startsWith('/content/')
+      || pathname.startsWith('/category/')
+      || pathname === '/latest'
+      || pathname === '/latest/'
     // Add locale prefix variations
       || pathname.match(/^\/[a-z]{2}$/)
       || pathname.match(/^\/[a-z]{2}\/$/)
       || pathname.match(/^\/[a-z]{2}\/about/)
-      || pathname.match(/^\/[a-z]{2}\/content/);
+      || pathname.match(/^\/[a-z]{2}\/content/)
+      || pathname.match(/^\/[a-z]{2}\/category\//)
+      || pathname.match(/^\/[a-z]{2}\/latest/);
 
   return (
     <html

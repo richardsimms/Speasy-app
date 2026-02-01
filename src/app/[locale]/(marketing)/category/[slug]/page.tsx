@@ -3,28 +3,25 @@ import { getTranslations } from 'next-intl/server';
 import { ContentGridDiscover } from '@/components/content-grid-discover';
 import { fetchCategorisedContent } from '@/libs/content-data';
 
-// Force dynamic rendering since this page requires user-specific data
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(props: {
-  params: Promise<{ locale: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }): Promise<Metadata> {
-  const { locale } = await props.params;
-  const t = await getTranslations({
-    locale,
-    namespace: 'Index',
-  });
+  const { locale, slug } = await props.params;
+  const t = await getTranslations({ locale, namespace: 'Index' });
+  const label = slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 
   return {
-    title: t('meta_title'),
+    title: `${label} – ${t('meta_title')}`,
   };
 }
 
-export default async function HomePage(props: {
-  params: Promise<{ locale: string }>;
+export default async function CategoryPage(props: {
+  params: Promise<{ locale: string; slug: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const { locale } = await props.params;
+  const { locale, slug } = await props.params;
   const searchParams = await props.searchParams;
   const autoplay = searchParams.autoplay === 'true';
   const result = await fetchCategorisedContent();
@@ -50,6 +47,7 @@ export default async function HomePage(props: {
         categories={result.categories}
         locale={locale}
         surface="home"
+        initialCategory={slug}
         autoplay={autoplay}
       />
     </div>

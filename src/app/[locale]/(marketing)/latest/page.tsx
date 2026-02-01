@@ -3,24 +3,20 @@ import { getTranslations } from 'next-intl/server';
 import { ContentGridDiscover } from '@/components/content-grid-discover';
 import { fetchCategorisedContent } from '@/libs/content-data';
 
-// Force dynamic rendering since this page requires user-specific data
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await props.params;
-  const t = await getTranslations({
-    locale,
-    namespace: 'Index',
-  });
+  const t = await getTranslations({ locale, namespace: 'Index' });
 
   return {
-    title: t('meta_title'),
+    title: `Latest – ${t('meta_title')}`,
   };
 }
 
-export default async function HomePage(props: {
+export default async function LatestPage(props: {
   params: Promise<{ locale: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
@@ -50,6 +46,7 @@ export default async function HomePage(props: {
         categories={result.categories}
         locale={locale}
         surface="home"
+        initialCategory="latest"
         autoplay={autoplay}
       />
     </div>
