@@ -146,7 +146,7 @@ export function ContentGridDiscover({
   }, [selectedTab, locale, tracks]);
 
   // Update playback provider with selected category for persistence
-  // and preload the first track from the current tab
+  // and either autoplay (once) or preload the queue
   useEffect(() => {
     if (!playback) {
       return;
@@ -159,25 +159,26 @@ export function ContentGridDiscover({
       playback.setSelectedCategoryId(undefined);
     }
 
-    // Preload the queue with current tab's tracks
-    // This sets up the queue so playing any track will work correctly
-    if (tracks.length > 0) {
-      playback.setQueueContext(queueContext, tracks);
-    }
-  }, [playback, selectedTab, tracks, queueContext]);
-
-  // Handle autoplay from URL (once, when tracks become available)
-  useEffect(() => {
-    if (!autoplay || hasAutoPlayed.current || !playback || tracks.length === 0) {
+    if (tracks.length === 0) {
       return;
     }
-    hasAutoPlayed.current = true;
-    const firstTrack = tracks[0];
-    if (firstTrack) {
-      playback.playTrack(firstTrack.id, queueContext, tracks);
-      playback.openPlayer();
+
+    // Autoplay path: call playTrack (sets queue + starts audio.play())
+    // This must be mutually exclusive with setQueueContext to avoid
+    // audio.load() and audio.play() racing on the same render.
+    if (autoplay && !hasAutoPlayed.current) {
+      hasAutoPlayed.current = true;
+      const firstTrack = tracks[0];
+      if (firstTrack) {
+        playback.playTrack(firstTrack.id, queueContext, tracks);
+        playback.openPlayer();
+      }
+      return;
     }
-  }, [autoplay, playback, tracks, queueContext]);
+
+    // Normal path: preload the queue without playing
+    playback.setQueueContext(queueContext, tracks);
+  }, [playback, selectedTab, tracks, queueContext, autoplay]);
 
   // Sync URL when tab changes (home surface only, shallow replaceState)
   const handleTabChange = useCallback(
