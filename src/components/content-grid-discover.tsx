@@ -31,6 +31,8 @@ type ContentGridDiscoverProps = {
   surface?: 'home' | 'dashboard';
   userId?: string;
   experimentVariant?: string;
+  initialCategory?: string;
+  autoplay?: boolean;
 };
 
 // Map category names to icons
@@ -55,12 +57,18 @@ const getCategoryIcon = (categoryName: string) => {
   return Star;
 };
 
+function buildTabPath(tabId: string): string {
+  return tabId === 'latest' ? '/' : `/category/${tabId}`;
+}
+
 export function ContentGridDiscover({
   categories,
   locale,
   surface = 'home',
   userId,
   experimentVariant,
+  initialCategory,
+  autoplay = false,
 }: ContentGridDiscoverProps) {
   const playback = usePlaybackOptional();
 
@@ -90,13 +98,22 @@ export function ContentGridDiscover({
     })),
   ];
 
-  const [selectedTab, setSelectedTab] = useState<string>('latest');
+  const resolvedInitial = useMemo(() => {
+    if (initialCategory && tabs.some(t => t.id === initialCategory)) {
+      return initialCategory;
+    }
+    return 'latest';
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const [selectedTab, setSelectedTab] = useState<string>(resolvedInitial);
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
   const [indicatorStyle, setIndicatorStyle] = useState<{
     left: number;
     width: number;
   }>({ left: 0, width: 0 });
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const hasAutoPlayed = useRef(false);
 
   const selectedTabData = tabs.find(tab => tab.id === selectedTab);
   const displayedItems = selectedTabData?.items || [];
@@ -149,6 +166,35 @@ export function ContentGridDiscover({
     }
   }, [playback, selectedTab, tracks, queueContext]);
 
+  // Handle autoplay from URL (once, when tracks become available)
+  useEffect(() => {
+    if (!autoplay || hasAutoPlayed.current || !playback || tracks.length === 0) {
+      return;
+    }
+    hasAutoPlayed.current = true;
+    const firstTrack = tracks[0];
+    if (firstTrack) {
+      playback.playTrack(firstTrack.id, queueContext, tracks);
+      playback.openPlayer();
+    }
+  }, [autoplay, playback, tracks, queueContext]);
+
+  // Sync URL when tab changes (home surface only, shallow replaceState)
+  const handleTabChange = useCallback(
+    (tabId: string) => {
+      setSelectedTab(tabId);
+
+      if (surface === 'home' && typeof window !== 'undefined') {
+        window.history.replaceState(
+          window.history.state,
+          '',
+          buildTabPath(tabId),
+        );
+      }
+    },
+    [surface],
+  );
+
   const updateIndicator = useCallback((tabId: string) => {
     const button = tabRefs.current[tabId];
     if (button) {
@@ -179,7 +225,7 @@ export function ContentGridDiscover({
       const nextIndex = (currentIndex + direction + tabs.length) % tabs.length;
       const nextTab = tabs[nextIndex];
       if (nextTab) {
-        setSelectedTab(nextTab.id);
+        handleTabChange(nextTab.id);
         // Focus the next tab button
         const nextButton = e.currentTarget.parentElement?.children[
           nextIndex
@@ -190,7 +236,7 @@ export function ContentGridDiscover({
       e.preventDefault();
       const firstTab = tabs[0];
       if (firstTab) {
-        setSelectedTab(firstTab.id);
+        handleTabChange(firstTab.id);
         const firstButton = e.currentTarget.parentElement
           ?.children[0] as HTMLElement;
         firstButton?.focus();
@@ -199,7 +245,7 @@ export function ContentGridDiscover({
       e.preventDefault();
       const lastTab = tabs[tabs.length - 1];
       if (lastTab) {
-        setSelectedTab(lastTab.id);
+        handleTabChange(lastTab.id);
         const lastButton = e.currentTarget.parentElement?.children[
           tabs.length - 1
         ] as HTMLElement;
@@ -264,7 +310,7 @@ export function ContentGridDiscover({
                 aria-controls={tabPanelId}
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => {
-                  setSelectedTab(tab.id);
+                  handleTabChange(tab.id);
                   updateIndicator(tab.id);
                 }}
                 onMouseEnter={() => {
