@@ -84,7 +84,9 @@
     "**/*.e2e.ts",
     "src/blog/**/*.md",
     "**/*.md",
-    ".next/dev/types/validator.ts"
+    ".next/dev/types/validator.ts",
+    "supabase/**/*",
+    "chatkit-server/**/*"
   ],
   "include": [
     "next-env.d.ts",

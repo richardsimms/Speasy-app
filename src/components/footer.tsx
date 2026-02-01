@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 export function Footer() {
@@ -59,6 +60,20 @@ export function Footer() {
             transition={reducedMotion ? { duration: 0 } : { duration: 0.6, delay: 0.8 }}
             className="pt-12 text-sm text-gray-200"
           >
+            <div className="mb-4 flex justify-center gap-6">
+              <Link
+                href="/privacy"
+                className="underline decoration-gray-500 underline-offset-4 transition-colors hover:text-white hover:decoration-gray-300"
+              >
+                Privacy
+              </Link>
+              <Link
+                href="/terms"
+                className="underline decoration-gray-500 underline-offset-4 transition-colors hover:text-white hover:decoration-gray-300"
+              >
+                Terms
+              </Link>
+            </div>
             <p>&copy; 2025 Speasy. All rights reserved.</p>
           </motion.div>
         </div>

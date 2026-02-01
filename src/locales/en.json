@@ -54,7 +54,12 @@
   },
   "DashboardLayout": {
     "dashboard_link": "Dashboard",
+    "chat_link": "AI Assistant",
     "user_profile_link": "Manage your account",
     "sign_out": "Sign out"
+  },
+  "Chat": {
+    "meta_title": "AI Assistant",
+    "meta_description": "Chat with Speasy AI to discover and play audio content"
   }
 }
