@@ -4,8 +4,8 @@
   "description": "Transform newsletters and saved articles into personal podcast-style audio you can listen to anytime.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a090c",
-  "theme_color": "#0a090c",
+  "background_color": "#100e12",
+  "theme_color": "#100e12",
   "orientation": "portrait-primary",
   "icons": [
     {

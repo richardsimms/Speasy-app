@@ -66,7 +66,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0a090c',
+  themeColor: '#100e12',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -117,6 +117,7 @@ export default async function RootLayout(props: {
     <html
       lang={locale}
       className={`${GeistSans.variable} ${GeistMono.variable} ${GeistSans.className}`}
+      style={{ backgroundColor: '#100e12' }}
     >
       <body className="font-sans antialiased">
         <NextIntlClientProvider>

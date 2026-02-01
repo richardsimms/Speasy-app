@@ -2,6 +2,13 @@
 
 @import 'tailwindcss';
 
+@layer base {
+  html,
+  body {
+    background-color: #100e12;
+  }
+}
+
 /* Content body styles for rendered HTML content */
 @layer components {
   .content-body {
