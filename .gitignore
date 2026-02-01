@@ -29,6 +29,9 @@ Thumbs.db
 # Cursor
 .cursor/plans/
 
+# Supabase temp files
+supabase/.temp/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
