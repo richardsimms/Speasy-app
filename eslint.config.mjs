@@ -37,6 +37,8 @@ export default antfu(
       'motion-review.md',
       'animation-performance-audit.md',
       '.claude/references/**/*.md',
+      // Python ChatKit server
+      'chatkit-server/**/*',
     ],
   },
   // --- Accessibility Rules ---

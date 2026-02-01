@@ -653,3 +653,106 @@ function WidgetRenderer({
 
   return <>{renderNode(widget)}</>;
 }
+
+type WidgetWithId = WidgetNode & { _id: string };
+
+let widgetIdCounter = 0;
+
+/**
+ * ChatGPT App UI - Renders widgets from MCP tool results
+ * Used when page is loaded in ChatGPT App iframe with ?mode=chatgpt
+ */
+export function ChatGPTAppUI() {
+  const [widgets, setWidgets] = useState<WidgetWithId[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    // Listen for messages from ChatGPT parent frame
+    const handleMessage = (event: MessageEvent) => {
+      // Accept messages from ChatGPT domains
+      const allowedOrigins = [
+        'https://chat.openai.com',
+        'https://chatgpt.com',
+      ];
+
+      if (!allowedOrigins.some(origin => event.origin.startsWith(origin))) {
+        return;
+      }
+
+      try {
+        const data = event.data;
+
+        // Handle tool result messages
+        if (data?.type === 'tool_result' && data?.result?.ui) {
+          const widgetWithId: WidgetWithId = {
+            ...data.result.ui,
+            _id: `widget-${++widgetIdCounter}`,
+          };
+          setWidgets(prev => [...prev, widgetWithId]);
+        }
+
+        // Handle connection acknowledgment
+        if (data?.type === 'connected') {
+          setIsConnected(true);
+        }
+      } catch {
+        // Ignore parse errors from other messages
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    // Signal to parent that we're ready
+    if (window.parent !== window) {
+      window.parent.postMessage({ type: 'speasy_ready' }, '*');
+    }
+
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  const handleWidgetAction = useCallback((action: WidgetAction) => {
+    if (action.type === 'link' && action.payload?.url) {
+      window.open(action.payload.url, '_blank');
+    } else if (action.type === 'custom') {
+      // Send action back to ChatGPT
+      if (window.parent !== window) {
+        window.parent.postMessage({
+          type: 'speasy_action',
+          action: action.payload,
+        }, '*');
+      }
+    }
+  }, []);
+
+  if (widgets.length === 0) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center text-white/50">
+        <Headphones className="mb-4 size-12 opacity-50" aria-hidden="true" />
+        <p className="text-sm">Waiting for content…</p>
+        <p className="mt-1 text-xs text-white/30">
+          {isConnected ? 'Connected to ChatGPT' : 'Connecting…'}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4 overflow-y-auto">
+      {widgets.map(widget => (
+        <motion.div
+          key={widget._id}
+          initial={reducedMotion ? undefined : { opacity: 0, y: 10 }}
+          animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+          transition={
+            reducedMotion
+              ? { duration: 0 }
+              : { duration: MOTION.duration.normal, ease: MOTION.easing.default }
+          }
+        >
+          <WidgetRenderer widget={widget} onAction={handleWidgetAction} />
+        </motion.div>
+      ))}
+    </div>
+  );
+}

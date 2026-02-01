@@ -62,6 +62,203 @@ function createJSONResponse(data: any, status = 200): Response {
   });
 }
 
+// ChatKit Widget Builders
+function formatDuration(seconds: number | null): string | null {
+  if (!seconds || seconds <= 0) {
+    return null;
+  }
+  const mins = Math.round(seconds / 60);
+  return `${mins} min`;
+}
+
+function formatCategoryName(name: string): string {
+  const upper = ['ai', 'ux', 'ui', 'api', 'css', 'html'];
+  if (upper.includes(name.toLowerCase())) {
+    return name.toUpperCase();
+  }
+  return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+}
+
+function buildContentItemWidget(item: any): any {
+  const category = item.category;
+  const duration = item.audio_files?.[0]?.duration;
+  const durationStr = formatDuration(duration);
+
+  const source = item.source_name || '';
+  const author = item.author;
+  let sourceLine = source;
+  if (author && author !== source) {
+    sourceLine = source ? `${source} · ${author}` : author;
+  }
+
+  const metaChildren: any[] = [];
+  if (category?.name) {
+    metaChildren.push({
+      type: 'Badge',
+      label: formatCategoryName(category.name),
+      color: 'info',
+      variant: 'soft',
+      size: 'sm',
+    });
+  }
+  if (durationStr) {
+    metaChildren.push({
+      type: 'Caption',
+      value: `⏱️ ${durationStr}`,
+      size: 'sm',
+    });
+  }
+
+  return {
+    type: 'ListViewItem',
+    onClickAction: {
+      type: 'link',
+      url: `https://www.speasy.app/content/${item.id}`,
+    },
+    children: [
+      {
+        type: 'Row',
+        gap: 12,
+        align: 'start',
+        children: [
+          {
+            type: 'Image',
+            src: item.image_url || 'https://www.speasy.app/poster.png',
+            alt: item.title || 'Content',
+            width: 64,
+            height: 64,
+            radius: 'md',
+            fit: 'cover',
+          },
+          {
+            type: 'Col',
+            flex: 1,
+            gap: 4,
+            children: [
+              ...(metaChildren.length > 0
+                ? [{ type: 'Row', gap: 8, align: 'center', children: metaChildren }]
+                : []),
+              {
+                type: 'Text',
+                value: item.title || 'Untitled',
+                size: 'md',
+                weight: 'semibold',
+                maxLines: 2,
+              },
+              {
+                type: 'Caption',
+                value: sourceLine || 'Speasy',
+                size: 'sm',
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  };
+}
+
+function buildContentListWidget(items: any[], categoryName: string): any {
+  const totalDuration = items.reduce((sum, item) => {
+    const d = item.audio_files?.[0]?.duration;
+    return sum + (d || 0);
+  }, 0);
+  const durationMin = Math.round(totalDuration / 60);
+
+  const subtitle
+    = durationMin > 0
+      ? `${items.length} stories · ${durationMin} min listening`
+      : `${items.length} stories ready to play`;
+
+  const playlistUrl
+    = categoryName === 'Latest'
+      ? 'https://www.speasy.app/latest?autoplay=true'
+      : `https://www.speasy.app/category/${categoryName.toLowerCase()}?autoplay=true`;
+
+  return {
+    type: 'Card',
+    size: 'lg',
+    status: { text: `${formatCategoryName(categoryName)} Content`, icon: 'headphones' },
+    confirm: {
+      label: '▶ Play All',
+      action: { type: 'link', url: playlistUrl },
+    },
+    children: [
+      { type: 'Caption', value: subtitle, size: 'md' },
+      { type: 'Divider' },
+      {
+        type: 'ListView',
+        limit: 10,
+        children: items.map(buildContentItemWidget),
+      },
+    ],
+  };
+}
+
+function buildContentDetailWidget(item: any): any {
+  const category = item.category;
+  const duration = item.audio_files?.[0]?.duration;
+  const durationStr = formatDuration(duration);
+  const audioUrl = item.audio_files?.[0]?.file_url;
+
+  const source = item.source_name || '';
+  const author = item.author;
+  let sourceLine = source;
+  if (author && author !== source) {
+    sourceLine = source ? `${source} · ${author}` : author;
+  }
+
+  const metaChildren: any[] = [];
+  if (category?.name) {
+    metaChildren.push({
+      type: 'Badge',
+      label: formatCategoryName(category.name),
+      color: 'info',
+      variant: 'soft',
+      size: 'sm',
+    });
+  }
+  if (durationStr) {
+    metaChildren.push({ type: 'Caption', value: `⏱️ ${durationStr}`, size: 'sm' });
+  }
+
+  const children: any[] = [
+    {
+      type: 'Image',
+      src: item.image_url || 'https://www.speasy.app/poster.png',
+      alt: item.title || 'Content',
+    },
+    ...(metaChildren.length > 0
+      ? [{ type: 'Row', gap: 8, align: 'center', children: metaChildren }]
+      : []),
+    { type: 'Title', value: item.title || 'Untitled', size: 'lg' },
+    { type: 'Caption', value: sourceLine || 'Speasy', size: 'md' },
+  ];
+
+  if (item.summary) {
+    children.push({ type: 'Divider' });
+    children.push({ type: 'Text', value: item.summary, size: 'sm', maxLines: 6 });
+  }
+
+  if (item.key_insights?.length > 0) {
+    children.push({ type: 'Divider' });
+    children.push({ type: 'Caption', value: 'Key Insights', size: 'sm', weight: 'semibold' });
+    for (const insight of item.key_insights.slice(0, 3)) {
+      children.push({ type: 'Caption', value: `• ${insight}`, size: 'sm' });
+    }
+  }
+
+  return {
+    type: 'Card',
+    size: 'lg',
+    status: { text: 'Content Detail', icon: 'headphones' },
+    confirm: audioUrl
+      ? { label: '▶ Play Now', action: { type: 'link', url: `https://www.speasy.app/content/${item.id}` } }
+      : undefined,
+    children,
+  };
+}
+
 serve(async (req) => {
   const _url = new URL(req.url);
 
@@ -651,6 +848,10 @@ async function handleToolCall(supabase: any, params: any) {
       )
       .eq('status', 'done');
 
+    const categoryName = args.category_slug
+      ? formatCategoryName(args.category_slug)
+      : 'Latest';
+
     if (args.category_slug) {
       const { data: category } = await supabase
         .from('categories')
@@ -672,6 +873,9 @@ async function handleToolCall(supabase: any, params: any) {
       throw error;
     }
 
+    // Build ChatKit widget
+    const widget = buildContentListWidget(data || [], categoryName);
+
     return {
       content: [
         {
@@ -679,6 +883,7 @@ async function handleToolCall(supabase: any, params: any) {
           text: JSON.stringify(data, null, 2),
         },
       ],
+      ui: widget,
     };
   }
 
@@ -729,6 +934,9 @@ async function handleToolCall(supabase: any, params: any) {
       throw error;
     }
 
+    // Build ChatKit widget for search results
+    const widget = buildContentListWidget(data || [], `Search: "${args.query}"`);
+
     return {
       content: [
         {
@@ -745,6 +953,7 @@ async function handleToolCall(supabase: any, params: any) {
           ),
         },
       ],
+      ui: widget,
     };
   }
 
@@ -774,6 +983,9 @@ async function handleToolCall(supabase: any, params: any) {
       play_url: `https://www.speasy.app/content/${data.id}`,
     };
 
+    // Build ChatKit detail widget
+    const widget = buildContentDetailWidget(enrichedData);
+
     return {
       content: [
         {
@@ -781,6 +993,7 @@ async function handleToolCall(supabase: any, params: any) {
           text: JSON.stringify(enrichedData, null, 2),
         },
       ],
+      ui: widget,
     };
   }
 
