@@ -74,14 +74,6 @@ export function ContentListWidget() {
 
   // Watch for toolResult changes and update local state to trigger re-render
   useEffect(() => {
-    // Debug: Log what we're receiving
-    // eslint-disable-next-line no-console
-    console.log('Widget toolResult:', toolResult);
-    // eslint-disable-next-line no-console
-    console.log('Widget widgetState:', widgetState);
-    // eslint-disable-next-line no-console
-    console.log('Widget theme:', theme);
-
     if (toolResult?.structuredContent) {
       setData(toolResult.structuredContent);
     }
