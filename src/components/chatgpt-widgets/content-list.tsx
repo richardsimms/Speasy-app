@@ -66,6 +66,14 @@ export function ContentListWidget() {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  // Debug: Log what we're receiving (using console.warn for ESLint)
+  // eslint-disable-next-line no-console
+  console.log('Widget toolResult:', toolResult);
+  // eslint-disable-next-line no-console
+  console.log('Widget widgetState:', widgetState);
+  // eslint-disable-next-line no-console
+  console.log('Widget theme:', theme);
+
   // Get data from MCP tool result
   const items = toolResult?.structuredContent?.items || [];
   const category = toolResult?.structuredContent?.category || 'Latest';
