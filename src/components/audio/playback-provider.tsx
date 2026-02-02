@@ -12,6 +12,7 @@ import {
   use,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -113,8 +114,11 @@ export function PlaybackProvider({ children }: PlaybackProviderProps) {
     return null;
   }, [queue, activeIndex]);
 
-  // Initialize audio element on mount (client-side only)
-  useEffect(() => {
+  // Create audio element in useLayoutEffect so it exists before child useEffects run.
+  // This prevents a race condition where autoplay effects in child components
+  // call playTrack() before the audio element is initialised (useEffect runs
+  // children-first, so a parent useEffect would be too late).
+  useLayoutEffect(() => {
     if (typeof window === 'undefined') {
       return;
     }
