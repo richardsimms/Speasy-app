@@ -369,6 +369,7 @@ async function handleResourceRead(supabase: any, params: any) {
               resource_domains: [
                 'https://www.speasy.app',
                 'https://images.unsplash.com',
+                'https://lmmobnqmxkcdwdhhpwwd.supabase.co',
               ],
             },
           },
