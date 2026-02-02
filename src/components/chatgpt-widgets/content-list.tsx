@@ -2,10 +2,9 @@ import type { ContentItem, StructuredContent } from './types';
 import { useEffect, useState } from 'react';
 
 // Type definitions for OpenAI Apps SDK
+// ChatGPT unwraps structuredContent - toolOutput contains the data directly
 type OpenAiContext = {
-  toolOutput?: {
-    structuredContent?: StructuredContent;
-  };
+  toolOutput?: StructuredContent;
   theme?: 'light' | 'dark';
 };
 
@@ -15,23 +14,12 @@ function useOpenAiGlobal(): OpenAiContext {
     // @ts-expect-error - window.openai is injected by ChatGPT
     const openai = window.openai;
 
-    // eslint-disable-next-line no-console
-    console.log('[Speasy] Widget initializing');
-    // eslint-disable-next-line no-console
-    console.log('[Speasy] window.openai exists:', !!openai);
-
     if (!openai) {
-      console.warn('[Speasy] No window.openai found - using fallback');
       return {
         toolOutput: undefined,
         theme: 'dark',
       };
     }
-
-    // eslint-disable-next-line no-console
-    console.log('[Speasy] Initial toolOutput:', openai.toolOutput);
-    // eslint-disable-next-line no-console
-    console.log('[Speasy] Initial theme:', openai.theme);
 
     return {
       toolOutput: openai.toolOutput,
@@ -40,23 +28,11 @@ function useOpenAiGlobal(): OpenAiContext {
   });
 
   useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('[Speasy] Setting up openai:set_globals event listener');
-
-    // Subscribe to openai:set_globals events for reactivity
-    const handleGlobalsChange = (event: Event) => {
-      // eslint-disable-next-line no-console
-      console.log('[Speasy] openai:set_globals event fired!', event);
-
+    const handleGlobalsChange = () => {
       // @ts-expect-error - window.openai is injected by ChatGPT
       const openai = window.openai;
 
       if (openai) {
-        // eslint-disable-next-line no-console
-        console.log('[Speasy] Updated toolOutput:', openai.toolOutput);
-        // eslint-disable-next-line no-console
-        console.log('[Speasy] Updated theme:', openai.theme);
-
         setContext({
           toolOutput: openai.toolOutput,
           theme: openai.theme || 'dark',
@@ -67,8 +43,6 @@ function useOpenAiGlobal(): OpenAiContext {
     window.addEventListener('openai:set_globals', handleGlobalsChange as EventListener);
 
     return () => {
-      // eslint-disable-next-line no-console
-      console.log('[Speasy] Removing event listener');
       window.removeEventListener('openai:set_globals', handleGlobalsChange as EventListener);
     };
   }, []);
@@ -79,22 +53,13 @@ function useOpenAiGlobal(): OpenAiContext {
 export function ContentListWidget() {
   const { toolOutput, theme } = useOpenAiGlobal();
 
-  // Debug logging
-  // eslint-disable-next-line no-console
-  console.log('[Speasy] Widget rendering with toolOutput:', toolOutput);
-
-  // Extract data from toolOutput
-  const data = toolOutput?.structuredContent || {
+  // toolOutput contains data directly (ChatGPT unwraps structuredContent)
+  const data = toolOutput || {
     items: [],
     count: 0,
     category: 'Latest',
     total_duration_minutes: 0,
   };
-
-  // eslint-disable-next-line no-console
-  console.log('[Speasy] Extracted data:', data);
-  // eslint-disable-next-line no-console
-  console.log('[Speasy] Items count:', data.items?.length);
 
   const items = data.items || [];
   const isDark = theme === 'dark';
