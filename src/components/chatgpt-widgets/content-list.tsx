@@ -1,5 +1,5 @@
 import type { ContentItem, StructuredContent, WidgetState } from './types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 // Type definitions for OpenAI Apps SDK
 // TODO: Replace with actual import when @openai/apps-sdk types are available
@@ -65,19 +65,32 @@ export function ContentListWidget() {
   } = useOpenAi();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState<StructuredContent>({
+    items: [],
+    count: 0,
+    category: 'Latest',
+    total_duration_minutes: 0,
+  });
 
-  // Debug: Log what we're receiving (using console.warn for ESLint)
-  // eslint-disable-next-line no-console
-  console.log('Widget toolResult:', toolResult);
-  // eslint-disable-next-line no-console
-  console.log('Widget widgetState:', widgetState);
-  // eslint-disable-next-line no-console
-  console.log('Widget theme:', theme);
+  // Watch for toolResult changes and update local state to trigger re-render
+  useEffect(() => {
+    // Debug: Log what we're receiving
+    // eslint-disable-next-line no-console
+    console.log('Widget toolResult:', toolResult);
+    // eslint-disable-next-line no-console
+    console.log('Widget widgetState:', widgetState);
+    // eslint-disable-next-line no-console
+    console.log('Widget theme:', theme);
 
-  // Get data from MCP tool result
-  const items = toolResult?.structuredContent?.items || [];
-  const category = toolResult?.structuredContent?.category || 'Latest';
-  const totalDuration = toolResult?.structuredContent?.total_duration_minutes || 0;
+    if (toolResult?.structuredContent) {
+      setData(toolResult.structuredContent);
+    }
+  }, [toolResult, widgetState, theme]);
+
+  // Get data from local state (reactive)
+  const items = data.items || [];
+  const category = data.category || 'Latest';
+  const totalDuration = data.total_duration_minutes || 0;
 
   // Get persisted state
   const selectedCategory = widgetState?.selectedCategory || 'all';
