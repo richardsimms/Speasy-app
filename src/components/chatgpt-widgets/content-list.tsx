@@ -23,10 +23,30 @@ function useOpenAi(): OpenAiContext {
   // Debug: Log what we're receiving
   // eslint-disable-next-line no-console
   console.log('OpenAI SDK available');
+
+  // Log all available properties
+  const allKeys = [];
+  let obj = openai;
+  while (obj) {
+    allKeys.push(...Object.getOwnPropertyNames(obj));
+    obj = Object.getPrototypeOf(obj);
+  }
   // eslint-disable-next-line no-console
-  console.log('Available openai properties:', Object.keys(openai));
+  console.log('All openai properties:', [...new Set(allKeys)].sort());
+
+  // Try to access common data properties
   // eslint-disable-next-line no-console
-  console.log('Full openai object:', openai);
+  console.log('Check data access patterns:');
+  // eslint-disable-next-line no-console
+  console.log('- openai.toolResult:', openai.toolResult);
+  // eslint-disable-next-line no-console
+  console.log('- openai.data:', openai.data);
+  // eslint-disable-next-line no-console
+  console.log('- openai.getContext:', typeof openai.getContext);
+  // eslint-disable-next-line no-console
+  console.log('- openai.getToolResult:', typeof openai.getToolResult);
+  // eslint-disable-next-line no-console
+  console.log('- openai.getData:', typeof openai.getData);
 
   return {
     toolResult: openai.toolResult || openai.data || openai,
