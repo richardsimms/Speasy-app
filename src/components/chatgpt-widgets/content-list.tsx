@@ -24,10 +24,12 @@ function useOpenAi(): OpenAiContext {
   // eslint-disable-next-line no-console
   console.log('OpenAI SDK available');
   // eslint-disable-next-line no-console
-  console.log('toolResult:', openai.toolResult);
+  console.log('Available openai properties:', Object.keys(openai));
+  // eslint-disable-next-line no-console
+  console.log('Full openai object:', openai);
 
   return {
-    toolResult: openai.toolResult,
+    toolResult: openai.toolResult || openai.data || openai,
     theme: openai.theme || 'dark',
   };
 }
