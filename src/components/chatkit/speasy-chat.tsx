@@ -224,18 +224,7 @@ export function SpeasyChat() {
 
   return (
     <div className="flex h-full flex-col">
-      {/* Header */}
-      <header className="flex items-center gap-3 border-b border-white/10 px-4 py-4 md:px-6">
-        <div className="flex size-10 items-center justify-center rounded-full bg-white/10">
-          <Headphones className="size-5 text-white/70" aria-hidden="true" />
-        </div>
-        <div>
-          <h1 className="text-lg font-semibold text-white">Speasy AI Assistant</h1>
-          <p className="text-sm text-white/50">Discover and play audio content</p>
-        </div>
-      </header>
 
-      {/* Messages area with live region for screen readers */}
       <div
         className="flex-1 overflow-y-auto p-4 md:p-6"
         role="log"
@@ -267,7 +256,8 @@ export function SpeasyChat() {
       </div>
 
       {/* Input area */}
-      <div className="border-t border-white/10 p-4 md:px-6">
+      <div className="fixed right-0 bottom-0 z-40 w-full max-w-full border-t border-white/10 bg-[#0A0A0A]/95 px-4 pt-3 pb-3 backdrop-blur-xl ease-out md:left-20 md:max-w-[calc(100vw-5rem)]">
+
         <form onSubmit={handleSubmit} className="flex gap-3">
           <label htmlFor="chat-input" className="sr-only">
             Message input

@@ -145,26 +145,37 @@ export function ContentGridDiscover({
     };
   }, [selectedTab, locale, tracks]);
 
+  // Extract stable callback references to avoid re-running effect when playback object changes
+  const setSelectedCategoryId = playback?.setSelectedCategoryId;
+  const setQueueContextFn = playback?.setQueueContext;
+
+  // Track what we've synced to avoid redundant updates that cause re-renders
+  const lastSyncedCategoryRef = useRef<string | undefined>(undefined);
+  const lastSyncedQueueKeyRef = useRef<string | undefined>(undefined);
+
   // Update playback provider with selected category for persistence
   // and preload the first track from the current tab
   useEffect(() => {
-    if (!playback) {
+    if (!setSelectedCategoryId || !setQueueContextFn) {
       return;
     }
 
-    // Set selected category for persistence
-    if (selectedTab !== 'latest') {
-      playback.setSelectedCategoryId(selectedTab);
-    } else {
-      playback.setSelectedCategoryId(undefined);
+    // Set selected category for persistence (only if changed)
+    const newCategoryId = selectedTab !== 'latest' ? selectedTab : undefined;
+    if (lastSyncedCategoryRef.current !== newCategoryId) {
+      lastSyncedCategoryRef.current = newCategoryId;
+      setSelectedCategoryId(newCategoryId);
     }
 
-    // Preload the queue with current tab's tracks
-    // This sets up the queue so playing any track will work correctly
+    // Preload the queue with current tab's tracks (only if context changed)
     if (tracks.length > 0) {
-      playback.setQueueContext(queueContext, tracks);
+      const queueKey = `${queueContext.source}-${queueContext.categoryId ?? 'none'}`;
+      if (lastSyncedQueueKeyRef.current !== queueKey) {
+        lastSyncedQueueKeyRef.current = queueKey;
+        setQueueContextFn(queueContext, tracks);
+      }
     }
-  }, [playback, selectedTab, tracks, queueContext]);
+  }, [setSelectedCategoryId, setQueueContextFn, selectedTab, tracks, queueContext]);
 
   // Handle autoplay from URL (once, when tracks become available)
   useEffect(() => {

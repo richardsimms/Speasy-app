@@ -29,7 +29,7 @@ export default async function ChatPage({ searchParams }: ChatPageProps) {
   }
 
   return (
-    <div className="container mx-auto h-[calc(100vh-8rem)] max-w-4xl py-4">
+    <div className="h-100vh mx-auto max-w-4xl px-4 md:h-[calc(100dvh-6rem)] md:px-6 lg:px-8">
       <SpeasyChat />
     </div>
   );
