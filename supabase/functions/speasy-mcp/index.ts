@@ -256,19 +256,8 @@ function handleInitialize() {
   };
 }
 
-// Widget HTML template for ChatGPT Apps SDK
-const WIDGET_TEMPLATE = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://www.speasy.app/chatgpt-widget.css">
-</head>
-<body>
-  <div id="speasy-root"></div>
-  <script src="https://www.speasy.app/chatgpt-widget.js"></script>
-</body>
-</html>`;
+// Widget bundle URL for ChatGPT Apps SDK
+const WIDGET_BUNDLE_URL = 'https://www.speasy.app/widgets/content-list.js';
 
 async function handleResourcesList(supabase: any, _params: any) {
   const resources = [];
@@ -344,14 +333,24 @@ async function handleResourcesList(supabase: any, _params: any) {
 async function handleResourceRead(supabase: any, params: any) {
   const uri = params.uri;
 
-  // Handle widget template requests
+  // Handle widget bundle requests
   if (uri === 'ui://widget/speasy-content.html' || uri === 'ui://widget/speasy-detail.html') {
     return {
       contents: [
         {
           uri,
           mimeType: 'text/html+skybridge',
-          text: WIDGET_TEMPLATE,
+          text: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <div id="speasy-root"></div>
+  <script type="module" src="${WIDGET_BUNDLE_URL}"></script>
+</body>
+</html>`,
           _meta: {
             'openai/widgetPrefersBorder': true,
             'openai/widgetDomain': 'https://www.speasy.app',

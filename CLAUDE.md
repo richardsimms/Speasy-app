@@ -245,10 +245,20 @@ This is a **Next.js 16 application** using the App Router with the following str
 ├── migrations/                # Drizzle ORM migrations
 ├── public/                    # Static assets
 │   ├── assets/               # Images, fonts, etc.
+│   ├── chatgpt-app.json      # ChatGPT App manifest
 │   ├── sw.js                 # Service worker (PWA)
 │   ├── manifest.json         # PWA manifest
 │   └── offline.html          # Offline fallback
 ├── scripts/                   # Build and utility scripts
+├── chatkit-server/            # Python FastAPI chat backend
+│   ├── server.py             # Main FastAPI application
+│   ├── store.py              # SQLite conversation store
+│   ├── widgets/              # Widget builders for chat UI
+│   └── requirements.txt      # Python dependencies
+├── supabase/
+│   └── functions/
+│       └── speasy-mcp/       # MCP server for ChatGPT App
+│           └── index.ts      # Supabase Edge Function
 ├── src/
 │   ├── app/                  # Next.js 16 App Router
 │   │   ├── [locale]/         # Internationalized routes
@@ -259,11 +269,15 @@ This is a **Next.js 16 application** using the App Router with the following str
 │   │   │       ├── page.tsx  # Landing page
 │   │   │       ├── about/    # About page
 │   │   │       ├── blog/     # Blog listing and posts
-│   │   │       ├── content/  # Content detail pages
+│   │   │       ├── category/[slug]/ # Category audio content
+│   │   │       ├── chat/     # Chat interface (standalone + ChatGPT App)
+│   │   │       ├── content/[id]/ # Content detail + audio player
+│   │   │       ├── latest/   # Latest audio content feed
 │   │   │       ├── manifesto/# Manifesto page
 │   │   │       ├── original/ # Original content
 │   │   │       └── portfolio/# Portfolio pages
 │   │   ├── api/              # API routes
+│   │   │   ├── chatkit/      # Chat proxy to Python backend
 │   │   │   ├── feeds/        # RSS/Podcast feed generation
 │   │   │   ├── push/         # Push notification endpoints
 │   │   │   ├── users/        # User sync endpoints
@@ -278,6 +292,8 @@ This is a **Next.js 16 application** using the App Router with the following str
 │   │   ├── ui/              # Base UI components (shadcn/ui)
 │   │   ├── analytics/       # Analytics components
 │   │   ├── audio/           # Audio player components
+│   │   ├── chatkit/         # Chat UI components
+│   │   │   └── speasy-chat.tsx # SpeasyChat + ChatGPTAppUI
 │   │   └── pwa/             # PWA-specific components
 │   ├── hooks/                # Custom React hooks
 │   ├── libs/                 # Third-party library configs
@@ -442,6 +458,150 @@ const user = await userOperations.getUserByEmail(email);
 - **Offline**: `src/app/offline/page.tsx`
 - **Components**: `src/components/pwa/`
 
+### Audio Content Routing
+
+Speasy serves audio content through these routes:
+
+| Route | Description | Key Features |
+|-------|-------------|--------------|
+| `/latest` | Latest content across all categories | `?autoplay=true` for auto-play |
+| `/category/[slug]` | Category-filtered content | Slugs: `ai`, `business`, `design`, `technology`, `productivity` |
+| `/content/[id]` | Single content item detail | Full audio player, key insights |
+| `/chat` | Chat interface | Standalone or ChatGPT App mode |
+
+**Data fetching**: `src/libs/content-data.ts` provides `fetchCategorisedContent()` which:
+- Queries Supabase for content items with `status: 'done'`
+- Requires `audio_files!inner` join (only items with audio)
+- Groups by category and sorts by `created_at`
+
+**URL Parameters**:
+- `?autoplay=true` - Auto-starts playback on page load
+- `?limit=N` - Limits number of items (for playlists)
+
+### ChatGPT App Integration
+
+Speasy integrates with ChatGPT as an App with MCP (Model Context Protocol) support.
+
+#### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     ChatGPT Platform                        │
+│  ┌─────────────────┐     ┌─────────────────────────────┐   │
+│  │  ChatGPT Chat   │────▶│  MCP Server (Edge Function) │   │
+│  └────────┬────────┘     └──────────────┬──────────────┘   │
+│           │                             │                   │
+│           ▼                             ▼                   │
+│  ┌─────────────────┐     ┌─────────────────────────────┐   │
+│  │ Speasy UI iframe│     │       Supabase DB           │   │
+│  │ /chat?mode=chatgpt    └─────────────────────────────┘   │
+│  └─────────────────┘                                        │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `chatgpt-app.json` | `public/chatgpt-app.json` | App manifest for ChatGPT platform |
+| MCP Server | `supabase/functions/speasy-mcp/index.ts` | MCP protocol handler (tools, resources) |
+| **ChatGPT Widgets** | `src/components/chatgpt-widgets/` | **OpenAI SDK-based widgets (current)** |
+| Widget Build Script | `scripts/build-chatgpt-widget.js` | Builds widget to `public/widgets/content-list.js` |
+| `ChatGPTAppUI` | `src/components/chatkit/speasy-chat.tsx` | ⚠️ Legacy widget renderer (deprecated) |
+| `SpeasyChat` | `src/components/chatkit/speasy-chat.tsx` | Standalone chat (uses Python backend) |
+| Chat API Proxy | `src/app/api/chatkit/route.ts` | Proxies to Python chatkit-server |
+| Python Backend | `chatkit-server/server.py` | FastAPI with OpenAI function calling |
+
+#### Chat Modes
+
+The `/chat` page supports two modes:
+
+1. **Standalone Mode** (`/chat`):
+   - Uses `SpeasyChat` component
+   - Proxies through `/api/chatkit` to Python `chatkit-server`
+   - Python server uses OpenAI function calling directly
+   - Full conversation history, thread management
+
+2. **ChatGPT App Mode** (widget iframe):
+   - Uses **new SDK-based widgets** from `src/components/chatgpt-widgets/`
+   - Built to `public/widgets/content-list.js` via `npm run build:chatgpt-widget`
+   - Loads in ChatGPT iframe, accesses `window.openai` SDK
+   - Supports interactive features: filters, state persistence, theme support
+   - See `docs/chatgpt-widget-restructure.md` for architecture details
+   - **Legacy**: `ChatGPTAppUI` component (deprecated, use new widgets)
+
+#### MCP Server Tools
+
+The Supabase Edge Function at `supabase/functions/speasy-mcp/index.ts` exposes:
+
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `list_categories` | Get all content categories | None |
+| `list_content` | Browse content by category | `category_slug?`, `limit?` |
+| `search_content` | Search by keywords | `query`, `category_slug?`, `limit?` |
+| `get_content_detail` | Get single item details | `id` |
+| `get_playlist_url` | Get playback URL | `type` (`latest`/`category`), `category_slug?` |
+
+**Testing MCP endpoint**:
+```bash
+curl -X POST "https://lmmobnqmxkcdwdhhpwwd.supabase.co/functions/v1/speasy-mcp" \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+```
+
+#### ChatGPT App Manifest
+
+`public/chatgpt-app.json` configures:
+```json
+{
+  "ui": {
+    "url": "https://www.speasy.app/chat?mode=chatgpt",
+    "height": "tall"
+  },
+  "mcp": {
+    "servers": [{
+      "url": "https://xxx.supabase.co/functions/v1/speasy-mcp",
+      "transport": "sse"
+    }]
+  }
+}
+```
+
+#### Python ChatKit Server
+
+Located in `chatkit-server/`, provides standalone chat functionality:
+
+- **Framework**: FastAPI with SSE streaming
+- **AI**: OpenAI GPT-4o with function calling
+- **Storage**: SQLite for conversation threads
+- **Widgets**: Rich UI widgets (`widgets/*.py`)
+
+**Environment variables** (`chatkit-server/.env`):
+```bash
+OPENAI_API_KEY=sk-...
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJhbG...
+```
+
+**Running locally**:
+```bash
+cd chatkit-server
+pip install -r requirements.txt
+python server.py  # Runs on http://localhost:8000
+```
+
+#### Troubleshooting ChatGPT Integration
+
+**"FORBIDDEN: developer MCPs not supported"**:
+- This is a ChatGPT platform restriction, not a code issue
+- MCP tools only work in registered ChatGPT Apps, not regular chats
+- Test the standalone `/chat` page instead (uses Python backend)
+
+**MCP returns empty results**:
+- Verify Supabase connection in Edge Function
+- Check that content items have `status: 'done'` and audio files
+- Test endpoint directly with curl
+
 ### Security & Validation
 
 - **Arcjet**: Bot detection and WAF in `src/middleware.ts`
@@ -458,9 +618,15 @@ const user = await userOperations.getUserByEmail(email);
 pnpm run dev              # Start dev server with PGlite + Sentry Spotlight
 pnpm run dev:next         # Start only Next.js dev server
 pnpm run dev:spotlight    # Start Sentry Spotlight
-pnpm run build            # Production build
+pnpm run build            # Production build (includes ChatGPT widget)
 pnpm run build-local      # Build with in-memory database (for testing)
 pnpm run start            # Start production server
+```
+
+### ChatGPT Widget
+```bash
+pnpm run build:chatgpt-widget  # Build widget to public/widgets/content-list.js
+pnpm run dev:chatgpt-widget    # Watch mode (rebuilds on save)
 ```
 
 ### Code Quality
@@ -586,8 +752,11 @@ ARCJET_KEY=ajkey_...
 NEXT_PUBLIC_BETTER_STACK_SOURCE_TOKEN=...
 NEXT_PUBLIC_BETTER_STACK_INGESTING_HOST=in.logs.betterstack.com
 
-# Other
+# ChatKit
+CHATKIT_SERVER_URL=http://localhost:8000/chatkit  # Python backend URL
 OPENAI_KEY=sk-...
+
+# Other
 UNSPLASH_ACCESS_KEY=...
 DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
 CLERK_WEBHOOK_SIGNING_SECRET=whsec_...
@@ -799,6 +968,9 @@ export default function Component() {
 - **Service worker**: PWA functionality via `public/sw.js` - update carefully to avoid cache issues.
 - **Blog content**: Stored as markdown in `src/blog/` and processed by `src/libs/blog.ts`.
 - **Feed generation**: RSS/podcast feeds generated via `src/libs/feed-generator.ts` and `src/app/api/feeds/` routes.
+- **Audio content**: Only items with `status: 'done'` and associated `audio_files` are shown. Use `audio_files!inner` join in Supabase queries.
+- **ChatKit server**: Python backend in `chatkit-server/` runs separately. Set `CHATKIT_SERVER_URL` env var for production.
+- **ChatGPT App**: MCP server is a Supabase Edge Function. Deploy changes via `supabase functions deploy speasy-mcp`.
 
 ---
 
@@ -823,3 +995,18 @@ Run: `pnpm run check:types` to see all errors, then `rm -rf .next node_modules &
 
 ### Lefthook not running
 Install hooks: `npx lefthook install`
+
+### Chat not loading content
+1. Check if `CHATKIT_SERVER_URL` is set (defaults to `http://localhost:8000/chatkit`)
+2. Ensure Python chatkit-server is running: `cd chatkit-server && python server.py`
+3. Verify Supabase credentials in `chatkit-server/.env`
+
+### ChatGPT App MCP errors
+- "FORBIDDEN: developer MCPs not supported" - Test in standalone `/chat` instead
+- MCP calls only work within registered ChatGPT Apps, not regular conversations
+- Test MCP endpoint directly: `curl -X POST "https://xxx.supabase.co/functions/v1/speasy-mcp" -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'`
+
+### Audio content not appearing
+- Verify content items have `status: 'done'` in database
+- Check that content has associated `audio_files` records
+- Queries use `audio_files!inner` join - items without audio are excluded

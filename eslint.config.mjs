@@ -39,6 +39,10 @@ export default antfu(
       '.claude/references/**/*.md',
       // Python ChatKit server
       'chatkit-server/**/*',
+      'docs/**/*',
+      'src/components/chatgpt-widgets/README.md',
+      // Built ChatGPT widgets (generated files)
+      'public/widgets/**/*',
     ],
   },
   // --- Accessibility Rules ---
