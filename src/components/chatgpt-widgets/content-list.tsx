@@ -3,122 +3,65 @@ import { useEffect, useState } from 'react';
 
 // Type definitions for OpenAI Apps SDK
 type OpenAiContext = {
-  toolResult?: any; // Keep flexible to handle different data structures
+  toolOutput?: {
+    structuredContent?: StructuredContent;
+  };
   theme?: 'light' | 'dark';
 };
 
-// Hook to access OpenAI context
-function useOpenAi(): OpenAiContext {
-  // @ts-expect-error - window.openai is injected by ChatGPT
-  const openai = window.openai;
+// Hook to access OpenAI context with event subscription
+function useOpenAiGlobal(): OpenAiContext {
+  const [context, setContext] = useState<OpenAiContext>(() => {
+    // @ts-expect-error - window.openai is injected by ChatGPT
+    const openai = window.openai;
 
-  if (!openai) {
-    console.warn('OpenAI SDK not available - using fallback');
+    if (!openai) {
+      return {
+        toolOutput: undefined,
+        theme: 'dark',
+      };
+    }
+
     return {
-      toolResult: undefined,
-      theme: 'dark',
+      toolOutput: openai.toolOutput,
+      theme: openai.theme || 'dark',
     };
-  }
+  });
 
-  // Debug: Log what we're receiving
-  // eslint-disable-next-line no-console
-  console.log('OpenAI SDK available');
+  useEffect(() => {
+    // Subscribe to openai:set_globals events for reactivity
+    const handleGlobalsChange = () => {
+      // @ts-expect-error - window.openai is injected by ChatGPT
+      const openai = window.openai;
 
-  // Log all available properties
-  const allKeys = [];
-  let obj = openai;
-  while (obj) {
-    allKeys.push(...Object.getOwnPropertyNames(obj));
-    obj = Object.getPrototypeOf(obj);
-  }
-  // eslint-disable-next-line no-console
-  console.log('All openai properties:', [...new Set(allKeys)].sort());
+      if (openai) {
+        setContext({
+          toolOutput: openai.toolOutput,
+          theme: openai.theme || 'dark',
+        });
+      }
+    };
 
-  // Try to access common data properties
-  // eslint-disable-next-line no-console
-  console.log('Check data access patterns:');
-  // eslint-disable-next-line no-console
-  console.log('- openai.toolResult:', openai.toolResult);
-  // eslint-disable-next-line no-console
-  console.log('- openai.data:', openai.data);
-  // eslint-disable-next-line no-console
-  console.log('- openai.getContext:', typeof openai.getContext);
-  // eslint-disable-next-line no-console
-  console.log('- openai.getToolResult:', typeof openai.getToolResult);
-  // eslint-disable-next-line no-console
-  console.log('- openai.getData:', typeof openai.getData);
+    window.addEventListener('openai:set_globals', handleGlobalsChange);
 
-  return {
-    toolResult: openai.toolResult || openai.data || openai,
-    theme: openai.theme || 'dark',
-  };
+    return () => {
+      window.removeEventListener('openai:set_globals', handleGlobalsChange);
+    };
+  }, []);
+
+  return context;
 }
 
 export function ContentListWidget() {
-  const { toolResult, theme } = useOpenAi();
-  const [data, setData] = useState<StructuredContent>({
+  const { toolOutput, theme } = useOpenAiGlobal();
+
+  // Extract data from toolOutput
+  const data = toolOutput?.structuredContent || {
     items: [],
     count: 0,
     category: 'Latest',
     total_duration_minutes: 0,
-  });
-
-  // Watch for toolResult changes and extract data
-  useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.log('useEffect triggered, toolResult:', toolResult);
-
-    if (!toolResult) {
-      // eslint-disable-next-line no-console
-      console.log('No toolResult yet');
-      return;
-    }
-
-    // Try different possible data structures
-    let contentData: StructuredContent | null = null;
-
-    // Option 1: Data is in structuredContent property
-    if (toolResult.structuredContent) {
-      // eslint-disable-next-line no-console
-      console.log('Found data in toolResult.structuredContent');
-      contentData = toolResult.structuredContent;
-    } else if (toolResult.items && Array.isArray(toolResult.items)) {
-      // Option 2: Data is directly in toolResult
-      // eslint-disable-next-line no-console
-      console.log('Found data directly in toolResult');
-      contentData = {
-        items: toolResult.items,
-        count: toolResult.count || toolResult.items.length,
-        category: toolResult.category || 'Latest',
-        total_duration_minutes: toolResult.total_duration_minutes || 0,
-      };
-    } else if (toolResult.result) {
-      // Option 3: Check if there's a result property
-      // eslint-disable-next-line no-console
-      console.log('Found data in toolResult.result');
-      // eslint-disable-next-line no-console
-      console.log('Found data in toolResult.result');
-      if (toolResult.result.structuredContent) {
-        contentData = toolResult.result.structuredContent;
-      } else if (toolResult.result.items) {
-        contentData = {
-          items: toolResult.result.items,
-          count: toolResult.result.count || toolResult.result.items.length,
-          category: toolResult.result.category || 'Latest',
-          total_duration_minutes: toolResult.result.total_duration_minutes || 0,
-        };
-      }
-    }
-
-    if (contentData) {
-      // eslint-disable-next-line no-console
-      console.log('Setting data:', contentData);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setData(contentData);
-    } else {
-      console.warn('Could not extract content data from toolResult');
-    }
-  }, [toolResult]);
+  };
 
   const items = data.items || [];
   const isDark = theme === 'dark';
