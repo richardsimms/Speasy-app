@@ -1,5 +1,6 @@
 {
   "name": "Speasy",
+  "type": "module",
   "author": "Richard Simmons (https://github.com/richardsimms)",
   "engines": {
     "node": ">=20"
@@ -95,6 +96,7 @@
     "conventional-changelog-conventionalcommits": "catalog:",
     "cross-env": "catalog:",
     "drizzle-kit": "catalog:",
+    "esbuild": "catalog:",
     "eslint": "catalog:",
     "eslint-plugin-format": "catalog:",
     "eslint-plugin-jsx-a11y": "catalog:",
