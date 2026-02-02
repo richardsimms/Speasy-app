@@ -257,6 +257,8 @@ function handleInitialize() {
 }
 
 // Widget bundle URL for ChatGPT Apps SDK
+// Built from src/components/chatgpt-widgets/ using scripts/build-chatgpt-widget.js
+// Widget uses window.openai SDK for theme support, state persistence, and inline tool calls
 const WIDGET_BUNDLE_URL = 'https://www.speasy.app/widgets/content-list.js';
 
 async function handleResourcesList(supabase: any, _params: any) {
@@ -334,6 +336,9 @@ async function handleResourceRead(supabase: any, params: any) {
   const uri = params.uri;
 
   // Handle widget bundle requests
+  // Returns HTML shell that loads the React widget bundle
+  // Widget built from src/components/chatgpt-widgets/ using esbuild
+  // Supports OpenAI Apps SDK: theme, widgetState, callTool(), sendFollowUpMessage()
   if (uri === 'ui://widget/speasy-content.html' || uri === 'ui://widget/speasy-detail.html') {
     return {
       contents: [
@@ -345,6 +350,7 @@ async function handleResourceRead(supabase: any, params: any) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speasy Content</title>
 </head>
 <body>
   <div id="speasy-root"></div>
@@ -354,10 +360,16 @@ async function handleResourceRead(supabase: any, params: any) {
           _meta: {
             'openai/widgetPrefersBorder': true,
             'openai/widgetDomain': 'https://www.speasy.app',
-            'openai/widgetDescription': 'Browse and play Speasy audio content',
+            'openai/widgetDescription': 'Browse and play Speasy audio content with category filters',
             'openai/widgetCSP': {
-              connect_domains: ['https://www.speasy.app', 'https://lmmobnqmxkcdwdhhpwwd.supabase.co'],
-              resource_domains: ['https://www.speasy.app', 'https://images.unsplash.com'],
+              connect_domains: [
+                'https://www.speasy.app',
+                'https://lmmobnqmxkcdwdhhpwwd.supabase.co',
+              ],
+              resource_domains: [
+                'https://www.speasy.app',
+                'https://images.unsplash.com',
+              ],
             },
           },
         },
