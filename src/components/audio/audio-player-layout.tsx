@@ -1,8 +1,7 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
-import { FullPlayer } from './full-player';
-import { MiniPlayer } from './mini-player';
 import { PlaybackProvider } from './playback-provider';
 
 type AudioPlayerLayoutProps = {
@@ -50,15 +49,29 @@ function isDiscoverPage(pathname: string): boolean {
  * Includes PlaybackProvider, MiniPlayer, and FullPlayer
  * Note: MiniPlayer and FullPlayer only render on discover pages (home, /latest, /category/*)
  */
+const MiniPlayer = dynamic(
+  () => import('./mini-player').then(mod => mod.MiniPlayer),
+  { ssr: false },
+);
+
+const FullPlayer = dynamic(
+  () => import('./full-player').then(mod => mod.FullPlayer),
+  { ssr: false },
+);
+
 export function AudioPlayerLayout({ children }: AudioPlayerLayoutProps) {
   const pathname = usePathname();
   const showPlayer = isDiscoverPage(pathname);
 
+  if (!showPlayer) {
+    return <>{children}</>;
+  }
+
   return (
     <PlaybackProvider>
       {children}
-      {showPlayer && <MiniPlayer />}
-      {showPlayer && <FullPlayer />}
+      <MiniPlayer />
+      <FullPlayer />
     </PlaybackProvider>
   );
 }
