@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import { ContentGridDiscover } from '@/components/content-grid-discover';
 import { fetchCategorisedContent } from '@/libs/content-data';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>;
