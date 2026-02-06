@@ -1,0 +1,1129 @@
+{
+  "version": "2.6",
+  "children": [
+    {
+      "type": "frame",
+      "id": "MWsbU",
+      "x": 0,
+      "y": 0,
+      "name": "Speasy Landing Page",
+      "width": 1440,
+      "height": 900,
+      "fill": "#0A0A0A",
+      "children": [
+        {
+          "type": "frame",
+          "id": "ZNFO1",
+          "name": "Sidebar",
+          "width": 80,
+          "height": "fill_container",
+          "fill": "#100E12",
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "#FFFFFF1A"
+          },
+          "layout": "vertical",
+          "children": [
+            {
+              "type": "frame",
+              "id": "CNUtn",
+              "name": "Sidebar Header",
+              "width": "fill_container",
+              "height": 64,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#FFFFFF1A"
+              },
+              "padding": 16,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "fctdK",
+                  "name": "Toggle Button",
+                  "width": 40,
+                  "height": 40,
+                  "cornerRadius": 8,
+                  "layout": "vertical",
+                  "gap": 4,
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "4OVo6",
+                      "name": "Line 1",
+                      "width": 20,
+                      "height": 2,
+                      "fill": "#FFFFFFCC",
+                      "cornerRadius": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "8wvmc",
+                      "name": "Line 2",
+                      "width": 20,
+                      "height": 2,
+                      "fill": "#FFFFFFCC",
+                      "cornerRadius": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "zrMrc",
+                      "name": "Line 3",
+                      "width": 20,
+                      "height": 2,
+                      "fill": "#FFFFFFCC",
+                      "cornerRadius": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "RTjFu",
+              "name": "Nav Section",
+              "width": "fill_container",
+              "height": "fill_container",
+              "layout": "vertical",
+              "gap": 4,
+              "padding": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "zcEsP",
+                  "name": "Home Nav",
+                  "width": "fill_container",
+                  "fill": "#FFFFFF1A",
+                  "cornerRadius": 8,
+                  "padding": [
+                    8,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "t8dhm",
+                      "name": "homeIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "home",
+                      "iconFontFamily": "lucide",
+                      "fill": "#ffededff"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "5yEOl",
+                  "name": "Chat Nav",
+                  "width": "fill_container",
+                  "cornerRadius": 8,
+                  "padding": [
+                    8,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "4wx93",
+                      "name": "chatIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "message-square",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FFFFFF99"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "eaBmc",
+                  "name": "Digest Nav",
+                  "width": "fill_container",
+                  "cornerRadius": 8,
+                  "padding": [
+                    8,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "9XHuu",
+                      "name": "digestIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "newspaper",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FFFFFF99"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "a8Org",
+                  "name": "About Nav",
+                  "width": "fill_container",
+                  "cornerRadius": 8,
+                  "padding": [
+                    8,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "VlJKP",
+                      "name": "aboutIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "file-text",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FFFFFF99"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "yA6P8",
+                  "name": "Manifesto Nav",
+                  "width": "fill_container",
+                  "cornerRadius": 8,
+                  "padding": [
+                    8,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "6T1Uu",
+                      "name": "manifestoIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "heart",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FFFFFF99"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "9pQhu",
+              "name": "Radio Section",
+              "width": "fill_container",
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "#FFFFFF1A"
+              },
+              "layout": "vertical",
+              "padding": 16,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "uF93I",
+                  "name": "Radio Button",
+                  "width": "fill_container",
+                  "fill": {
+                    "type": "gradient",
+                    "gradientType": "linear",
+                    "enabled": true,
+                    "rotation": 90,
+                    "size": {
+                      "height": 1
+                    },
+                    "colors": [
+                      {
+                        "color": "#3B82F633",
+                        "position": 0
+                      },
+                      {
+                        "color": "#8B5CF633",
+                        "position": 1
+                      }
+                    ]
+                  },
+                  "cornerRadius": 8,
+                  "padding": [
+                    8,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "a1Vfy",
+                      "name": "radioIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "radio",
+                      "iconFontFamily": "lucide",
+                      "fill": "#60A5FA"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "mCKX0",
+          "name": "Main Content",
+          "width": "fill_container",
+          "height": "fill_container",
+          "fill": "#0A0A0A",
+          "layout": "vertical",
+          "gap": 24,
+          "padding": [
+            32,
+            48
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "AmraY",
+              "name": "Header",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "TLihK",
+                  "name": "Title",
+                  "fill": "#FFFFFF",
+                  "content": "Discover",
+                  "fontFamily": "Abril Fatface",
+                  "fontSize": 48,
+                  "letterSpacing": -1
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "cPBzG",
+              "name": "Tab Navigation",
+              "width": "fill_container",
+              "gap": 8,
+              "padding": [
+                16,
+                0
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "ZmkNP",
+                  "name": "Latest Tab",
+                  "fill": "#FFFFFF1A",
+                  "cornerRadius": 8,
+                  "stroke": {
+                    "thickness": 1,
+                    "fill": "#FFFFFF33"
+                  },
+                  "gap": 8,
+                  "padding": [
+                    12,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "NWwzI",
+                      "name": "latestIcon",
+                      "width": 16,
+                      "height": 16,
+                      "iconFontName": "star",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FFFFFF"
+                    },
+                    {
+                      "type": "text",
+                      "id": "jIGXb",
+                      "name": "latestText",
+                      "fill": "#FFFFFF",
+                      "content": "Latest",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "TOOLh",
+                  "name": "AI Tab",
+                  "cornerRadius": 8,
+                  "gap": 8,
+                  "padding": [
+                    12,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "CUakg",
+                      "name": "aiIcon",
+                      "width": 16,
+                      "height": 16,
+                      "iconFontName": "cpu",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FFFFFFB3"
+                    },
+                    {
+                      "type": "text",
+                      "id": "aG9ZQ",
+                      "name": "aiText",
+                      "fill": "#FFFFFFB3",
+                      "content": "AI",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "UBXLH",
+                  "name": "Business Tab",
+                  "cornerRadius": 8,
+                  "gap": 8,
+                  "padding": [
+                    12,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "mWyAT",
+                      "name": "bizIcon",
+                      "width": 16,
+                      "height": 16,
+                      "iconFontName": "dollar-sign",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FFFFFFB3"
+                    },
+                    {
+                      "type": "text",
+                      "id": "zlhFk",
+                      "name": "bizText",
+                      "fill": "#FFFFFFB3",
+                      "content": "Business",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "PgYLw",
+                  "name": "Design Tab",
+                  "cornerRadius": 8,
+                  "gap": 8,
+                  "padding": [
+                    12,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "Zc71y",
+                      "name": "designIcon",
+                      "width": 16,
+                      "height": 16,
+                      "iconFontName": "palette",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FFFFFFB3"
+                    },
+                    {
+                      "type": "text",
+                      "id": "1OKUn",
+                      "name": "designText",
+                      "fill": "#FFFFFFB3",
+                      "content": "Design",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "XXW4I",
+                  "name": "Technology Tab",
+                  "cornerRadius": 8,
+                  "gap": 8,
+                  "padding": [
+                    12,
+                    16
+                  ],
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "ZjMWl",
+                      "name": "techIcon",
+                      "width": 16,
+                      "height": 16,
+                      "iconFontName": "cpu",
+                      "iconFontFamily": "lucide",
+                      "fill": "#FFFFFFB3"
+                    },
+                    {
+                      "type": "text",
+                      "id": "Kt6U7",
+                      "name": "techText",
+                      "fill": "#FFFFFFB3",
+                      "content": "Technology",
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "uJkFZ",
+              "name": "Content Grid",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 24,
+              "padding": [
+                32,
+                0
+              ],
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "xE7jo",
+                  "name": "Featured Row",
+                  "width": "fill_container",
+                  "gap": 24,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "iaPvZ",
+                      "name": "Featured Card 1",
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 320,
+                      "fill": "#FFFFFF0D",
+                      "cornerRadius": 16,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#FFFFFF1A"
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "eW4m5",
+                          "name": "Image",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "6408syntechs",
+                            "link": "https://unsplash.com/@6408syntechs",
+                            "author": "Syntechs Robotics"
+                          },
+                          "width": "fill_container",
+                          "height": 180,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1590038667005-7d82ac6f864b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzAxMTA3MTV8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          }
+                        },
+                        {
+                          "type": "frame",
+                          "id": "U3IO4",
+                          "name": "Content",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "layout": "vertical",
+                          "gap": 8,
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "gU4WZ",
+                              "name": "Badge Row",
+                              "width": "fill_container",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "vgxzJ",
+                                  "name": "Badge",
+                                  "fill": "#FFFFFF1A",
+                                  "cornerRadius": 6,
+                                  "padding": [
+                                    4,
+                                    8
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "x3pOw",
+                                      "name": "badgeText1",
+                                      "fill": "#FFFFFF",
+                                      "content": "AI",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "500"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "SClhN",
+                                  "name": "duration1",
+                                  "fill": "#FFFFFF80",
+                                  "content": "⏱️ 8 min",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "pBikH",
+                              "name": "title1",
+                              "fill": "#FFFFFF",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "The Future of AI in Creative Workflows",
+                              "fontFamily": "Inter",
+                              "fontSize": 16,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "8s4Jh",
+                              "name": "summary1",
+                              "fill": "#FFFFFF66",
+                              "content": "TechCrunch",
+                              "fontFamily": "Inter",
+                              "fontSize": 12
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "2ZzIf",
+                      "name": "Featured Card 2",
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 320,
+                      "fill": "#FFFFFF0D",
+                      "cornerRadius": 16,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#FFFFFF1A"
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Id2dn",
+                          "name": "Image",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "apexvirtualeducation",
+                            "link": "https://unsplash.com/@apexvirtualeducation",
+                            "author": "Apex Virtual Education"
+                          },
+                          "width": "fill_container",
+                          "height": 180,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1763038311036-6d18805537e5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzAxMTA3MjV8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          }
+                        },
+                        {
+                          "type": "frame",
+                          "id": "tKlzK",
+                          "name": "Content",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "layout": "vertical",
+                          "gap": 8,
+                          "padding": 16,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "r24oz",
+                              "name": "Badge Row",
+                              "width": "fill_container",
+                              "gap": 8,
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "frame",
+                                  "id": "9qYVf",
+                                  "name": "Badge",
+                                  "fill": "#FFFFFF1A",
+                                  "cornerRadius": 6,
+                                  "padding": [
+                                    4,
+                                    8
+                                  ],
+                                  "children": [
+                                    {
+                                      "type": "text",
+                                      "id": "7m1oU",
+                                      "name": "badgeText2",
+                                      "fill": "#FFFFFF",
+                                      "content": "Business",
+                                      "fontFamily": "Inter",
+                                      "fontSize": 12,
+                                      "fontWeight": "500"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "text",
+                                  "id": "Ci9eb",
+                                  "name": "duration2",
+                                  "fill": "#FFFFFF80",
+                                  "content": "⏱️ 12 min",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 12
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "2O0vi",
+                              "name": "title2",
+                              "fill": "#FFFFFF",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "How Startups Are Redefining Market Entry",
+                              "fontFamily": "Inter",
+                              "fontSize": 16,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "T51DS",
+                              "name": "summary2",
+                              "fill": "#FFFFFF66",
+                              "content": "Harvard Business Review",
+                              "fontFamily": "Inter",
+                              "fontSize": 12
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "vMorG",
+                  "name": "Small Cards Row",
+                  "width": "fill_container",
+                  "gap": 24,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "9jG7b",
+                      "name": "Small Card 1",
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 260,
+                      "fill": "#FFFFFF0D",
+                      "cornerRadius": 12,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#FFFFFF1A"
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "eqbAs",
+                          "name": "Image",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "brett_jordan",
+                            "link": "https://unsplash.com/@brett_jordan",
+                            "author": "Brett Jordan"
+                          },
+                          "width": "fill_container",
+                          "height": 120,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1562774555-db2ea73a43aa?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzAxMTA3MzR8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          }
+                        },
+                        {
+                          "type": "frame",
+                          "id": "RqP26",
+                          "name": "Content",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "padding": 12,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "UmCzr",
+                              "name": "Badge",
+                              "fill": "#FFFFFF1A",
+                              "cornerRadius": 4,
+                              "padding": [
+                                3,
+                                6
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "bhAgg",
+                                  "name": "sBadgeText1",
+                                  "fill": "#FFFFFF",
+                                  "content": "Design",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "PWENq",
+                              "name": "sTitle1",
+                              "fill": "#FFFFFF",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Modern Design Systems for Scale",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "ZKQum",
+                              "name": "sSource1",
+                              "fill": "#FFFFFF66",
+                              "content": "Figma Blog",
+                              "fontFamily": "Inter",
+                              "fontSize": 11
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "gfCay",
+                      "name": "Small Card 2",
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 260,
+                      "fill": "#FFFFFF0D",
+                      "cornerRadius": 12,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#FFFFFF1A"
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "50sGt",
+                          "name": "Image",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "hiteshchoudhary",
+                            "link": "https://unsplash.com/@hiteshchoudhary",
+                            "author": "Hitesh Choudhary"
+                          },
+                          "width": "fill_container",
+                          "height": 120,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1564931768730-7e4d8e240044?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzAxMTA3NDV8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          }
+                        },
+                        {
+                          "type": "frame",
+                          "id": "erQHp",
+                          "name": "Content",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "padding": 12,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "XpD1G",
+                              "name": "Badge",
+                              "fill": "#FFFFFF1A",
+                              "cornerRadius": 4,
+                              "padding": [
+                                3,
+                                6
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "8zvNS",
+                                  "name": "sBadgeText2",
+                                  "fill": "#FFFFFF",
+                                  "content": "Technology",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "gheyK",
+                              "name": "sTitle2",
+                              "fill": "#FFFFFF",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Building for the Next Generation",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "gKmKI",
+                              "name": "sSource2",
+                              "fill": "#FFFFFF66",
+                              "content": "Vercel Blog",
+                              "fontFamily": "Inter",
+                              "fontSize": 11
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "qsT5e",
+                      "name": "Small Card 3",
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 260,
+                      "fill": "#FFFFFF0D",
+                      "cornerRadius": 12,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#FFFFFF1A"
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "4Fndr",
+                          "name": "Image",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "oregonstateuni",
+                            "link": "https://unsplash.com/@oregonstateuni",
+                            "author": "The Oregon State University Collections and Archives"
+                          },
+                          "width": "fill_container",
+                          "height": 120,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1727517786578-ff2bb896b852?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzAxMTA3NTN8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          }
+                        },
+                        {
+                          "type": "frame",
+                          "id": "BcCCM",
+                          "name": "Content",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "padding": 12,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "sD9Iw",
+                              "name": "Badge",
+                              "fill": "#FFFFFF1A",
+                              "cornerRadius": 4,
+                              "padding": [
+                                3,
+                                6
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "gfT09",
+                                  "name": "sBadgeText3",
+                                  "fill": "#FFFFFF",
+                                  "content": "Productivity",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "ArANF",
+                              "name": "sTitle3",
+                              "fill": "#FFFFFF",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Automate Your Daily Workflows",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "OOG3n",
+                              "name": "sSource3",
+                              "fill": "#FFFFFF66",
+                              "content": "Notion Blog",
+                              "fontFamily": "Inter",
+                              "fontSize": 11
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "mtt7C",
+                      "name": "Small Card 4",
+                      "clip": true,
+                      "width": "fill_container",
+                      "height": 260,
+                      "fill": "#FFFFFF0D",
+                      "cornerRadius": 12,
+                      "stroke": {
+                        "thickness": 1,
+                        "fill": "#FFFFFF1A"
+                      },
+                      "layout": "vertical",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "C9UJa",
+                          "name": "Image",
+                          "metadata": {
+                            "type": "unsplash",
+                            "username": "loganvoss",
+                            "link": "https://unsplash.com/@loganvoss",
+                            "author": "Logan Voss"
+                          },
+                          "width": "fill_container",
+                          "height": 120,
+                          "fill": {
+                            "type": "image",
+                            "enabled": true,
+                            "url": "https://images.unsplash.com/photo-1758043602784-eba6f35226a5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w4NDM0ODN8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NzAxMTA3NjB8&ixlib=rb-4.1.0&q=80&w=1080",
+                            "mode": "fill"
+                          }
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Zltgm",
+                          "name": "Content",
+                          "width": "fill_container",
+                          "height": "fill_container",
+                          "layout": "vertical",
+                          "gap": 6,
+                          "padding": 12,
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "8fgnY",
+                              "name": "Badge",
+                              "fill": "#FFFFFF1A",
+                              "cornerRadius": 4,
+                              "padding": [
+                                3,
+                                6
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "DLiRa",
+                                  "name": "sBadgeText4",
+                                  "fill": "#FFFFFF",
+                                  "content": "AI",
+                                  "fontFamily": "Inter",
+                                  "fontSize": 10,
+                                  "fontWeight": "500"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "0Bg6S",
+                              "name": "sTitle4",
+                              "fill": "#FFFFFF",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Understanding Large Language Models",
+                              "fontFamily": "Inter",
+                              "fontSize": 14,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "text",
+                              "id": "oboTC",
+                              "name": "sSource4",
+                              "fill": "#FFFFFF66",
+                              "content": "OpenAI Research",
+                              "fontFamily": "Inter",
+                              "fontSize": 11
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

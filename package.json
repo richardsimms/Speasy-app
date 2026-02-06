@@ -31,7 +31,8 @@
     "db-server:memory": "pglite-server --port=5433 --include-database-url --run 'npm run db:migrate'",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "speasy": "tsx src/cli/index.ts"
   },
   "dependencies": {
     "@arcjet/next": "catalog:",
@@ -47,8 +48,12 @@
     "@vercel/analytics": "catalog:",
     "@vercel/speed-insights": "catalog:",
     "agentation": "catalog:",
+    "chalk": "catalog:",
     "class-variance-authority": "catalog:",
+    "cli-table3": "catalog:",
     "clsx": "catalog:",
+    "commander": "catalog:",
+    "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
     "framer-motion": "catalog:",
     "geist": "catalog:",
@@ -113,6 +118,7 @@
     "rimraf": "catalog:",
     "semantic-release": "catalog:",
     "tailwindcss": "catalog:",
+    "tsx": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-tsconfig-paths": "catalog:",
