@@ -1,0 +1,10 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "command": "npx tsc --noEmit 2>&1 | head -20; npx eslint --quiet --no-error-on-unmatched-pattern $(git diff --name-only --diff-filter=M | grep -E '\\.(ts|tsx)$' | head -5) 2>&1 | head -20"
+      }
+    ]
+  }
+}
