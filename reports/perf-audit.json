@@ -1,0 +1,149 @@
+{
+  "baseUrl": "http://localhost:3000",
+  "results": [
+    {
+      "name": "website_overall",
+      "url": "http://localhost:3000/en",
+      "status": 200,
+      "finalUrl": "http://localhost:3000/",
+      "metrics": {
+        "domContentLoadedMs": 251.9,
+        "loadEventMs": 594.2,
+        "firstContentfulPaintMs": 252,
+        "largestContentfulPaintMs": 252,
+        "skeletonNodeCount": 0
+      },
+      "lighthousePerformanceScore": null,
+      "speedIndex": null,
+      "notes": "Lighthouse unavailable in this environment (blocked package install)."
+    },
+    {
+      "name": "homepage",
+      "url": "http://localhost:3000/en",
+      "status": 200,
+      "finalUrl": "http://localhost:3000/",
+      "metrics": {
+        "domContentLoadedMs": 402.4,
+        "loadEventMs": 583.4,
+        "firstContentfulPaintMs": 224,
+        "largestContentfulPaintMs": 224,
+        "skeletonNodeCount": 0
+      },
+      "lighthousePerformanceScore": null,
+      "speedIndex": null,
+      "notes": "Lighthouse unavailable in this environment (blocked package install)."
+    },
+    {
+      "name": "dashboard",
+      "url": "http://localhost:3000/en/dashboard",
+      "status": 500,
+      "finalUrl": "http://localhost:3000/en/dashboard",
+      "metrics": {
+        "domContentLoadedMs": 39.2,
+        "loadEventMs": 39.6,
+        "firstContentfulPaintMs": 60,
+        "largestContentfulPaintMs": 60,
+        "skeletonNodeCount": 0
+      },
+      "lighthousePerformanceScore": null,
+      "speedIndex": null,
+      "notes": "Lighthouse unavailable in this environment (blocked package install)."
+    },
+    {
+      "name": "article_newsletter-overload",
+      "url": "http://localhost:3000/en/blog/newsletter-overload",
+      "status": 200,
+      "finalUrl": "http://localhost:3000/blog/newsletter-overload",
+      "metrics": {
+        "domContentLoadedMs": 168.1,
+        "loadEventMs": 666.1,
+        "firstContentfulPaintMs": 168,
+        "largestContentfulPaintMs": 320,
+        "skeletonNodeCount": 0
+      },
+      "lighthousePerformanceScore": null,
+      "speedIndex": null,
+      "notes": "Lighthouse unavailable in this environment (blocked package install)."
+    },
+    {
+      "name": "article_transform-articles-to-podcasts",
+      "url": "http://localhost:3000/en/blog/transform-articles-to-podcasts",
+      "status": 200,
+      "finalUrl": "http://localhost:3000/blog/transform-articles-to-podcasts",
+      "metrics": {
+        "domContentLoadedMs": 139.4,
+        "loadEventMs": 671.1,
+        "firstContentfulPaintMs": 320,
+        "largestContentfulPaintMs": 320,
+        "skeletonNodeCount": 0
+      },
+      "lighthousePerformanceScore": null,
+      "speedIndex": null,
+      "notes": "Lighthouse unavailable in this environment (blocked package install)."
+    },
+    {
+      "name": "article_reading-overload-career",
+      "url": "http://localhost:3000/en/blog/reading-overload-career",
+      "status": 200,
+      "finalUrl": "http://localhost:3000/blog/reading-overload-career",
+      "metrics": {
+        "domContentLoadedMs": 137.9,
+        "loadEventMs": 700.8,
+        "firstContentfulPaintMs": 328,
+        "largestContentfulPaintMs": 328,
+        "skeletonNodeCount": 0
+      },
+      "lighthousePerformanceScore": null,
+      "speedIndex": null,
+      "notes": "Lighthouse unavailable in this environment (blocked package install)."
+    },
+    {
+      "name": "article_blog-post-template",
+      "url": "http://localhost:3000/en/blog/blog-post-template",
+      "status": 200,
+      "finalUrl": "http://localhost:3000/blog/blog-post-template",
+      "metrics": {
+        "domContentLoadedMs": 134.5,
+        "loadEventMs": 660.6,
+        "firstContentfulPaintMs": 288,
+        "largestContentfulPaintMs": 288,
+        "skeletonNodeCount": 0
+      },
+      "lighthousePerformanceScore": null,
+      "speedIndex": null,
+      "notes": "Lighthouse unavailable in this environment (blocked package install)."
+    },
+    {
+      "name": "article_getting-started-with-speasy",
+      "url": "http://localhost:3000/en/blog/getting-started-with-speasy",
+      "status": 200,
+      "finalUrl": "http://localhost:3000/blog/getting-started-with-speasy",
+      "metrics": {
+        "domContentLoadedMs": 140.1,
+        "loadEventMs": 670.4,
+        "firstContentfulPaintMs": 144,
+        "largestContentfulPaintMs": 300,
+        "skeletonNodeCount": 0
+      },
+      "lighthousePerformanceScore": null,
+      "speedIndex": null,
+      "notes": "Lighthouse unavailable in this environment (blocked package install)."
+    },
+    {
+      "name": "article_email-overwhelm",
+      "url": "http://localhost:3000/en/blog/email-overwhelm",
+      "status": 200,
+      "finalUrl": "http://localhost:3000/blog/email-overwhelm",
+      "metrics": {
+        "domContentLoadedMs": 121.6,
+        "loadEventMs": 692.2,
+        "firstContentfulPaintMs": 320,
+        "largestContentfulPaintMs": 320,
+        "skeletonNodeCount": 0
+      },
+      "lighthousePerformanceScore": null,
+      "speedIndex": null,
+      "notes": "Lighthouse unavailable in this environment (blocked package install)."
+    }
+  ]
+}
