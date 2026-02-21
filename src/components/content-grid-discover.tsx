@@ -57,6 +57,8 @@ const getCategoryIcon = (categoryName: string) => {
   return Star;
 };
 
+const INITIAL_HOME_CARDS = 12;
+
 function buildTabPath(tabId: string): string {
   return tabId === 'latest' ? '/' : `/category/${tabId}`;
 }
@@ -107,6 +109,7 @@ export function ContentGridDiscover({
   }, []);
 
   const [selectedTab, setSelectedTab] = useState<string>(resolvedInitial);
+  const [visibleCardCount, setVisibleCardCount] = useState(INITIAL_HOME_CARDS);
   const [hoveredTab, setHoveredTab] = useState<string | null>(null);
   const [indicatorStyle, setIndicatorStyle] = useState<{
     left: number;
@@ -117,6 +120,11 @@ export function ContentGridDiscover({
 
   const selectedTabData = tabs.find(tab => tab.id === selectedTab);
   const displayedItems = selectedTabData?.items || [];
+  const isHomeWithMore = surface === 'home' && displayedItems.length > INITIAL_HOME_CARDS;
+  const visibleItems = isHomeWithMore
+    ? displayedItems.slice(0, visibleCardCount)
+    : displayedItems;
+  const hasMoreToShow = isHomeWithMore && visibleCardCount < displayedItems.length;
 
   // Build tracks array from displayed items (for queue)
   const tracks = useMemo<Track[]>(() => {
@@ -194,13 +202,15 @@ export function ContentGridDiscover({
   const handleTabChange = useCallback(
     (tabId: string) => {
       setSelectedTab(tabId);
-
-      if (surface === 'home' && typeof window !== 'undefined') {
-        window.history.replaceState(
-          window.history.state,
-          '',
-          buildTabPath(tabId),
-        );
+      if (surface === 'home') {
+        setVisibleCardCount(INITIAL_HOME_CARDS);
+        if (typeof window !== 'undefined') {
+          window.history.replaceState(
+            window.history.state,
+            '',
+            buildTabPath(tabId),
+          );
+        }
       }
     },
     [surface],
@@ -373,44 +383,55 @@ export function ContentGridDiscover({
           id={`tabpanel-${selectedTab}`}
           role="tabpanel"
           aria-labelledby={`tab-${selectedTab}`}
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+          className="space-y-6"
         >
-          {displayedItems.map((item, index) => {
-            // Perplexity-style pattern: 2 featured cards side-by-side (span 2 cols each), then 4 regular cards (1 col each)
-            // Pattern repeats every 6 items: [0-1: featured] [2-5: regular] | [6-7: featured] [8-11: regular]
-            const positionInPattern = index % 6;
-            const isFeatured = positionInPattern < 2; // First 2 items in each group of 6 are featured
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {visibleItems.map((item, index) => {
+              const positionInPattern = index % 6;
+              const isFeatured = positionInPattern < 2;
 
-            return (
-              <div
-                key={item.id}
-                className={cn(
-                  isFeatured
-                    ? 'sm:col-span-2 lg:col-span-2'
-                    : 'sm:col-span-1 lg:col-span-1',
-                )}
+              return (
+                <div
+                  key={item.id}
+                  className={cn(
+                    isFeatured
+                      ? 'sm:col-span-2 lg:col-span-2'
+                      : 'sm:col-span-1 lg:col-span-1',
+                  )}
+                >
+                  <ContentGridCard
+                    id={item.id}
+                    title={item.title}
+                    summary={item.summary}
+                    keyInsight={item.keyInsight}
+                    imageUrl={item.imageUrl}
+                    category={item.category}
+                    duration={item.duration}
+                    createdAt={item.created_at}
+                    index={index}
+                    locale={locale}
+                    surface={surface}
+                    userId={userId}
+                    experimentVariant={experimentVariant}
+                    audioUrl={item.audioUrl}
+                    queueContext={queueContext}
+                    allTracks={tracks}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          {hasMoreToShow && (
+            <div className="flex justify-center pt-4">
+              <button
+                type="button"
+                onClick={() => setVisibleCardCount(prev => prev + 8)}
+                className="rounded-lg border border-white/20 bg-white/5 px-6 py-3 text-sm font-medium text-white/90 transition-colors hover:border-white/40 hover:bg-white/10 focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-[#0A0A0A] focus:outline-none"
               >
-                <ContentGridCard
-                  id={item.id}
-                  title={item.title}
-                  summary={item.summary}
-                  keyInsight={item.keyInsight}
-                  imageUrl={item.imageUrl}
-                  category={item.category}
-                  duration={item.duration}
-                  createdAt={item.created_at}
-                  index={index}
-                  locale={locale}
-                  surface={surface}
-                  userId={userId}
-                  experimentVariant={experimentVariant}
-                  audioUrl={item.audioUrl}
-                  queueContext={queueContext}
-                  allTracks={tracks}
-                />
-              </div>
-            );
-          })}
+                Load more
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

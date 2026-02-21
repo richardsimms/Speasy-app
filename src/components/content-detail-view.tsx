@@ -213,14 +213,14 @@ export function ContentDetailView({
 
       {/* Main content */}
       <div className="mx-auto max-w-4xl px-4 pb-32">
-        {/* Header */}
+        {/* Fast transition with no delay so the title paints immediately for LCP */}
         <motion.div
-          initial={reducedMotion ? undefined : { opacity: 0, y: 20 }}
+          initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
           animate={reducedMotion ? undefined : { opacity: 1, y: 0 }}
           transition={
             reducedMotion
               ? { duration: 0 }
-              : { duration: MOTION.duration.slow, ease: MOTION.easing.default }
+              : { duration: MOTION.duration.fast, ease: MOTION.easing.default }
           }
           className="mb-8"
         >
@@ -266,15 +266,14 @@ export function ContentDetailView({
           </div>
         </motion.div>
 
-        {/* Image */}
         {content.imageUrl && (
           <motion.div
-            initial={reducedMotion ? undefined : { opacity: 0, scale: 0.95 }}
-            animate={reducedMotion ? undefined : { opacity: 1, scale: 1 }}
+            initial={reducedMotion ? undefined : { opacity: 0 }}
+            animate={reducedMotion ? undefined : { opacity: 1 }}
             transition={
               reducedMotion
                 ? { duration: 0 }
-                : { duration: MOTION.duration.slow, delay: 0.1, ease: MOTION.easing.default }
+                : { duration: MOTION.duration.fast, ease: MOTION.easing.default }
             }
             className="mb-8 overflow-hidden rounded-2xl"
           >
@@ -285,6 +284,7 @@ export function ContentDetailView({
                 fill
                 className="object-cover"
                 priority
+                fetchPriority="high"
                 sizes="(max-width: 768px) 100vw, 896px"
               />
             </div>

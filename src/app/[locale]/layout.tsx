@@ -89,6 +89,10 @@ export default async function RootLayout(props: {
       className={`${GeistSans.variable} ${GeistMono.variable} ${GeistSans.className}`}
       style={{ backgroundColor: '#100e12' }}
     >
+      <head>
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+      </head>
       <body className="font-sans antialiased">
         <NextIntlClientProvider>
           <PostHogProvider>
