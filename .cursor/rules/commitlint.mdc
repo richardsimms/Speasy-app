@@ -25,7 +25,7 @@ Always use a single-line header in the following format:
 - `<scope>` is optional and, when used, is placed in parentheses after the type, with no spaces: `type(scope): description`.
 - The description must be short, in the imperative mood, and written in lowercase except for proper nouns. [web:1][web:7]
 
-body's lines must not be longer than 100 characters [body-max-line-length]
+body's lines must not be longer than 150 characters [body-max-line-length]
 
 
 ### Allowed types
