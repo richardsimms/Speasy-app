@@ -43,6 +43,8 @@ export default antfu(
       'src/components/chatgpt-widgets/README.md',
       // Built ChatGPT widgets (generated files)
       'public/widgets/**/*',
+      // Supabase Edge Functions (Deno runtime, not Node)
+      'supabase/**/*',
     ],
   },
   // --- Accessibility Rules ---
