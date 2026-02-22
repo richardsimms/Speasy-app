@@ -3,7 +3,7 @@
   "type": "module",
   "author": "Richard Simmons (https://github.com/richardsimms)",
   "engines": {
-    "node": ">=20"
+    "node": ">=20 <25"
   },
   "scripts": {
     "predev": "node scripts/ensure-pglite-port.mjs",
@@ -25,6 +25,7 @@
     "check:types": "tsc --noEmit --pretty",
     "check:deps": "knip",
     "commit": "commit",
+    "perf-audit": "node scripts/perf-audit.mjs",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "db-server:file": "pglite-server --db=local.db --port=5433 --include-database-url --run 'npm run db:migrate'",
@@ -98,6 +99,8 @@
     "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "babel-plugin-react-compiler": "catalog:",
+    "chalk": "catalog:",
+    "chrome-launcher": "catalog:",
     "conventional-changelog-conventionalcommits": "catalog:",
     "cross-env": "catalog:",
     "drizzle-kit": "catalog:",
@@ -112,6 +115,7 @@
     "jiti": "catalog:",
     "knip": "catalog:",
     "lefthook": "catalog:",
+    "lighthouse": "catalog:",
     "npm-run-all": "catalog:",
     "postcss": "catalog:",
     "postcss-load-config": "catalog:",
