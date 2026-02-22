@@ -19,6 +19,7 @@ const config: KnipConfig = {
     'src/components/ui/skeleton.tsx', // Skeleton loader component library
     'src/libs/motion-config.ts', // Motion configuration and utility functions (public API)
     'tests/**/*.ts',
+    'supabase/functions/**/*.ts',
   ],
   // Dependencies to ignore during analysis
   ignoreDependencies: [

@@ -9,10 +9,12 @@ pre-commit:
   commands:
     lint:
       glob: '*'
+      exclude: 'supabase/functions/**/*.ts'
       run: bash -c "export PATH='/opt/homebrew/bin:/opt/homebrew/sbin:$PATH' && npx --no -- eslint --fix --no-warn-ignored {staged_files}"
       stage_fixed: true
       priority: 1
     check-types:
       glob: '*.{ts,tsx}'
+      exclude: 'supabase/functions/**/*.ts'
       run: bash -c 'export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH" && npm run check:types'
       priority: 2

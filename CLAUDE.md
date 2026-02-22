@@ -836,6 +836,65 @@ Types: feat, fix, docs, style, refactor, perf, test, build, ci, chore
 
 ---
 
+# Core Principles
+
+- **Simplicity First**: Make every change as simple as possible. Impact minimal code. Prefer editing existing files over creating new ones.
+- **No Laziness**: Find root causes. No temporary fixes. Senior developer standards.
+- **Minimal Impact**: Changes should only touch what's necessary. Avoid introducing bugs through unrelated modifications.
+
+---
+
+# Workflow Orchestration
+
+### 1. Plan Mode Default
+- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions)
+- If something goes sideways, STOP and re-plan immediately — don't keep pushing
+- Use plan mode for verification steps, not just building
+- Write detailed specs upfront to reduce ambiguity
+
+### 2. Subagent Strategy
+- Use subagents liberally to keep main context window clean
+- Offload research, exploration, and parallel analysis to subagents
+- For complex problems, throw more compute at it via subagents
+- One task per subagent for focused execution
+
+### 3. Self-Improvement Loop
+- After ANY correction from the user: update `tasks/lessons.md` with the pattern
+- Write rules for yourself that prevent the same mistake
+- Ruthlessly iterate on these lessons until mistake rate drops
+- Review lessons at session start for relevant project
+
+### 4. Verification Before Done
+- Never mark a task complete without proving it works
+- Diff behavior between main and your changes when relevant
+- Ask yourself: "Would a staff engineer approve this?"
+- Run `pnpm run lint`, `pnpm run check:types`, and `pnpm test` to demonstrate correctness
+
+### 5. Demand Elegance (Balanced)
+- For non-trivial changes: pause and ask "is there a more elegant way?"
+- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution"
+- Skip this for simple, obvious fixes — don't over-engineer
+- Challenge your own work before presenting it
+
+### 6. Autonomous Bug Fixing
+- When given a bug report: just fix it. Don't ask for hand-holding
+- Point at logs, errors, failing tests — then resolve them
+- Zero context switching required from the user
+- Go fix failing CI tests without being told how
+
+---
+
+# Task Management
+
+1. **Plan First**: Write plan to `tasks/todo.md` with checkable items
+2. **Verify Plan**: Check in before starting implementation
+3. **Track Progress**: Mark items complete as you go
+4. **Explain Changes**: High-level summary at each step
+5. **Document Results**: Add review section to `tasks/todo.md`
+6. **Capture Lessons**: Update `tasks/lessons.md` after corrections
+
+---
+
 # Key Technical Details
 
 ### TypeScript Configuration
@@ -969,6 +1028,7 @@ export default function Component() {
 - **Blog content**: Stored as markdown in `src/blog/` and processed by `src/libs/blog.ts`.
 - **Feed generation**: RSS/podcast feeds generated via `src/libs/feed-generator.ts` and `src/app/api/feeds/` routes.
 - **Audio content**: Only items with `status: 'done'` and associated `audio_files` are shown. Use `audio_files!inner` join in Supabase queries.
+- **LLM Jobs pipeline**: The `llm_jobs` table drives audio generation. Jobs stuck in `running` with `started_at IS NULL` are zombies. The `reset_stale_llm_jobs()` DB function auto-resets these before each 15-min processing run (see `.github/workflows/process-llm-jobs.yml`).
 - **ChatKit server**: Python backend in `chatkit-server/` runs separately. Set `CHATKIT_SERVER_URL` env var for production.
 - **ChatGPT App**: MCP server is a Supabase Edge Function. Deploy changes via `supabase functions deploy speasy-mcp`.
 
@@ -1010,3 +1070,5 @@ Install hooks: `npx lefthook install`
 - Verify content items have `status: 'done'` in database
 - Check that content has associated `audio_files` records
 - Queries use `audio_files!inner` join - items without audio are excluded
+- Check for zombie `llm_jobs` stuck in `running`: `SELECT status, COUNT(*) FROM llm_jobs GROUP BY status`
+- If zombies exist, run `SELECT reset_stale_llm_jobs()` or wait for the next workflow run to auto-reset them

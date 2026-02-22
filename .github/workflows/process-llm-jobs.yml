@@ -9,6 +9,17 @@ jobs:
   run-edge-function:
     runs-on: ubuntu-latest
     steps:
+      - name: Reset stale LLM jobs
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          result=$(curl -sf -X POST \
+            'https://lmmobnqmxkcdwdhhpwwd.supabase.co/rest/v1/rpc/reset_stale_llm_jobs' \
+            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+            -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+            -H "Content-Type: application/json")
+          echo "Reset result: ${result}"
+
       - name: Call Edge Function
         env:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
