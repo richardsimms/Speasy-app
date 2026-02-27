@@ -147,3 +147,33 @@ Concise rules for building accessible, fast, delightful UIs. Use MUST/SHOULD/NEV
 - MUST: Increase contrast on `:hover`/`:active`/`:focus`
 - SHOULD: Match browser UI to bg
 - SHOULD: Avoid dark color gradient banding (use background images when needed)
+
+## Cursor Cloud specific instructions
+
+### Services overview
+
+| Service | Command | Port | Notes |
+|---------|---------|------|-------|
+| Next.js + PGlite + Spotlight | `pnpm run dev` | 3000, 5433, 8969 | Single command starts all three via `npm-run-all` |
+| Python ChatKit server | `cd chatkit-server && python server.py` | 8000 | Optional; needed only for `/chat` standalone mode |
+
+### Running the app
+
+- `pnpm run dev` starts PGlite (port 5433), Next.js (port 3000), and Sentry Spotlight (port 8969) in parallel. A `predev` script auto-kills stale PGlite processes on port 5433.
+- The `.env.local` file must contain at minimum `CLERK_SECRET_KEY`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, and `DATABASE_URL=postgresql://localhost:5433/postgres`. All other env vars are optional (see `src/libs/Env.ts`).
+- PGlite provides a local PostgreSQL-compatible database; no external Postgres setup is needed for development.
+- Migrations run automatically when PGlite starts (via the `--run 'npm run db:migrate'` flag in `db-server:file`).
+
+### Lint, type-check, and test
+
+Standard commands documented in `CLAUDE.md` and `package.json` scripts:
+- `pnpm run lint` / `pnpm run lint:fix`
+- `pnpm run check:types`
+- `pnpm test` (Vitest — unit + browser tests; requires Playwright browsers installed via `pnpm exec playwright install --with-deps chromium`)
+- `pnpm run test:e2e` (Playwright E2E; needs the dev server running)
+
+### Gotchas
+
+- pnpm `trustPolicy: no-downgrade` causes "Ignored build scripts" warnings on install. Key tools (esbuild, lefthook, etc.) still work because they ship pre-built binaries. No action needed.
+- Clerk auth pages (`/sign-in`, `/sign-up`) require valid Clerk API keys matching the instance; a "handshake token verification" error on sign-in is expected if keys don't match the domain.
+- The Vitest browser test project (`*.test.tsx`) needs Chromium; run `pnpm exec playwright install --with-deps chromium` once if tests fail with "Executable doesn't exist".
