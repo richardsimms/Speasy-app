@@ -5,7 +5,7 @@ export const Env = createEnv({
   server: {
     ARCJET_KEY: z.string().startsWith('ajkey_').optional(),
     CLERK_SECRET_KEY: z.string().min(1),
-    CLERK_WEBHOOK_SIGNING_SECRET: z.string().min(1).optional(),
+    CLERK_WEBHOOK_SIGNING_SECRET: z.string().min(1),
     DATABASE_URL: z.string().min(1),
     SUPABASE_URL: z.string().url().optional(),
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
