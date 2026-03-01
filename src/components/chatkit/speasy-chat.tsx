@@ -80,6 +80,56 @@ export function SpeasyChat() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
+  const streamSseEvents = useCallback(async (
+    response: Response,
+    onEvent: (eventData: { type: string; content?: string; thread_id?: string; widget?: WidgetNode }) => void,
+  ) => {
+    if (!response.body) {
+      return;
+    }
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    let done = false;
+    while (!done) {
+      const result = await reader.read();
+      done = result.done;
+
+      if (result.value) {
+        buffer += decoder.decode(result.value, { stream: true });
+      }
+
+      const lines = buffer.split('\n');
+      buffer = lines.pop() ?? '';
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ') || line === 'data: [DONE]') {
+          continue;
+        }
+
+        try {
+          const eventData = JSON.parse(line.slice(6));
+          onEvent(eventData);
+        } catch {
+          // Ignore malformed events from upstream
+        }
+      }
+    }
+
+    buffer += decoder.decode();
+
+    if (buffer.startsWith('data: ') && buffer !== 'data: [DONE]') {
+      try {
+        const eventData = JSON.parse(buffer.slice(6));
+        onEvent(eventData);
+      } catch {
+        // Ignore malformed events from upstream
+      }
+    }
+  }, []);
+
   const handleWidgetAction = useCallback(async (action: WidgetAction) => {
     const { payload } = action;
 
@@ -100,42 +150,26 @@ export function SpeasyChat() {
           }),
         });
 
-        if (response.ok && response.body) {
-          const reader = response.body.getReader();
-          const decoder = new TextDecoder();
-
-          let done = false;
-          while (!done) {
-            const result = await reader.read();
-            done = result.done;
-            if (result.value) {
-              const text = decoder.decode(result.value);
-              const lines = text.split('\n');
-
-              for (const line of lines) {
-                if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-                  const eventData = JSON.parse(line.slice(6));
-                  if (eventData.type === 'widget') {
-                    setMessages(prev => [
-                      ...prev,
-                      {
-                        id: `widget-${Date.now()}`,
-                        role: 'assistant',
-                        content: '',
-                        widget: eventData.widget,
-                      },
-                    ]);
-                  }
-                }
-              }
+        if (response.ok) {
+          await streamSseEvents(response, (eventData) => {
+            if (eventData.type === 'widget') {
+              setMessages(prev => [
+                ...prev,
+                {
+                  id: `widget-${Date.now()}`,
+                  role: 'assistant',
+                  content: '',
+                  widget: eventData.widget,
+                },
+              ]);
             }
-          }
+          });
         }
       } finally {
         setIsLoading(false);
       }
     }
-  }, [threadId]);
+  }, [streamSseEvents, threadId]);
 
   const sendMessage = useCallback(async (content: string) => {
     if (!content.trim() || isLoading) {
@@ -163,59 +197,38 @@ export function SpeasyChat() {
         }),
       });
 
-      if (response.ok && response.body) {
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
+      if (response.ok) {
+        await streamSseEvents(response, (eventData) => {
+          if (eventData.type === 'widget') {
+            setMessages(prev => [
+              ...prev,
+              {
+                id: `widget-${Date.now()}`,
+                role: 'assistant',
+                content: '',
+                widget: eventData.widget,
+              },
+            ]);
+          } else if (eventData.type === 'message') {
+            setMessages(prev => [
+              ...prev,
+              {
+                id: `assistant-${Date.now()}`,
+                role: 'assistant',
+                content: eventData.content ?? '',
+              },
+            ]);
 
-        let done = false;
-        while (!done) {
-          const result = await reader.read();
-          done = result.done;
-          if (result.value) {
-            const text = decoder.decode(result.value);
-            const lines = text.split('\n');
-
-            for (const line of lines) {
-              if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-                try {
-                  const eventData = JSON.parse(line.slice(6));
-
-                  if (eventData.type === 'widget') {
-                    setMessages(prev => [
-                      ...prev,
-                      {
-                        id: `widget-${Date.now()}`,
-                        role: 'assistant',
-                        content: '',
-                        widget: eventData.widget,
-                      },
-                    ]);
-                  } else if (eventData.type === 'message') {
-                    setMessages(prev => [
-                      ...prev,
-                      {
-                        id: `assistant-${Date.now()}`,
-                        role: 'assistant',
-                        content: eventData.content,
-                      },
-                    ]);
-
-                    if (!threadId && eventData.thread_id) {
-                      setThreadId(eventData.thread_id);
-                    }
-                  }
-                } catch {
-                  // Skip malformed JSON
-                }
-              }
+            if (!threadId && eventData.thread_id) {
+              setThreadId(eventData.thread_id);
             }
           }
-        }
+        });
       }
     } finally {
       setIsLoading(false);
     }
-  }, [isLoading, threadId]);
+  }, [isLoading, streamSseEvents, threadId]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
