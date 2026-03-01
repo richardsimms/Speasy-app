@@ -17,9 +17,26 @@ function getSupabaseClient() {
 
 const BLOG_DIR = path.join(process.cwd(), 'src', 'blog');
 
+export function resolveSafeBlogPath(slug: string): string | null {
+  const blogDir = path.resolve(BLOG_DIR);
+  const fullPath = path.resolve(blogDir, `${slug}.md`);
+  const relativePath = path.relative(blogDir, fullPath);
+
+  if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+    logger.warn('Path traversal attempt detected for markdown blog fallback', { slug, fullPath });
+    return null;
+  }
+
+  return fullPath;
+}
+
 async function parseMarkdownFile(slug: string): Promise<BlogPost | null> {
   try {
-    const fullPath = path.join(BLOG_DIR, `${slug}.md`);
+    const fullPath = resolveSafeBlogPath(slug);
+    if (!fullPath) {
+      return null;
+    }
+
     const raw = await fs.readFile(fullPath, 'utf8');
     const lines = raw.split('\n').filter(l => !l.startsWith('| '));
     const title = lines[0]?.replace(/^#\s*/, '').trim() || slug;
