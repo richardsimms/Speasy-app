@@ -63,15 +63,11 @@ export function AudioPlayerLayout({ children }: AudioPlayerLayoutProps) {
   const pathname = usePathname();
   const showPlayer = isDiscoverPage(pathname);
 
-  if (!showPlayer) {
-    return <>{children}</>;
-  }
-
   return (
     <PlaybackProvider>
       {children}
-      <MiniPlayer />
-      <FullPlayer />
+      {showPlayer && <MiniPlayer />}
+      {showPlayer && <FullPlayer />}
     </PlaybackProvider>
   );
 }
