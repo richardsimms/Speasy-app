@@ -2,6 +2,18 @@ import path from 'node:path';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
+vi.mock('./Logger', () => ({
+  logger: {
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+  },
+}));
+vi.mock('./Supabase', () => ({
+  getSupabaseAdmin: vi.fn(() => {
+    throw new Error('Supabase admin client not configured for tests');
+  }),
+}));
 
 let resolveSafeBlogPath: (slug: string) => string | null;
 
