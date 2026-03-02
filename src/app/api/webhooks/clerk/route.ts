@@ -1,105 +1,98 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { Webhook } from 'svix';
 import { Env } from '@/libs/Env';
 import { logger } from '@/libs/Logger';
 import { userOperations } from '@/libs/Supabase';
 
-// Disable body parsing, we need the raw body for webhook verification
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 type WebhookEvent = {
   data: {
     id: string;
-    email_addresses: Array<{
-      id: string;
-      email_address: string;
-    }>;
-    primary_email_address_id: string | null;
-    first_name: string | null;
-    last_name: string | null;
-    image_url: string | null;
-    created_at: number;
-    updated_at: number;
+    email_addresses?: Array<{ id: string; email_address: string }>;
+    primary_email_address_id?: string | null;
+    email?: string;
   };
-  object: string;
-  type: string;
+  type: 'user.created' | 'user.updated' | 'user.deleted';
 };
 
 type UserCreatedEvent = WebhookEvent & { type: 'user.created' };
 type UserUpdatedEvent = WebhookEvent & { type: 'user.updated' };
 type UserDeletedEvent = WebhookEvent & { type: 'user.deleted' };
 
-export async function POST(request: Request) {
-  // Get the Svix headers for verification
-  const headerPayload = await headers();
-  const svix_id = headerPayload.get('svix-id');
-  const svix_timestamp = headerPayload.get('svix-timestamp');
-  const svix_signature = headerPayload.get('svix-signature');
-
-  // If there are no headers, error out
-  if (!svix_id || !svix_timestamp || !svix_signature) {
-    logger.error('Missing svix headers in Clerk webhook request');
-    return NextResponse.json(
-      { error: 'Missing svix headers' },
-      { status: 400 },
-    );
+function getPrimaryEmail(data: WebhookEvent['data']): string | null {
+  if (data.email) {
+    return data.email;
   }
+  const emails = data.email_addresses ?? [];
+  const primary = data.primary_email_address_id
+    ? emails.find(e => e.id === data.primary_email_address_id)
+    : null;
+  const first = emails[0];
+  return (primary ?? first)?.email_address ?? null;
+}
 
-  // Get the raw body as text (required for svix verification)
-  const body = await request.text();
-
-  // Get the webhook signing secret from environment
-  const webhookSecret = Env.CLERK_WEBHOOK_SIGNING_SECRET;
-
+export async function POST(request: Request) {
+  const webhookSecret = Env.USER_SYNC_WEBHOOK_SECRET;
   if (!webhookSecret) {
-    logger.error('CLERK_WEBHOOK_SIGNING_SECRET is not configured');
+    logger.error('USER_SYNC_WEBHOOK_SECRET is not configured');
     return NextResponse.json(
       { error: 'Webhook secret not configured' },
       { status: 500 },
     );
   }
 
-  // Create a new Svix instance with the webhook secret
-  const wh = new Webhook(webhookSecret);
+  const headerPayload = await headers();
+  const authHeader = headerPayload.get('authorization');
+  const bearer = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null;
+  const secretHeader = headerPayload.get('x-webhook-secret');
 
-  let evt: WebhookEvent;
-
-  // Verify the webhook
-  try {
-    evt = wh.verify(body, {
-      'svix-id': svix_id,
-      'svix-timestamp': svix_timestamp,
-      'svix-signature': svix_signature,
-    }) as WebhookEvent;
-  } catch (err) {
-    logger.error('Error verifying webhook', {
-      error: err instanceof Error ? err.message : String(err),
-    });
+  const providedSecret = bearer ?? secretHeader;
+  if (!providedSecret || providedSecret !== webhookSecret) {
+    logger.error('Invalid or missing webhook secret');
     return NextResponse.json(
-      { error: 'Error verifying webhook' },
+      { error: 'Unauthorized' },
+      { status: 401 },
+    );
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    logger.error('Invalid JSON body in user sync webhook');
+    return NextResponse.json(
+      { error: 'Invalid JSON' },
       { status: 400 },
     );
   }
 
-  // Type narrowing for better type inference
-  if (evt.type === 'user.created') {
-    const event = evt as UserCreatedEvent;
-    return handleUserCreated(event);
-  } else if (evt.type === 'user.updated') {
-    const event = evt as UserUpdatedEvent;
-    return handleUserUpdated(event);
-  } else if (evt.type === 'user.deleted') {
-    const event = evt as UserDeletedEvent;
-    return handleUserDeleted(event);
-  } else {
+  const evt = body as WebhookEvent;
+  if (!evt?.type || !evt?.data?.id) {
+    logger.error('Missing type or data.id in webhook payload', { body: evt });
+    return NextResponse.json(
+      { error: 'Invalid payload: type and data.id required' },
+      { status: 400 },
+    );
+  }
+
+  const allowed: WebhookEvent['type'][] = ['user.created', 'user.updated', 'user.deleted'];
+  if (!allowed.includes(evt.type)) {
     logger.warn('Unhandled webhook event type', { eventType: evt.type });
     return NextResponse.json(
       { error: 'Unhandled event type' },
       { status: 400 },
     );
   }
+
+  if (evt.type === 'user.created') {
+    return handleUserCreated(evt as UserCreatedEvent);
+  }
+  if (evt.type === 'user.updated') {
+    return handleUserUpdated(evt as UserUpdatedEvent);
+  }
+  return handleUserDeleted(evt as UserDeletedEvent);
 }
 
 async function handleUserCreated(evt: UserCreatedEvent) {
@@ -107,9 +100,7 @@ async function handleUserCreated(evt: UserCreatedEvent) {
   const primaryEmail = getPrimaryEmail(userData);
 
   if (!primaryEmail) {
-    logger.error('No email address found in Clerk webhook event', {
-      userId: userData.id,
-    });
+    logger.error('No email in user sync webhook event', { userId: userData.id });
     return NextResponse.json(
       { error: 'No email address found' },
       { status: 400 },
@@ -117,16 +108,15 @@ async function handleUserCreated(evt: UserCreatedEvent) {
   }
 
   try {
-    logger.info('Syncing new Clerk user to Supabase', {
-      clerkUserId: userData.id,
+    logger.info('Syncing new user to Supabase', {
+      userId: userData.id,
       email: primaryEmail,
     });
 
-    // Create user in Supabase
     const supabaseUser = await userOperations.upsertUser(primaryEmail);
 
-    logger.info('Successfully synced Clerk user to Supabase', {
-      clerkUserId: userData.id,
+    logger.info('Successfully synced user to Supabase', {
+      userId: userData.id,
       supabaseUserId: supabaseUser.id,
       email: primaryEmail,
     });
@@ -138,7 +128,7 @@ async function handleUserCreated(evt: UserCreatedEvent) {
   } catch (error) {
     logger.error('Error processing user.created webhook', {
       error: error instanceof Error ? error.message : String(error),
-      clerkUserId: userData.id,
+      userId: userData.id,
       email: primaryEmail,
     });
 
@@ -157,9 +147,7 @@ async function handleUserUpdated(evt: UserUpdatedEvent) {
   const primaryEmail = getPrimaryEmail(userData);
 
   if (!primaryEmail) {
-    logger.error('No email address found in Clerk webhook event', {
-      userId: userData.id,
-    });
+    logger.error('No email in user sync webhook event', { userId: userData.id });
     return NextResponse.json(
       { error: 'No email address found' },
       { status: 400 },
@@ -167,16 +155,15 @@ async function handleUserUpdated(evt: UserUpdatedEvent) {
   }
 
   try {
-    logger.info('Updating Clerk user in Supabase', {
-      clerkUserId: userData.id,
+    logger.info('Updating user in Supabase', {
+      userId: userData.id,
       email: primaryEmail,
     });
 
-    // Update user in Supabase (upsert in case it doesn't exist)
     const supabaseUser = await userOperations.upsertUser(primaryEmail);
 
-    logger.info('Successfully updated Clerk user in Supabase', {
-      clerkUserId: userData.id,
+    logger.info('Successfully updated user in Supabase', {
+      userId: userData.id,
       supabaseUserId: supabaseUser.id,
       email: primaryEmail,
     });
@@ -188,7 +175,7 @@ async function handleUserUpdated(evt: UserUpdatedEvent) {
   } catch (error) {
     logger.error('Error processing user.updated webhook', {
       error: error instanceof Error ? error.message : String(error),
-      clerkUserId: userData.id,
+      userId: userData.id,
       email: primaryEmail,
     });
 
@@ -206,23 +193,12 @@ async function handleUserDeleted(evt: UserDeletedEvent) {
   const userData = evt.data;
   const primaryEmail = getPrimaryEmail(userData);
 
-  // Note: We're not deleting users from Supabase on Clerk deletion
-  // as they may have associated data. You can implement soft delete if needed.
-  logger.info('Clerk user deleted (not removing from Supabase)', {
-    clerkUserId: userData.id,
-    email: primaryEmail || 'unknown',
+  logger.info('User deleted (not removing from Supabase)', {
+    userId: userData.id,
+    email: primaryEmail ?? 'unknown',
   });
 
   return NextResponse.json({
     message: 'User deletion noted',
   });
-}
-
-function getPrimaryEmail(userData: WebhookEvent['data']): string | null {
-  // Find the email object with matching ID, or use the first email
-  const primaryEmailObj = userData.email_addresses.find(
-    email => email.id === userData.primary_email_address_id,
-  ) || userData.email_addresses[0];
-
-  return primaryEmailObj?.email_address || null;
 }

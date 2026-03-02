@@ -2,7 +2,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { FileText, Heart, Home, Menu, MessageSquare, Newspaper, Radio, X } from 'lucide-react';
+import { Home, Menu, MessageSquare, Newspaper, Radio, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useId, useState } from 'react';
@@ -147,14 +147,6 @@ function getNavItemActive(pathname: string, navItemId: string) {
     return (
       normalizedPathname === '/blog' || normalizedPathname.startsWith('/blog/')
     );
-  }
-
-  if (navItemId === 'about') {
-    return normalizedPathname === '/about';
-  }
-
-  if (navItemId === 'manifesto') {
-    return normalizedPathname === '/manifesto';
   }
 
   return false;
@@ -379,20 +371,6 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
       icon: Newspaper,
       href: '/blog',
       active: getNavItemActive(resolvedPathname, 'digest'),
-    },
-    {
-      id: 'about',
-      label: 'About',
-      icon: FileText,
-      href: '/about',
-      active: getNavItemActive(resolvedPathname, 'about'),
-    },
-    {
-      id: 'manifesto',
-      label: 'Manifesto',
-      icon: Heart,
-      href: '/manifesto',
-      active: getNavItemActive(resolvedPathname, 'manifesto'),
     },
   ];
 
