@@ -95,7 +95,7 @@ export default async function ContentDetail(props: ContentDetailProps) {
     )
     .eq('id', id)
     .eq('status', 'done')
-    .single();
+    .maybeSingle();
 
   if (error || !item) {
     notFound();
