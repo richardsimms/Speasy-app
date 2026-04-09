@@ -16,6 +16,9 @@ const openai = new OpenAI({
 // ─── Batch Configuration ──────────────────────────────────────────────
 const BATCH_SIZE = 5;
 
+// OpenAI TTS currently returns 128kbps mono MP3 output.
+const TTS_BITRATE_BPS = 128000;
+
 type SummaryPromptVariant = {
   name: string;
   openingRule: string;
@@ -276,11 +279,17 @@ async function retryWithBackoff<T>(
 }
 
 // ─── Job Status Helpers ───────────────────────────────────────────────
-async function markJobDone(jobId: string) {
-  const { error } = await sb.from('llm_jobs').update({
+async function markJobDone(jobId: string, processingTimeMs?: number) {
+  const updateData: Record<string, string | number> = {
     status: 'done',
     completed_at: new Date().toISOString(),
-  }).eq('id', jobId);
+  };
+
+  if (processingTimeMs !== undefined) {
+    updateData.processing_time_ms = processingTimeMs;
+  }
+
+  const { error } = await sb.from('llm_jobs').update(updateData).eq('id', jobId);
   if (error) {
     log.error(`Failed to mark job ${jobId} as done:`, error);
   }
@@ -759,6 +768,8 @@ Return only the query.`,
     return { success: false };
   }
 
+  const audioDurationSeconds = Math.round((audioBuf.byteLength * 8) / TTS_BITRATE_BPS);
+
   // Save summary, insights, image, and audio
   await sb
     .from('content_items')
@@ -775,9 +786,11 @@ Return only the query.`,
     file_url: urlData.publicUrl,
     format: 'mp3',
     type: 'summary',
+    duration: audioDurationSeconds,
   });
 
-  await markJobDone(job.id);
+  const processingTimeMs = Date.now() - jobStartTime;
+  await markJobDone(job.id, processingTimeMs);
 
   const totalDuration = Date.now() - jobStartTime;
   log.success(`Job completed successfully in ${totalDuration}ms`, {
@@ -785,6 +798,8 @@ Return only the query.`,
     contentId: job.content_id,
     title: item.title,
     totalDuration,
+    processingTimeMs,
+    audioDurationSeconds,
     hasImage: !!imageUrl,
     wordCount: summary.split(/\s+/).length,
   });
