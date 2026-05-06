@@ -10,6 +10,16 @@ import { MOTION } from '@/libs/motion-config';
 import { cn } from '@/libs/utils';
 import { usePlayback } from './playback-provider';
 
+const decodeHtmlEntities = (value: string): string => {
+  if (typeof window === 'undefined') {
+    return value;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = value;
+  return textarea.value;
+};
+
 /**
  * Mini player bar that appears at the bottom when a track is active
  * Clicking anywhere opens the full player
@@ -126,6 +136,7 @@ export function MiniPlayer() {
     return null;
   }
 
+  const decodedTrackTitle = decodeHtmlEntities(activeTrack.title);
   const progress = durationSec ? (currentTimeSec / durationSec) * 100 : 0;
 
   // Desktop left offset based on sidebar state: 78px closed, 190px open
@@ -179,7 +190,7 @@ export function MiniPlayer() {
               ? (
                   <Image
                     src={activeTrack.imageUrl}
-                    alt={activeTrack.title}
+                    alt={decodedTrackTitle}
                     fill
                     className="object-cover"
                     sizes="48px"
@@ -187,7 +198,7 @@ export function MiniPlayer() {
                 )
               : (
                   <div className="flex h-full w-full items-center justify-center text-xl font-bold text-white/30">
-                    {activeTrack.title.charAt(0).toUpperCase()}
+                    {decodedTrackTitle.charAt(0).toUpperCase()}
                   </div>
                 )}
           </div>
@@ -195,7 +206,7 @@ export function MiniPlayer() {
           {/* Track info */}
           <div className="min-w-0 flex-1">
             <h3 className="truncate text-sm font-medium text-white">
-              {activeTrack.title}
+              {decodedTrackTitle}
             </h3>
             <div className="flex items-center gap-2 text-xs text-white/60">
               <span className="truncate">{activeTrack.category}</span>

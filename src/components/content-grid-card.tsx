@@ -2,10 +2,10 @@
 
 import type { Track, VisibleQueueContext } from '@/types/audio';
 import { motion } from 'framer-motion';
-import { Clock, Pause, Play, Share2 } from 'lucide-react';
+import { Clock, Pause, Play } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { usePlaybackOptional } from '@/components/audio/playback-provider';
 import { useContentAnalytics } from '@/hooks/useContentAnalytics';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -22,6 +22,8 @@ type ContentGridCardProps = {
   category: string;
   duration?: number | null;
   createdAt?: string;
+  sourceName?: string | null;
+  sourceLink?: string | null;
   index?: number;
   locale: string;
   surface?: 'home' | 'dashboard';
@@ -35,6 +37,16 @@ type ContentGridCardProps = {
   allTracks?: Track[];
 };
 
+const decodeHtmlEntities = (value: string): string => {
+  if (typeof window === 'undefined') {
+    return value;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = value;
+  return textarea.value;
+};
+
 export function ContentGridCard({
   id,
   title,
@@ -44,6 +56,8 @@ export function ContentGridCard({
   category,
   duration,
   createdAt,
+  sourceName,
+  sourceLink,
   index = 0,
   locale,
   surface = 'home',
@@ -56,7 +70,7 @@ export function ContentGridCard({
   const { trackContentViewed, trackContentPlayStarted } = useContentAnalytics();
   const playback = usePlaybackOptional();
   const reducedMotion = useReducedMotion();
-  const [shareMessage, setShareMessage] = useState('');
+  const decodedSourceName = sourceName ? decodeHtmlEntities(sourceName) : null;
 
   // Check if this track is currently playing
   const isCurrentTrack = playback?.activeTrack?.id === id;
@@ -151,40 +165,6 @@ export function ContentGridCard({
     });
   };
 
-  const handleShareClick = useCallback(
-    async (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.preventDefault();
-      e.stopPropagation();
-
-      const shareUrl = typeof window !== 'undefined'
-        ? `${window.location.origin}/${locale}/content/${id}`
-        : `/${locale}/content/${id}`;
-
-      try {
-        if (typeof navigator !== 'undefined' && navigator.share) {
-          await navigator.share({
-            title,
-            text: summary ?? title,
-            url: shareUrl,
-          });
-          setShareMessage('Shared successfully.');
-          return;
-        }
-
-        if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-          await navigator.clipboard.writeText(shareUrl);
-          setShareMessage('Link copied to clipboard.');
-          return;
-        }
-
-        setShareMessage('Sharing is not supported on this device.');
-      } catch {
-        setShareMessage('Could not share right now.');
-      }
-    },
-    [id, locale, summary, title],
-  );
-
   const handleClick = () => {
     trackContentViewed({
       user_id: userId,
@@ -214,12 +194,12 @@ export function ContentGridCard({
               ease: MOTION.easing.default,
             }
       }
-      className="group relative w-full overflow-hidden rounded-none sm:rounded-2xl"
+      className="group relative flex h-full w-full flex-col overflow-hidden rounded-none sm:rounded-2xl"
     >
       <Link
         href={`/${locale}/content/${id}`}
         onClick={handleClick}
-        className="relative block overflow-hidden rounded-none bg-[#0A0A0A] transition-[box-shadow] duration-300 hover:shadow-lg hover:shadow-white/5 sm:rounded-2xl"
+        className="relative flex h-full flex-1 flex-col overflow-hidden rounded-none bg-[#0A0A0A] transition-[box-shadow] duration-300 hover:shadow-lg hover:shadow-white/5 sm:rounded-2xl"
       >
         {/* Image Section */}
         {imageUrl && imageUrl.trim() !== ''
@@ -315,7 +295,7 @@ export function ContentGridCard({
               </div>
             )}
         {/* Content Section */}
-        <div className="p-6">
+        <div className="flex min-h-[220px] flex-1 flex-col p-6">
           {/* Date */}
           <div className="mb-3 flex items-center justify-end gap-2">
             {createdAt && (
@@ -331,7 +311,7 @@ export function ContentGridCard({
           </h3>
           {/* Summary */}
           {summary && (
-            <p className="line-clamp-3 text-sm leading-relaxed text-white/60">
+            <p className="line-clamp-4 text-sm leading-relaxed text-white/60">
               {summary}
             </p>
           )}
@@ -372,17 +352,24 @@ export function ContentGridCard({
             {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
             <span>{isPlaying ? 'Pause' : 'Play'}</span>
           </button>
-          <button
-            type="button"
-            onClick={handleShareClick}
-            className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/85 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] focus-visible:outline-none"
-            aria-label="Share content"
-          >
-            <Share2 className="h-4 w-4" />
-            <span>Share</span>
-          </button>
+          {sourceLink && decodedSourceName
+            ? (
+                <a
+                  href={sourceLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-11 min-w-0 items-center rounded-lg px-3 py-2 text-sm font-medium text-white/85 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] focus-visible:outline-none"
+                  aria-label={`${decodedSourceName} (opens in new tab)`}
+                >
+                  <span className="block max-w-full truncate">{decodedSourceName}</span>
+                </a>
+              )
+            : (
+                <span className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/50">
+                  <span>Source</span>
+                </span>
+              )}
         </div>
-        <p aria-live="polite" className="sr-only">{shareMessage}</p>
       </div>
     </motion.div>
   );
