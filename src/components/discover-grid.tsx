@@ -169,12 +169,12 @@ export function DiscoverGrid({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 overflow-x-hidden">
       {/* Tab Navigation */}
       <div
         role="tablist"
         aria-label="Content categories"
-        className="-mx-4 flex items-center overflow-x-auto px-4 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mx-2 flex items-center overflow-x-auto px-2 pb-2 sm:-mx-4 sm:px-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         <div className="relative flex items-center gap-8">
           {/* Animated hover/active background */}
@@ -268,7 +268,7 @@ export function DiscoverGrid({
           id={`tabpanel-${selectedTab}`}
           role="tabpanel"
           aria-labelledby={`tab-${selectedTab}`}
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4"
+          className="grid min-w-0 gap-6 sm:grid-cols-2 lg:grid-cols-4"
         >
           {displayedItems.map((item, index) => {
             // Perplexity-style pattern: 2 featured cards side-by-side (span 2 cols each), then 4 regular cards (1 col each)
@@ -280,6 +280,7 @@ export function DiscoverGrid({
               <div
                 key={item.id}
                 className={cn(
+                  'min-w-0',
                   isFeatured
                     ? 'sm:col-span-2 lg:col-span-2'
                     : 'sm:col-span-1 lg:col-span-1',

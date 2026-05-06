@@ -182,7 +182,7 @@ export default async function Dashboard(props: {
     .sort((a, b) => a.categoryName.localeCompare(b.categoryName));
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 lg:px-8">
+    <div className="mx-auto max-w-7xl px-2 py-8 sm:px-4 md:px-6 lg:px-8">
       <DiscoverGrid
         categories={categories}
         locale={locale}

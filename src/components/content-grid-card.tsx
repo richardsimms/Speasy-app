@@ -194,12 +194,12 @@ export function ContentGridCard({
               ease: MOTION.easing.default,
             }
       }
-      className="group relative flex h-full w-full flex-col overflow-hidden rounded-none border border-white/5 transition-colors duration-300 sm:rounded-t-2xl sm:rounded-b-none group-hover:border-white/15"
+      className="group relative flex h-full w-full min-w-0 flex-col overflow-hidden rounded-none border border-white/5 transition-colors duration-300 sm:rounded-t-2xl sm:rounded-b-none group-hover:border-white/15"
     >
       <Link
         href={`/${locale}/content/${id}`}
         onClick={handleClick}
-        className="relative flex h-full flex-1 flex-col overflow-hidden rounded-none bg-[#0A0A0A] transition-colors duration-300 group-hover:bg-[#101010] sm:rounded-t-2xl sm:rounded-b-none"
+        className="relative flex h-full min-w-0 flex-1 flex-col overflow-hidden rounded-none bg-[#0A0A0A] transition-colors duration-300 group-hover:bg-[#101010] sm:rounded-t-2xl sm:rounded-b-none"
       >
         {/* Image Section */}
         {imageUrl && imageUrl.trim() !== ''
@@ -295,7 +295,7 @@ export function ContentGridCard({
               </div>
             )}
         {/* Content Section */}
-        <div className="flex min-h-[220px] flex-1 flex-col p-6">
+        <div className="flex min-h-[220px] min-w-0 flex-1 flex-col p-4 sm:p-6">
           {/* Date */}
           <div className="mb-3 flex items-center justify-end gap-2">
             {createdAt && (
@@ -341,7 +341,7 @@ export function ContentGridCard({
         {/* Hover indicator */}
         <div className="absolute top-0 right-0 left-0 h-[2px] origin-left scale-x-0 rounded-t-2xl bg-linear-to-r from-blue-500 to-purple-500 transition-transform duration-300 group-hover:scale-x-100" />
       </Link>
-      <div className="border-t border-white/10 bg-[#0A0A0A] px-4 py-3 transition-colors duration-300 group-hover:bg-[#111111] sm:px-6">
+      <div className="border-t border-white/10 bg-[#0A0A0A] px-3 py-3 transition-colors duration-300 group-hover:bg-[#111111] sm:px-6">
         <div className="flex items-center justify-between gap-3">
           <button
             type="button"

@@ -379,8 +379,7 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
   // Simplified logo without decorative lines (for mobile header)
   const simplifiedLogo = (
     <svg
-      width="140"
-      height="40"
+      className="h-auto w-full"
       viewBox="150 0 400 120"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
@@ -426,7 +425,7 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
 
   return (
     <>
-      <div className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-white/10 bg-[#100e12] px-4 md:hidden">
+      <div className="sticky top-0 z-40 flex h-16 w-full items-center justify-between overflow-hidden border-b border-white/10 bg-[#100e12] px-4 md:hidden">
         <button
           type="button"
           aria-label="Open menu"
@@ -435,8 +434,8 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <div className="absolute left-1/2 z-10 -translate-x-1/2">
-          <Link href="/" aria-label="Home">
+        <div className="absolute left-1/2 z-10 w-[110px] -translate-x-1/2 sm:w-[140px]">
+          <Link href="/" aria-label="Home" className="block w-full">
             {simplifiedLogo}
           </Link>
         </div>
@@ -445,7 +444,7 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
 
       <div
         className={cn(
-          'fixed inset-0 z-50 md:hidden',
+          'fixed inset-0 z-50 overflow-x-hidden md:hidden',
           isMobileOpen ? 'pointer-events-auto' : 'pointer-events-none',
         )}
         aria-hidden={!isMobileOpen}
