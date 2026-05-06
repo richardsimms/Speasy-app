@@ -4,7 +4,7 @@ import { AnimatePresence, motion, useDragControls } from 'framer-motion';
 import { ChevronDown, Pause, Play, SkipBack, SkipForward } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { MOTION } from '@/libs/motion-config';
@@ -50,6 +50,19 @@ export function FullPlayer() {
   // Use lazy initializer to check if we're on the client without useEffect
   const [mounted] = useState(() => typeof window !== 'undefined');
   const isOpen = uiMode === 'player';
+
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
 
   // Format time from seconds to MM:SS
   const formatTime = useCallback((seconds: number): string => {
@@ -181,7 +194,7 @@ export function FullPlayer() {
             dragConstraints={{ top: 0, bottom: 0 }}
             dragElastic={{ top: 0, bottom: 0.5 }}
             onDragEnd={handleDragEnd}
-            className="fixed inset-x-0 bottom-0 h-[90vh] overflow-hidden rounded-t-3xl border-t border-white/10 bg-[#0A0A0A] shadow-2xl"
+            className="fixed inset-x-0 bottom-0 h-[80vh] overflow-hidden rounded-t-3xl border-t border-white/10 bg-[#0A0A0A] shadow-2xl"
             style={{ zIndex: 9999 }}
             role="dialog"
             aria-modal="true"
@@ -189,7 +202,7 @@ export function FullPlayer() {
           >
             {/* Drag handle */}
             <div
-              className="flex h-6 cursor-grab items-center justify-center active:cursor-grabbing"
+              className="flex h-6 w-full cursor-grab items-center justify-center active:cursor-grabbing"
               onPointerDown={e => dragControls.start(e)}
               role="button"
               tabIndex={0}
