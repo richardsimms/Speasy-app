@@ -2,10 +2,10 @@
 
 import type { Track, VisibleQueueContext } from '@/types/audio';
 import { motion } from 'framer-motion';
-import { Clock, Pause, Play } from 'lucide-react';
+import { Clock, Pause, Play, Share2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { usePlaybackOptional } from '@/components/audio/playback-provider';
 import { useContentAnalytics } from '@/hooks/useContentAnalytics';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
@@ -56,6 +56,7 @@ export function ContentGridCard({
   const { trackContentViewed, trackContentPlayStarted } = useContentAnalytics();
   const playback = usePlaybackOptional();
   const reducedMotion = useReducedMotion();
+  const [shareMessage, setShareMessage] = useState('');
 
   // Check if this track is currently playing
   const isCurrentTrack = playback?.activeTrack?.id === id;
@@ -150,6 +151,40 @@ export function ContentGridCard({
     });
   };
 
+  const handleShareClick = useCallback(
+    async (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const shareUrl = typeof window !== 'undefined'
+        ? `${window.location.origin}/${locale}/content/${id}`
+        : `/${locale}/content/${id}`;
+
+      try {
+        if (typeof navigator !== 'undefined' && navigator.share) {
+          await navigator.share({
+            title,
+            text: summary ?? title,
+            url: shareUrl,
+          });
+          setShareMessage('Shared successfully.');
+          return;
+        }
+
+        if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(shareUrl);
+          setShareMessage('Link copied to clipboard.');
+          return;
+        }
+
+        setShareMessage('Sharing is not supported on this device.');
+      } catch {
+        setShareMessage('Could not share right now.');
+      }
+    },
+    [id, locale, summary, title],
+  );
+
   const handleClick = () => {
     trackContentViewed({
       user_id: userId,
@@ -179,12 +214,12 @@ export function ContentGridCard({
               ease: MOTION.easing.default,
             }
       }
-      className="group relative overflow-hidden rounded-2xl"
+      className="group relative w-full overflow-hidden rounded-none sm:rounded-2xl"
     >
       <Link
         href={`/${locale}/content/${id}`}
         onClick={handleClick}
-        className="relative block overflow-hidden rounded-2xl border border-white/20 bg-[#0A0A0A] transition-[border-color,box-shadow] duration-300 hover:border-white/40 hover:shadow-lg hover:shadow-white/5"
+        className="relative block overflow-hidden rounded-none bg-[#0A0A0A] transition-[box-shadow] duration-300 hover:shadow-lg hover:shadow-white/5 sm:rounded-2xl"
       >
         {/* Image Section */}
         {imageUrl && imageUrl.trim() !== ''
@@ -281,16 +316,8 @@ export function ContentGridCard({
             )}
         {/* Content Section */}
         <div className="p-6">
-          {/* Category Tag and Date */}
-          <div className="mb-3 flex items-center justify-between gap-2">
-            {/* Category Badge - Left */}
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-              <span className="text-xs font-medium tracking-wider text-white/70 uppercase">
-                {category}
-              </span>
-            </div>
-            {/* Date - Right */}
+          {/* Date */}
+          <div className="mb-3 flex items-center justify-end gap-2">
             {createdAt && (
               <span className="text-xs text-white/50">
                 {formatDate(createdAt)}
@@ -334,6 +361,29 @@ export function ContentGridCard({
         {/* Hover indicator */}
         <div className="absolute top-0 right-0 left-0 h-[2px] origin-left scale-x-0 rounded-t-2xl bg-linear-to-r from-blue-500 to-purple-500 transition-transform duration-300 group-hover:scale-x-100" />
       </Link>
+      <div className="border-t border-white/10 bg-[#0A0A0A] px-4 py-3 sm:px-6">
+        <div className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={handlePlayClick}
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/85 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] focus-visible:outline-none"
+            aria-label={isPlaying ? 'Pause content' : 'Play content'}
+          >
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            <span>{isPlaying ? 'Pause' : 'Play'}</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleShareClick}
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/85 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] focus-visible:outline-none"
+            aria-label="Share content"
+          >
+            <Share2 className="h-4 w-4" />
+            <span>Share</span>
+          </button>
+        </div>
+        <p aria-live="polite" className="sr-only">{shareMessage}</p>
+      </div>
     </motion.div>
   );
 }
