@@ -36,6 +36,11 @@ export default async function HomePage(props: {
 
     return (
       <div className="mx-auto max-w-7xl px-4 py-8 md:px-6 lg:px-8">
+        <div className="mb-2">
+          <h1 className="mb-3 font-serif text-5xl leading-tight text-white">
+            Discover
+          </h1>
+        </div>
         <div className="py-20 text-center">
           <p className="text-muted-foreground">{message}</p>
         </div>

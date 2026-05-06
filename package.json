@@ -70,7 +70,6 @@
     "react-markdown": "catalog:",
     "server-only": "catalog:",
     "showdown": "catalog:",
-    "svix": "catalog:",
     "tailwind-merge": "catalog:",
     "zod": "catalog:"
   },
@@ -100,7 +99,6 @@
     "@vitest/coverage-v8": "catalog:",
     "babel-plugin-react-compiler": "catalog:",
     "chalk": "catalog:",
-    "chrome-launcher": "catalog:",
     "conventional-changelog-conventionalcommits": "catalog:",
     "cross-env": "catalog:",
     "drizzle-kit": "catalog:",
@@ -115,7 +113,6 @@
     "jiti": "catalog:",
     "knip": "catalog:",
     "lefthook": "catalog:",
-    "lighthouse": "catalog:",
     "npm-run-all": "catalog:",
     "postcss": "catalog:",
     "postcss-load-config": "catalog:",

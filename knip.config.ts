@@ -12,6 +12,11 @@ const config: KnipConfig = {
     'src/components/ui/badge.tsx', // UI component library - components exported for use
     'src/components/theme-provider.tsx', // Theme provider - used via layout but knip doesn't detect
     'src/components/content-audio-card.tsx', // Used by dashboard-content.tsx
+    'src/components/skeleton-loader.tsx', // Motion review skeleton examples kept for reuse
+    'src/components/chatgpt-widgets/**/*', // Built by scripts/build-chatgpt-widget.js
+    'public/chatgpt-widget.css', // Public ChatGPT widget asset
+    'public/chatgpt-widget.js', // Public ChatGPT widget asset
+    'public/widgets/content-list.js', // Generated ChatGPT widget bundle
     'src/utils/DBConnection.ts', // Used by src/libs/DB.ts
     'src/app/[locale]/(marketing)/globals.css', // CSS file - imported via global styles
     // Motion design utility components (created for developer use, not yet consumed)
@@ -35,6 +40,11 @@ const config: KnipConfig = {
     '@types/pg', // Type definitions for pg package (type-only imports not detected)
     '@faker-js/faker', // May be used for testing or data generation
   ],
+  ignoreIssues: {
+    'src/cli/lib/format.ts': ['exports'],
+    'src/hooks/useReducedMotion.ts': ['exports'],
+    'src/libs/blog.ts': ['exports'],
+  },
   // Binaries to ignore during analysis
   ignoreBinaries: [],
   compilers: {

@@ -77,8 +77,8 @@ jobs:
         run: printf '%s\n' "$PR_TITLE" | npx commitlint --verbose
 
       - if: github.event_name == 'push'
-        name: Validate pushed commits follow Conventional Commits
-        run: npx commitlint --from ${{ github.event.before }} --to ${{ github.sha }} --verbose
+        name: Validate pushed HEAD follows Conventional Commits
+        run: npx commitlint --last --verbose
 
       - name: Linter
         run: npm run lint
