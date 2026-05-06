@@ -11,6 +11,8 @@ type ContentItem = {
   category: string;
   duration: number | null;
   created_at: string;
+  sourceName: string | null;
+  sourceLink: string | null;
   audioUrl?: string | null;
 };
 
@@ -43,6 +45,8 @@ export async function fetchCategorisedContent(): Promise<FetchContentResult> {
       key_insights,
       image_url,
       created_at,
+      source_name,
+      source_url,
       status,
       content_item_tags(
         categories(
@@ -100,6 +104,8 @@ export async function fetchCategorisedContent(): Promise<FetchContentResult> {
       created_at: item.created_at,
       category: categoryName,
       duration: audioFile.duration,
+      sourceName: item.source_name ?? null,
+      sourceLink: item.source_url ?? null,
       audioUrl: audioFile.file_url,
     };
 

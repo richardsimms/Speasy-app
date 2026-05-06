@@ -38,6 +38,16 @@ type ContentDetailViewProps = {
   experimentVariant?: string;
 };
 
+const decodeHtmlEntities = (value: string): string => {
+  if (typeof window === 'undefined') {
+    return value;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = value;
+  return textarea.value;
+};
+
 export function ContentDetailView({
   content,
   locale,
@@ -54,6 +64,9 @@ export function ContentDetailView({
   const hasTrackedPlayStart = useRef(false);
   const { trackContentPlayStarted, trackContentPlayCompleted }
     = useContentAnalytics();
+  const decodedSourceName = content.sourceName
+    ? decodeHtmlEntities(content.sourceName)
+    : null;
 
   // Format time from seconds to MM:SS
   const formatTime = (seconds: number): string => {
@@ -242,7 +255,7 @@ export function ContentDetailView({
                 <span>{formatTime(content.duration)}</span>
               </div>
             )}
-            {content.sourceName && (
+            {decodedSourceName && (
               <div className="flex items-center gap-2">
                 <span>•</span>
                 {content.sourceLink
@@ -251,15 +264,15 @@ export function ContentDetailView({
                         href={content.sourceLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label={`${content.sourceName} (opens in new tab)`}
+                        aria-label={`${decodedSourceName} (opens in new tab)`}
                         className="flex items-center gap-1 hover:text-white"
                       >
-                        {content.sourceName}
+                        {decodedSourceName}
                         <ExternalLink className="h-3 w-3" aria-hidden="true" />
                       </a>
                     )
                   : (
-                      <span>{content.sourceName}</span>
+                      <span>{decodedSourceName}</span>
                     )}
               </div>
             )}

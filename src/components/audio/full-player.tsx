@@ -12,6 +12,16 @@ import { MOTION } from '@/libs/motion-config';
 import { cn } from '@/libs/utils';
 import { usePlayback } from './playback-provider';
 
+const decodeHtmlEntities = (value: string): string => {
+  if (typeof window === 'undefined') {
+    return value;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = value;
+  return textarea.value;
+};
+
 /**
  * Full player sheet (~90vh) with queue display and extended controls
  * Supports swipe-down gesture to close
@@ -100,6 +110,9 @@ export function FullPlayer() {
 
   // Get upcoming tracks (next 5 in queue)
   const upcomingTracks = queue.slice(activeIndex + 1, activeIndex + 6);
+  const decodedTrackTitle = activeTrack
+    ? decodeHtmlEntities(activeTrack.title)
+    : null;
 
   const progress = durationSec ? (currentTimeSec / durationSec) * 100 : 0;
 
@@ -172,7 +185,7 @@ export function FullPlayer() {
             style={{ zIndex: 9999 }}
             role="dialog"
             aria-modal="true"
-            aria-label={`Now Playing: ${activeTrack?.title ?? 'No track selected'}`}
+            aria-label={`Now Playing: ${decodedTrackTitle ?? 'No track selected'}`}
           >
             {/* Drag handle */}
             <div
@@ -239,7 +252,7 @@ export function FullPlayer() {
                           {/* Track title and category */}
                           <div className="w-full max-w-md text-center">
                             <h2 className="mb-2 line-clamp-2 text-xl font-bold text-white sm:text-2xl">
-                              {activeTrack.title}
+                              {decodedTrackTitle}
                             </h2>
                             <p className="text-sm text-white/60">
                               {activeTrack.category}

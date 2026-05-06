@@ -22,6 +22,8 @@ type ContentGridCardProps = {
   category: string;
   duration?: number | null;
   createdAt?: string;
+  sourceName?: string | null;
+  sourceLink?: string | null;
   index?: number;
   locale: string;
   surface?: 'home' | 'dashboard';
@@ -35,6 +37,16 @@ type ContentGridCardProps = {
   allTracks?: Track[];
 };
 
+const decodeHtmlEntities = (value: string): string => {
+  if (typeof window === 'undefined') {
+    return value;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = value;
+  return textarea.value;
+};
+
 export function ContentGridCard({
   id,
   title,
@@ -44,6 +56,8 @@ export function ContentGridCard({
   category,
   duration,
   createdAt,
+  sourceName,
+  sourceLink,
   index = 0,
   locale,
   surface = 'home',
@@ -56,6 +70,7 @@ export function ContentGridCard({
   const { trackContentViewed, trackContentPlayStarted } = useContentAnalytics();
   const playback = usePlaybackOptional();
   const reducedMotion = useReducedMotion();
+  const decodedSourceName = sourceName ? decodeHtmlEntities(sourceName) : null;
 
   // Check if this track is currently playing
   const isCurrentTrack = playback?.activeTrack?.id === id;
@@ -179,12 +194,12 @@ export function ContentGridCard({
               ease: MOTION.easing.default,
             }
       }
-      className="group relative overflow-hidden rounded-2xl"
+      className="group relative flex h-full w-full flex-col overflow-hidden rounded-none border border-white/5 transition-colors duration-300 sm:rounded-t-2xl sm:rounded-b-none group-hover:border-white/15"
     >
       <Link
         href={`/${locale}/content/${id}`}
         onClick={handleClick}
-        className="relative block overflow-hidden rounded-2xl border border-white/20 bg-[#0A0A0A] transition-[border-color,box-shadow] duration-300 hover:border-white/40 hover:shadow-lg hover:shadow-white/5"
+        className="relative flex h-full flex-1 flex-col overflow-hidden rounded-none bg-[#0A0A0A] transition-colors duration-300 group-hover:bg-[#101010] sm:rounded-t-2xl sm:rounded-b-none"
       >
         {/* Image Section */}
         {imageUrl && imageUrl.trim() !== ''
@@ -201,7 +216,7 @@ export function ContentGridCard({
                   loading={index < 4 ? 'eager' : 'lazy'}
                   quality={70}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent opacity-90 transition-opacity duration-300 group-hover:opacity-100" />
 
                 {/* Duration badge on image */}
                 {duration && (
@@ -280,17 +295,9 @@ export function ContentGridCard({
               </div>
             )}
         {/* Content Section */}
-        <div className="p-6">
-          {/* Category Tag and Date */}
-          <div className="mb-3 flex items-center justify-between gap-2">
-            {/* Category Badge - Left */}
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-              <span className="text-xs font-medium tracking-wider text-white/70 uppercase">
-                {category}
-              </span>
-            </div>
-            {/* Date - Right */}
+        <div className="flex min-h-[220px] flex-1 flex-col p-6">
+          {/* Date */}
+          <div className="mb-3 flex items-center justify-end gap-2">
             {createdAt && (
               <span className="text-xs text-white/50">
                 {formatDate(createdAt)}
@@ -304,7 +311,7 @@ export function ContentGridCard({
           </h3>
           {/* Summary */}
           {summary && (
-            <p className="line-clamp-3 text-sm leading-relaxed text-white/60">
+            <p className="line-clamp-4 text-sm leading-relaxed text-white/60">
               {summary}
             </p>
           )}
@@ -334,6 +341,36 @@ export function ContentGridCard({
         {/* Hover indicator */}
         <div className="absolute top-0 right-0 left-0 h-[2px] origin-left scale-x-0 rounded-t-2xl bg-linear-to-r from-blue-500 to-purple-500 transition-transform duration-300 group-hover:scale-x-100" />
       </Link>
+      <div className="border-t border-white/10 bg-[#0A0A0A] px-4 py-3 transition-colors duration-300 group-hover:bg-[#111111] sm:px-6">
+        <div className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={handlePlayClick}
+            className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/85 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] focus-visible:outline-none"
+            aria-label={isPlaying ? 'Pause content' : 'Play content'}
+          >
+            {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+            <span>{isPlaying ? 'Pause' : 'Play'}</span>
+          </button>
+          {sourceLink && decodedSourceName
+            ? (
+                <a
+                  href={sourceLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-11 min-w-0 items-center rounded-lg px-3 py-2 text-sm font-medium text-white/85 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A] focus-visible:outline-none"
+                  aria-label={`${decodedSourceName} (opens in new tab)`}
+                >
+                  <span className="block max-w-full truncate">{decodedSourceName}</span>
+                </a>
+              )
+            : (
+                <span className="inline-flex min-h-11 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/50">
+                  <span>Source</span>
+                </span>
+              )}
+        </div>
+      </div>
     </motion.div>
   );
 }

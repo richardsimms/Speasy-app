@@ -17,6 +17,8 @@ type ContentItem = {
   duration: number | null;
   keyInsight: string[] | null;
   created_at: string;
+  sourceName: string | null;
+  sourceLink: string | null;
   audioUrl?: string | null;
 };
 
@@ -394,6 +396,7 @@ export function ContentGridDiscover({
                 <div
                   key={item.id}
                   className={cn(
+                    'h-full',
                     isFeatured
                       ? 'sm:col-span-2 lg:col-span-2'
                       : 'sm:col-span-1 lg:col-span-1',
@@ -408,6 +411,8 @@ export function ContentGridDiscover({
                     category={item.category}
                     duration={item.duration}
                     createdAt={item.created_at}
+                    sourceName={item.sourceName}
+                    sourceLink={item.sourceLink}
                     index={index}
                     locale={locale}
                     surface={surface}
