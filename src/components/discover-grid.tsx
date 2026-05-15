@@ -174,7 +174,7 @@ export function DiscoverGrid({
       <div
         role="tablist"
         aria-label="Content categories"
-        className="-mx-2 flex items-center overflow-x-auto px-2 pb-2 sm:-mx-4 sm:px-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="-mx-2 flex items-center overflow-x-auto px-2 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] sm:-mx-4 sm:px-4 [&::-webkit-scrollbar]:hidden"
       >
         <div className="relative flex items-center gap-8">
           {/* Animated hover/active background */}

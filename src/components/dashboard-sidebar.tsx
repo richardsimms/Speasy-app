@@ -2,7 +2,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Home, Menu, MessageSquare, Newspaper, Radio, X } from 'lucide-react';
+import { Home, Menu, Newspaper, Radio, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useId, useState } from 'react';
@@ -137,10 +137,6 @@ function getNavItemActive(pathname: string, navItemId: string) {
 
   if (navItemId === 'home') {
     return normalizedPathname === '/' || normalizedPathname === '/dashboard';
-  }
-
-  if (navItemId === 'chat') {
-    return normalizedPathname === '/chat';
   }
 
   if (navItemId === 'digest') {
@@ -357,13 +353,6 @@ export function DashboardSidebar({ currentPath }: SidebarProps) {
       icon: Home,
       href: '/',
       active: getNavItemActive(resolvedPathname, 'home'),
-    },
-    {
-      id: 'chat',
-      label: 'AI Assistant',
-      icon: MessageSquare,
-      href: '/chat',
-      active: getNavItemActive(resolvedPathname, 'chat'),
     },
     {
       id: 'digest',

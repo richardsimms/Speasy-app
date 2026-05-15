@@ -15,7 +15,6 @@ export const Env = createEnv({
     UNSPLASH_ACCESS_KEY: z.string().min(1).optional(),
     VAPID_PRIVATE_KEY: z.string().optional(),
     VAPID_SUBJECT: z.string().email().optional(),
-    CHATKIT_SERVER_URL: z.string().url().optional(),
     USER_SYNC_WEBHOOK_SECRET: z.string().min(1).optional(),
   },
   client: {
@@ -48,7 +47,6 @@ export const Env = createEnv({
     UNSPLASH_ACCESS_KEY: process.env.UNSPLASH_ACCESS_KEY,
     VAPID_PRIVATE_KEY: process.env.VAPID_PRIVATE_KEY,
     VAPID_SUBJECT: process.env.VAPID_SUBJECT,
-    CHATKIT_SERVER_URL: process.env.CHATKIT_SERVER_URL,
     USER_SYNC_WEBHOOK_SECRET: process.env.USER_SYNC_WEBHOOK_SECRET,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY:

@@ -194,7 +194,7 @@ export function ContentGridCard({
               ease: MOTION.easing.default,
             }
       }
-      className="group relative flex h-full w-full min-w-0 flex-col overflow-hidden rounded-none border border-white/5 transition-colors duration-300 sm:rounded-t-2xl sm:rounded-b-none group-hover:border-white/15"
+      className="group relative flex h-full w-full min-w-0 flex-col overflow-hidden rounded-none border border-white/5 transition-colors duration-300 group-hover:border-white/15 sm:rounded-t-2xl sm:rounded-b-none"
     >
       <Link
         href={`/${locale}/content/${id}`}
