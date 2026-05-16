@@ -58,4 +58,4 @@ At Speasy, we've developed a comprehensive solution that makes this process seam
 
 Ready to transform your reading experience? [Try Speasy today](/) and turn your reading list into a personal podcast feed. Start with a free trial and see how much more you can learn while doing other things.
 
-*Related: Learn more about [managing email newsletters](/blog/email-overwhelm) and [Safari integration](/blog/safari) to complete your digital content management strategy.* | Transform your reading list into a personal podcast feed with our comprehensive guide to article-to-audio conversion. Learn how to make the most of your time and consume content more efficiently.
+*Related: Learn more about [managing email newsletters](/blog/email-overwhelm) and [getting started with Speasy](/blog/getting-started-with-speasy) to complete your digital content management strategy.* | Transform your reading list into a personal podcast feed with our comprehensive guide to article-to-audio conversion. Learn how to make the most of your time and consume content more efficiently.

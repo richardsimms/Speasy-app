@@ -54,6 +54,6 @@ At Speasy, we've developed a solution that makes this transformation seamless. O
 
 Ready to transform your newsletter experience? [Try Speasy today](/) and turn your email overwhelm into a productive listening experience. Your future self will thank you for making this change.
 
-*Related: Learn more about [our upcoming personal inbox integration](/blog/coming-soon-personal-inbox) and how it will make managing your newsletters even easier.*
+*Related: Learn more about [getting started with Speasy](/blog/getting-started-with-speasy) and how it can make managing your newsletters even easier.*
 
-*Want to learn more about managing your digital content? Check out our guide on [Safari and Newsletter Management](/blog/safari) for additional tips and strategies.* | Tired of drowning in newsletters? Learn how to transform your email overwhelm into a productive listening experience with our guide to converting newsletters into a personal podcast feed.
+*Want to learn more about managing your digital content? Check out our guide on [transforming articles to podcasts](/blog/transform-articles-to-podcasts) for additional tips and strategies.* | Tired of drowning in newsletters? Learn how to transform your email overwhelm into a productive listening experience with our guide to converting newsletters into a personal podcast feed.

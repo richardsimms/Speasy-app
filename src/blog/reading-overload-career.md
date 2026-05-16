@@ -61,4 +61,4 @@ Ready to transform how you consume professional content? [Try Speasy today](/) a
 
 *Related: Learn more about [transforming your reading list](/blog/transform-articles-to-podcasts) and [managing email newsletters](/blog/email-overwhelm) to complete your content management strategy.*
 
-*Want to optimize your content consumption even further? Check out our guide on [Safari and Newsletter Management](/blog/safari) for additional productivity tips.* | Discover why trying to read everything is actually hurting your career growth, and learn how to transform your content consumption into a strategic advantage with our comprehensive guide.
+*Want to optimize your content consumption even further? Check out our guide on [getting started with Speasy](/blog/getting-started-with-speasy) for additional productivity tips.* | Discover why trying to read everything is actually hurting your career growth, and learn how to transform your content consumption into a strategic advantage with our comprehensive guide.
