@@ -1,8 +1,36 @@
 import { routing } from '@/libs/I18nRouting';
 
+const PRODUCTION_SITE_URL = 'https://www.speasy.app';
+
+function isBoilerplateDemoUrl(url: string): boolean {
+  try {
+    return new URL(url).hostname.endsWith('nextjs-boilerplate.com');
+  } catch {
+    return false;
+  }
+}
+
+function normalizeSiteUrl(url: string): string {
+  return url.replace(/\/$/, '');
+}
+
+function getConfiguredSiteUrl(): string | undefined {
+  for (const candidate of [
+    process.env.NEXT_PUBLIC_APP_URL,
+    process.env.NEXT_PUBLIC_SITE_URL,
+  ]) {
+    if (!candidate || isBoilerplateDemoUrl(candidate)) {
+      continue;
+    }
+    return normalizeSiteUrl(candidate);
+  }
+  return undefined;
+}
+
 export const getBaseUrl = () => {
-  if (process.env.NEXT_PUBLIC_APP_URL) {
-    return process.env.NEXT_PUBLIC_APP_URL;
+  const configuredUrl = getConfiguredSiteUrl();
+  if (configuredUrl) {
+    return configuredUrl;
   }
 
   if (
@@ -14,6 +42,10 @@ export const getBaseUrl = () => {
 
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`;
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    return PRODUCTION_SITE_URL;
   }
 
   return 'http://localhost:3000';
