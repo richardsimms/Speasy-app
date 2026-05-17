@@ -43,7 +43,7 @@ export default async function BlogPage() {
       ))}
       <div className="mx-auto max-w-5xl px-4 py-12 md:px-6 lg:px-8">
         <div className="mb-10 space-y-4">
-          <h1 className="font-serif text-5xl leading-tight text-white">Speasy Blog</h1>
+          <h1 className="font-serif text-5xl leading-tight text-white">Weekly digests</h1>
           <p className="max-w-3xl text-white/80">
             Practical guides on how to listen to newsletters while commuting, convert articles into
             audio, and stay informed without adding more screen time.

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { buildBlogIndexSchemas, buildBlogPostSchemas, getBlogFaqEntries } from './blog-seo';
+import {
+  buildBlogIndexSchemas,
+  buildBlogPostSchemas,
+  getBlogFaqEntries,
+  getBlogPostDescription,
+  getBlogPostTitle,
+  parseBlogPostJsonLd,
+} from './blog-seo';
 
 const basePost = {
   id: '1',
@@ -60,5 +67,56 @@ describe('getBlogFaqEntries', () => {
 
     expect(knownFaqEntries.length).toBe(3);
     expect(unknownFaqEntries).toEqual([]);
+  });
+});
+
+describe('getBlogPostTitle', () => {
+  it('prefers seo_title when set and falls back to title', () => {
+    expect(getBlogPostTitle({
+      ...basePost,
+      seo_title: 'Article to Audio Conversion: Complete Guide (2025)',
+    })).toBe('Article to Audio Conversion: Complete Guide (2025)');
+
+    expect(getBlogPostTitle({ ...basePost, seo_title: null })).toBe(basePost.title);
+    expect(getBlogPostTitle({ ...basePost, seo_title: '   ' })).toBe(basePost.title);
+  });
+});
+
+describe('getBlogPostDescription', () => {
+  it('prefers meta_description when set and falls back to excerpt', () => {
+    expect(getBlogPostDescription({
+      ...basePost,
+      meta_description: 'Article-to-audio conversion turns written content into spoken audio.',
+    })).toBe('Article-to-audio conversion turns written content into spoken audio.');
+
+    expect(getBlogPostDescription({ ...basePost, meta_description: null })).toBe(basePost.excerpt);
+    expect(getBlogPostDescription({ ...basePost, meta_description: '' })).toBe(basePost.excerpt);
+  });
+});
+
+describe('parseBlogPostJsonLd', () => {
+  const articleSchema = { '@type': 'Article', headline: 'Test' };
+  const faqSchema = { '@type': 'FAQPage', mainEntity: [] };
+
+  it('returns empty array for null, undefined, empty string, and invalid json', () => {
+    expect(parseBlogPostJsonLd(null)).toEqual([]);
+    expect(parseBlogPostJsonLd(undefined)).toEqual([]);
+    expect(parseBlogPostJsonLd('')).toEqual([]);
+    expect(parseBlogPostJsonLd('   ')).toEqual([]);
+    expect(parseBlogPostJsonLd('not-json')).toEqual([]);
+  });
+
+  it('parses json string, single object, and array of schemas', () => {
+    expect(parseBlogPostJsonLd(JSON.stringify(articleSchema))).toEqual([articleSchema]);
+    expect(parseBlogPostJsonLd(articleSchema)).toEqual([articleSchema]);
+    expect(parseBlogPostJsonLd([articleSchema, faqSchema])).toEqual([articleSchema, faqSchema]);
+  });
+
+  it('filters non-object entries from arrays', () => {
+    const mixedArray = [articleSchema, null, 'invalid', faqSchema];
+    expect(parseBlogPostJsonLd(mixedArray as unknown as typeof articleSchema[])).toEqual([
+      articleSchema,
+      faqSchema,
+    ]);
   });
 });

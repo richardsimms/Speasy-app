@@ -1,6 +1,50 @@
-import type { BlogPost, BlogPostSummary } from '@/libs/blog';
+import type { BlogPost, BlogPostJsonLd, BlogPostSummary } from '@/libs/blog';
 
 type JsonLd = Record<string, unknown>;
+
+function isJsonLdObject(value: unknown): value is JsonLd {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function normalizeJsonLdToArray(value: unknown): JsonLd[] {
+  if (Array.isArray(value)) {
+    return value.filter(isJsonLdObject);
+  }
+  if (isJsonLdObject(value)) {
+    return [value];
+  }
+  return [];
+}
+
+export function getBlogPostTitle(post: BlogPost): string {
+  const seoTitle = post.seo_title?.trim();
+  return seoTitle || post.title;
+}
+
+export function getBlogPostDescription(post: BlogPost): string {
+  const metaDescription = post.meta_description?.trim();
+  return metaDescription || post.excerpt;
+}
+
+export function parseBlogPostJsonLd(raw: BlogPostJsonLd | null | undefined): JsonLd[] {
+  if (raw == null) {
+    return [];
+  }
+
+  if (typeof raw === 'string') {
+    const trimmed = raw.trim();
+    if (!trimmed) {
+      return [];
+    }
+    try {
+      return normalizeJsonLdToArray(JSON.parse(trimmed));
+    } catch {
+      return [];
+    }
+  }
+
+  return normalizeJsonLdToArray(raw);
+}
 
 type BlogFaqEntry = {
   question: string;

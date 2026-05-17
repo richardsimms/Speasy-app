@@ -5,7 +5,13 @@ import { Footer } from '@/components/footer';
 import { Markdown } from '@/components/markdown';
 import { PageHeader } from '@/components/page-header';
 import { getBlogPostBySlug, getBlogPostsForStaticGeneration } from '@/libs/blog';
-import { buildBlogPostSchemas, getBlogFaqEntries } from '@/libs/blog-seo';
+import {
+  buildBlogPostSchemas,
+  getBlogFaqEntries,
+  getBlogPostDescription,
+  getBlogPostTitle,
+  parseBlogPostJsonLd,
+} from '@/libs/blog-seo';
 import { formatDate } from '@/libs/utils';
 import { getBaseUrl } from '@/utils/Helpers';
 
@@ -21,16 +27,18 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
   const { slug } = await params;
   const post = await getBlogPostBySlug(slug);
   const url = `${getBaseUrl()}/blog/${slug}`;
+  const title = getBlogPostTitle(post);
+  const description = getBlogPostDescription(post);
 
   return {
-    title: post.title,
-    description: post.excerpt,
+    title,
+    description,
     alternates: { canonical: url },
     openGraph: {
       type: 'article',
       url,
-      title: post.title,
-      description: post.excerpt,
+      title,
+      description,
       publishedTime: post.published_at,
       modifiedTime: post.updated_at ?? post.published_at,
       authors: [post.author],
@@ -38,8 +46,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${post.title} | Speasy`,
-      description: post.excerpt,
+      title,
+      description,
       ...(post.image_url && { images: [post.image_url] }),
     },
     keywords: [
@@ -64,7 +72,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
   const post = await getBlogPostBySlug(slug);
   const url = `${getBaseUrl()}/blog/${slug}`;
-  const jsonLdSchemas = buildBlogPostSchemas(post, url, getBaseUrl());
+  const storedJsonLd = parseBlogPostJsonLd(post.json_ld);
+  const jsonLdSchemas = storedJsonLd.length > 0
+    ? storedJsonLd
+    : buildBlogPostSchemas(post, url, getBaseUrl());
   const faqEntries = getBlogFaqEntries(post.slug);
 
   return (

@@ -74,6 +74,8 @@ async function getPostFromFile(slug: string): Promise<BlogPost | null> {
   return parseMarkdownFile(slug);
 }
 
+export type BlogPostJsonLd = string | Record<string, unknown> | Record<string, unknown>[];
+
 export type BlogPost = {
   id: string;
   title: string;
@@ -86,6 +88,9 @@ export type BlogPost = {
   author: string;
   category: string;
   image_url: string | null;
+  seo_title?: string | null;
+  meta_description?: string | null;
+  json_ld?: BlogPostJsonLd | null;
 };
 
 export type BlogPostSummary = Omit<BlogPost, 'content'>;
