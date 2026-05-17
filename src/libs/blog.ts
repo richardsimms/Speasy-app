@@ -44,7 +44,7 @@ async function parseMarkdownFile(slug: string): Promise<BlogPost | null> {
       published_at: date,
       updated_at: date,
       is_published: true,
-      author: 'Speasy Team',
+      author: 'Richard Simms',
       category: 'Blog',
       image_url: null,
     };

@@ -112,11 +112,43 @@ function normalizeBaseUrl(baseUrl: string): string {
   return baseUrl.replace(/\/$/, '');
 }
 
+const DEFAULT_AUTHOR = {
+  name: 'Richard Simms',
+  url: 'https://rsimms.com',
+} as const;
+
+const PUBLISHER_SAME_AS = [
+  'https://www.linkedin.com/in/richardsimms',
+] as const;
+
+function resolveAuthorName(author: string): string {
+  const trimmed = author.trim();
+  if (!trimmed || trimmed === 'Speasy Team') {
+    return DEFAULT_AUTHOR.name;
+  }
+  return trimmed;
+}
+
+function createAuthorSchema(author: string): JsonLd {
+  const name = resolveAuthorName(author);
+  const schema: JsonLd = {
+    '@type': 'Person',
+    'name': name,
+  };
+
+  if (name === DEFAULT_AUTHOR.name) {
+    schema.url = DEFAULT_AUTHOR.url;
+  }
+
+  return schema;
+}
+
 function createPublisherSchema(baseUrl: string): JsonLd {
   return {
     '@type': 'Organization',
     'name': 'Speasy',
     'url': baseUrl,
+    'sameAs': [baseUrl, ...PUBLISHER_SAME_AS],
     'logo': {
       '@type': 'ImageObject',
       'url': `${baseUrl}/apple-touch-icon.png`,
@@ -135,7 +167,7 @@ export function buildBlogPostSchemas(post: BlogPost, postUrl: string, baseUrl: s
     '@type': 'BlogPosting',
     'headline': post.title,
     'description': post.excerpt,
-    'author': { '@type': 'Person', 'name': post.author },
+    'author': createAuthorSchema(post.author),
     'datePublished': post.published_at,
     'dateModified': post.updated_at ?? post.published_at,
     'url': postUrl,

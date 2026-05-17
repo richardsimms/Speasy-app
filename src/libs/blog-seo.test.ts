@@ -17,12 +17,49 @@ const basePost = {
   published_at: '2026-01-01T00:00:00.000Z',
   updated_at: '2026-01-02T00:00:00.000Z',
   is_published: true,
-  author: 'Speasy Team',
+  author: 'Richard Simms',
   category: 'Productivity',
   image_url: null,
 } as const;
 
 describe('buildBlogPostSchemas', () => {
+  it('uses person author with profile url and publisher sameAs links', () => {
+    const schemas = buildBlogPostSchemas(
+      basePost,
+      'https://www.speasy.app/blog/transform-articles-to-podcasts',
+      'https://www.speasy.app',
+    );
+    const articleSchema = schemas[0]!;
+
+    expect(articleSchema.author).toEqual({
+      '@type': 'Person',
+      'name': 'Richard Simms',
+      'url': 'https://rsimms.com',
+    });
+    expect(articleSchema.publisher).toMatchObject({
+      '@type': 'Organization',
+      'name': 'Speasy',
+      'sameAs': [
+        'https://www.speasy.app',
+        'https://www.linkedin.com/in/richardsimms',
+      ],
+    });
+  });
+
+  it('maps legacy speasy team author to richard simms in schema', () => {
+    const schemas = buildBlogPostSchemas(
+      { ...basePost, author: 'Speasy Team' },
+      'https://www.speasy.app/blog/transform-articles-to-podcasts',
+      'https://www.speasy.app',
+    );
+
+    expect(schemas[0]?.author).toEqual({
+      '@type': 'Person',
+      'name': 'Richard Simms',
+      'url': 'https://rsimms.com',
+    });
+  });
+
   it('returns blogposting, faqpage, and howto schemas for supported guide slugs', () => {
     const schemas = buildBlogPostSchemas(
       basePost,
@@ -74,8 +111,8 @@ describe('getBlogPostTitle', () => {
   it('prefers seo_title when set and falls back to title', () => {
     expect(getBlogPostTitle({
       ...basePost,
-      seo_title: 'Article to Audio Conversion: Complete Guide (2025)',
-    })).toBe('Article to Audio Conversion: Complete Guide (2025)');
+      seo_title: 'Article to Audio Conversion: Complete Guide (2026)',
+    })).toBe('Article to Audio Conversion: Complete Guide (2026)');
 
     expect(getBlogPostTitle({ ...basePost, seo_title: null })).toBe(basePost.title);
     expect(getBlogPostTitle({ ...basePost, seo_title: '   ' })).toBe(basePost.title);

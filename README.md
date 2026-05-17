@@ -489,4 +489,4 @@ For questions, feedback, or support:
 
 ---
 
-Made with ♥ by the Speasy team
+Made with ♥ by the Richard Simms
