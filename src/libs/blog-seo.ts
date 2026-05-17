@@ -115,6 +115,10 @@ function normalizeBaseUrl(baseUrl: string): string {
 const DEFAULT_AUTHOR = {
   name: 'Richard Simms',
   url: 'https://rsimms.com',
+  sameAs: [
+    'https://rsimms.com',
+    'https://www.linkedin.com/in/richardsimms',
+  ],
 } as const;
 
 const PUBLISHER_SAME_AS = [
@@ -138,6 +142,7 @@ function createAuthorSchema(author: string): JsonLd {
 
   if (name === DEFAULT_AUTHOR.name) {
     schema.url = DEFAULT_AUTHOR.url;
+    schema.sameAs = [...DEFAULT_AUTHOR.sameAs];
   }
 
   return schema;

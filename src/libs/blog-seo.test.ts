@@ -35,6 +35,10 @@ describe('buildBlogPostSchemas', () => {
       '@type': 'Person',
       'name': 'Richard Simms',
       'url': 'https://rsimms.com',
+      'sameAs': [
+        'https://rsimms.com',
+        'https://www.linkedin.com/in/richardsimms',
+      ],
     });
     expect(articleSchema.publisher).toMatchObject({
       '@type': 'Organization',
@@ -57,6 +61,10 @@ describe('buildBlogPostSchemas', () => {
       '@type': 'Person',
       'name': 'Richard Simms',
       'url': 'https://rsimms.com',
+      'sameAs': [
+        'https://rsimms.com',
+        'https://www.linkedin.com/in/richardsimms',
+      ],
     });
   });
 
