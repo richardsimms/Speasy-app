@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { ContentDetailView } from '@/components/content-detail-view';
+import { Footer } from '@/components/footer';
 import { Env } from '@/libs/Env';
 import { getSupabaseAdmin } from '@/libs/Supabase';
 
@@ -127,6 +128,9 @@ export default async function ContentDetail(props: ContentDetailProps) {
   };
 
   return (
-    <ContentDetailView content={contentData} locale={locale} surface="home" />
+    <>
+      <ContentDetailView content={contentData} locale={locale} surface="home" />
+      <Footer />
+    </>
   );
 }
