@@ -8,7 +8,7 @@ export function Footer() {
   const reducedMotion = useReducedMotion();
 
   return (
-    <footer className="relative border-t border-gray-700 px-4 py-20 backdrop-blur-sm">
+    <footer className="relative border-t border-gray-700 px-4 pt-20 pb-32 backdrop-blur-sm sm:pb-28">
       <div className="mx-auto max-w-3xl">
         <div className="space-y-8 text-center">
           <motion.h2
@@ -60,7 +60,19 @@ export function Footer() {
             transition={reducedMotion ? { duration: 0 } : { duration: 0.6, delay: 0.8 }}
             className="pt-12 text-sm text-gray-200"
           >
-            <div className="mb-4 flex justify-center gap-6">
+            <div className="mb-4 flex flex-wrap justify-center gap-x-6 gap-y-2">
+              <Link
+                href="/about"
+                className="underline decoration-gray-500 underline-offset-4 transition-colors hover:text-white hover:decoration-gray-300"
+              >
+                About
+              </Link>
+              <Link
+                href="/blog"
+                className="underline decoration-gray-500 underline-offset-4 transition-colors hover:text-white hover:decoration-gray-300"
+              >
+                Digest
+              </Link>
               <Link
                 href="/privacy"
                 className="underline decoration-gray-500 underline-offset-4 transition-colors hover:text-white hover:decoration-gray-300"
@@ -74,6 +86,16 @@ export function Footer() {
                 Terms
               </Link>
             </div>
+            <p className="mb-2">
+              made by
+              {' '}
+              <Link
+                href="https://rsimms.com"
+                className="underline decoration-gray-500 underline-offset-4 transition-colors hover:text-white hover:decoration-gray-300"
+              >
+                Richard Simms
+              </Link>
+            </p>
             <p>&copy; 2025 Speasy. All rights reserved.</p>
           </motion.div>
         </div>
