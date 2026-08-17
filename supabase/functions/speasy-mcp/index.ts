@@ -706,24 +706,27 @@ async function handleToolCall(supabase: any, params: any) {
       throw error;
     }
 
-    const categoriesWithCounts = await Promise.all(
-      (categories || []).map(async (cat: any) => {
-        const { count } = await supabase
-          .from('content_items')
-          .select('id', { count: 'exact', head: true })
-          .eq('status', 'done')
-          .eq('category_id', cat.id)
-          .gte(
-            'published_at',
-            new Date(Date.now() - 7 * 86400000).toISOString(),
-          );
+    const { data: recentItems, error: countError } = await supabase
+      .from('content_items')
+      .select('category_id')
+      .eq('status', 'done')
+      .gte('published_at', new Date(Date.now() - 7 * 86400000).toISOString());
 
-        return {
-          ...cat,
-          recent_count: count || 0,
-        };
-      }),
-    );
+    if (countError) {
+      throw countError;
+    }
+
+    const countsByCategory = new Map<string, number>();
+    for (const item of recentItems ?? []) {
+      if (item.category_id) {
+        countsByCategory.set(item.category_id, (countsByCategory.get(item.category_id) ?? 0) + 1);
+      }
+    }
+
+    const categoriesWithCounts = (categories || []).map((cat: any) => ({
+      ...cat,
+      recent_count: countsByCategory.get(cat.id) ?? 0,
+    }));
 
     return {
       content: [
