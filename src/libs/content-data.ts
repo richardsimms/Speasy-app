@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 import { Env } from '@/libs/Env';
 import { logger } from '@/libs/Logger';
 import { getSupabaseAdmin } from '@/libs/Supabase';
@@ -25,7 +26,22 @@ export type FetchContentResult
   = | { ok: true; categories: CategoryGroup[] }
     | { ok: false; reason: 'no-config' | 'error'; message?: string };
 
-export async function fetchCategorisedContent(): Promise<FetchContentResult> {
+export type ContentDetailItem = {
+  id: string;
+  title: string;
+  summary: string | null;
+  content: string | null;
+  imageUrl: string | null;
+  category: string;
+  audioUrl: string | null;
+  duration: number | null;
+  sourceUrl: string | null;
+  sourceName: string | null;
+  sourceLink: string | null;
+  createdAt: string;
+};
+
+async function fetchCategorisedContentUncached(): Promise<FetchContentResult> {
   const hasSupabaseUrl = !!Env.SUPABASE_URL;
   const hasSupabaseKey = !!Env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -143,4 +159,88 @@ export async function fetchCategorisedContent(): Promise<FetchContentResult> {
     .sort((a, b) => a.categoryName.localeCompare(b.categoryName));
 
   return { ok: true, categories };
+}
+
+export const fetchCategorisedContent: () => Promise<FetchContentResult> = unstable_cache(
+  fetchCategorisedContentUncached,
+  ['categorised-content'],
+  { revalidate: 300, tags: ['content'] },
+);
+
+async function fetchContentDetailUncached(id: string): Promise<ContentDetailItem | null> {
+  const hasSupabaseUrl = !!Env.SUPABASE_URL;
+  const hasSupabaseKey = !!Env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!hasSupabaseUrl || !hasSupabaseKey) {
+    return null;
+  }
+
+  const supabase = getSupabaseAdmin();
+
+  const { data: item, error } = await supabase
+    .from('content_items')
+    .select(
+      `
+      id,
+      title,
+      summary,
+      content,
+      image_url,
+      created_at,
+      url,
+      source_name,
+      source_url,
+      content_item_tags(
+        categories(
+          name
+        )
+      ),
+      audio_files(
+        file_url,
+        duration
+      )
+    `,
+    )
+    .eq('id', id)
+    .eq('status', 'done')
+    .maybeSingle();
+
+  if (error || !item) {
+    if (error) {
+      logger.error('Error fetching content detail', { error: error.message, id });
+    }
+    return null;
+  }
+
+  let categoryName = 'Uncategorized';
+  const firstTag = item.content_item_tags?.[0] as any;
+  if (firstTag?.categories?.name) {
+    categoryName = firstTag.categories.name;
+  }
+
+  const audioFile = item.audio_files?.[0];
+
+  return {
+    id: item.id,
+    title: item.title,
+    summary: item.summary,
+    content: item.content,
+    imageUrl: item.image_url,
+    category: categoryName,
+    audioUrl: audioFile?.file_url || null,
+    duration: audioFile?.duration || null,
+    sourceUrl: item.url,
+    sourceName: item.source_name ?? null,
+    sourceLink: item.source_url ?? null,
+    createdAt: item.created_at,
+  };
+}
+
+export function fetchContentDetail(id: string): Promise<ContentDetailItem | null> {
+  const cached = unstable_cache(
+    fetchContentDetailUncached,
+    ['content-detail', id],
+    { revalidate: 300, tags: ['content', `content-${id}`] },
+  );
+  return cached(id);
 }
