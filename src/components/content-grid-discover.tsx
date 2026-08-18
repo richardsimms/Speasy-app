@@ -2,7 +2,8 @@
 
 import type { Track, VisibleQueueContext } from '@/types/audio';
 import { Cpu, DollarSign, Palette, Star, Trophy } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { usePlaybackOptional } from '@/components/audio/playback-provider';
 import { cn } from '@/libs/utils';
 
@@ -34,7 +35,6 @@ type ContentGridDiscoverProps = {
   userId?: string;
   experimentVariant?: string;
   initialCategory?: string;
-  autoplay?: boolean;
 };
 
 // Map category names to icons
@@ -65,6 +65,37 @@ function buildTabPath(tabId: string): string {
   return tabId === 'latest' ? '/' : `/category/${tabId}`;
 }
 
+// Isolated so only this (invisible) subtree needs useSearchParams(), keeping
+// the rest of the grid statically renderable instead of forcing the whole
+// page dynamic just to read ?autoplay=true.
+function AutoplayFromUrl({
+  playback,
+  tracks,
+  queueContext,
+}: {
+  playback: ReturnType<typeof usePlaybackOptional>;
+  tracks: Track[];
+  queueContext: VisibleQueueContext;
+}) {
+  const searchParams = useSearchParams();
+  const autoplay = searchParams.get('autoplay') === 'true';
+  const hasAutoPlayed = useRef(false);
+
+  useEffect(() => {
+    if (!autoplay || hasAutoPlayed.current || !playback || tracks.length === 0) {
+      return;
+    }
+    hasAutoPlayed.current = true;
+    const firstTrack = tracks[0];
+    if (firstTrack) {
+      playback.playTrack(firstTrack.id, queueContext, tracks);
+      playback.openPlayer();
+    }
+  }, [autoplay, playback, tracks, queueContext]);
+
+  return null;
+}
+
 export function ContentGridDiscover({
   categories,
   locale,
@@ -72,7 +103,6 @@ export function ContentGridDiscover({
   userId,
   experimentVariant,
   initialCategory,
-  autoplay = false,
 }: ContentGridDiscoverProps) {
   const playback = usePlaybackOptional();
 
@@ -118,7 +148,6 @@ export function ContentGridDiscover({
     width: number;
   }>({ left: 0, width: 0 });
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
-  const hasAutoPlayed = useRef(false);
 
   const selectedTabData = tabs.find(tab => tab.id === selectedTab);
   const displayedItems = selectedTabData?.items || [];
@@ -186,19 +215,6 @@ export function ContentGridDiscover({
       }
     }
   }, [setSelectedCategoryId, setQueueContextFn, selectedTab, tracks, queueContext]);
-
-  // Handle autoplay from URL (once, when tracks become available)
-  useEffect(() => {
-    if (!autoplay || hasAutoPlayed.current || !playback || tracks.length === 0) {
-      return;
-    }
-    hasAutoPlayed.current = true;
-    const firstTrack = tracks[0];
-    if (firstTrack) {
-      playback.playTrack(firstTrack.id, queueContext, tracks);
-      playback.openPlayer();
-    }
-  }, [autoplay, playback, tracks, queueContext]);
 
   // Sync URL when tab changes (home surface only, shallow replaceState)
   const handleTabChange = useCallback(
@@ -289,6 +305,10 @@ export function ContentGridDiscover({
 
   return (
     <div className="space-y-8">
+      <Suspense fallback={null}>
+        <AutoplayFromUrl playback={playback} tracks={tracks} queueContext={queueContext} />
+      </Suspense>
+
       {/* Header */}
       <div className="mb-2">
         <h1 className="mb-3 font-serif text-5xl leading-tight text-white">

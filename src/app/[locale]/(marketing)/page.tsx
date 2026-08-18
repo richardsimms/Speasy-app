@@ -21,11 +21,8 @@ export async function generateMetadata(props: {
 
 export default async function HomePage(props: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale } = await props.params;
-  const searchParams = await props.searchParams;
-  const autoplay = searchParams.autoplay === 'true';
   const result = await fetchCategorisedContent();
 
   if (!result.ok) {
@@ -54,7 +51,6 @@ export default async function HomePage(props: {
         categories={result.categories}
         locale={locale}
         surface="home"
-        autoplay={autoplay}
       />
     </div>
   );

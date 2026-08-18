@@ -6,12 +6,18 @@ import { Footer } from '@/components/footer';
 import { fetchContentDetail } from '@/libs/content-data';
 import { Env } from '@/libs/Env';
 
-// Force dynamic rendering
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 type ContentDetailProps = {
   params: Promise<{ id: string; locale: string }>;
 };
+
+// No paths pre-rendered at build time (content is created continuously by
+// the LLM pipeline) -- each id is rendered on first visit and then served
+// from the ISR cache for `revalidate` seconds.
+export function generateStaticParams() {
+  return [];
+}
 
 export async function generateMetadata(
   props: ContentDetailProps,

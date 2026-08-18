@@ -3,7 +3,13 @@ import { getTranslations } from 'next-intl/server';
 import { ContentGridDiscover } from '@/components/content-grid-discover';
 import { fetchCategorisedContent } from '@/libs/content-data';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
+
+// No paths pre-rendered at build time -- each slug is rendered on first
+// visit and then served from the ISR cache for `revalidate` seconds.
+export function generateStaticParams() {
+  return [];
+}
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string; slug: string }>;
@@ -19,11 +25,8 @@ export async function generateMetadata(props: {
 
 export default async function CategoryPage(props: {
   params: Promise<{ locale: string; slug: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { locale, slug } = await props.params;
-  const searchParams = await props.searchParams;
-  const autoplay = searchParams.autoplay === 'true';
   const result = await fetchCategorisedContent();
 
   if (!result.ok) {
@@ -48,7 +51,6 @@ export default async function CategoryPage(props: {
         locale={locale}
         surface="home"
         initialCategory={slug}
-        autoplay={autoplay}
       />
     </div>
   );
