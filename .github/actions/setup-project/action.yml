@@ -15,7 +15,7 @@ runs:
   steps:
     - name: Install pnpm
       shell: bash
-      run: corepack enable && corepack prepare pnpm@latest --activate
+      run: corepack enable && corepack prepare pnpm@10.33.0 --activate
 
     - name: Use Node.js ${{ inputs.node-version }}
       uses: actions/setup-node@v6

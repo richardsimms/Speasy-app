@@ -1,6 +1,7 @@
 {
   "name": "Speasy",
   "type": "module",
+  "packageManager": "pnpm@10.33.0",
   "author": "Richard Simmons (https://github.com/richardsimms)",
   "engines": {
     "node": ">=20 <25"
