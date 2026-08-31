@@ -16,6 +16,17 @@ const openai = new OpenAI({
 // ─── Batch Configuration ──────────────────────────────────────────────
 const BATCH_SIZE = 5;
 
+// OpenAI TTS currently returns 128kbps mono MP3 output.
+const TTS_BITRATE_BPS = 128000;
+
+type SummaryPromptVariant = {
+  name: string;
+  openingRule: string;
+  closingRule: string;
+  openingExample: string;
+  closingExample: string;
+};
+
 // ─── Podcast Script System Prompt ─────────────────────────────────────
 const SUMMARY_SYSTEM_PROMPT = `You are a podcast scriptwriter creating engaging audio content for busy professionals. Your goal is to write scripts that sound natural when spoken aloud—like a knowledgeable friend explaining something interesting over coffee.
 
@@ -57,6 +68,7 @@ Insert inline cues using double-parentheses to guide vocal delivery. Use sparing
 HOOK (15-25 words):
 Start mid-thought or with an intriguing angle. Pull them in immediately.
 Never start with: "Today we're discussing...", "In this article...", "This piece explores...", or the article title.
+Do NOT use generic openings like: "Let's dive into...", "Today we're looking at...", "Welcome back...", or "Here's your summary..."
 Good openings: "Here's something that caught my attention—", "So, [interesting finding]...", "You know how [relatable thing]? Well...", "[Bold statement]. And the implications are fascinating."
 
 CONTEXT + SO-WHAT (30-40 words):
@@ -69,6 +81,7 @@ Use phrases like: "According to [Author]...", "[Author] points out that...", "As
 CLOSE (20-30 words):
 Land the plane with a forward-looking thought, implication, or "what to watch for."
 Never use: "In conclusion," "To summarise," "In summary," or end with a generic call-to-action.
+Do NOT use formulaic sign-offs like: "That's all for today," "Thanks for listening," or "See you next time."
 
 5 | Attribution Rules (Non-negotiable)
 - Use the exact author and source names provided—never invent or guess
@@ -94,6 +107,7 @@ Never use: "In conclusion," "To summarise," "In summary," or end with a generic 
 ✗ Robotic summaries that could be written by any AI
 ✗ Saying "the author" instead of using their actual name
 ✗ Generic filler phrases ("In today's fast-paced world...")
+✗ Generic podcast framing and sign-offs ("Let's dive in", "That's all for today")
 
 8 | Key Insights Requirements
 Extract exactly 3 distinct insights that stand alone and immediately inform. Each insight should be:
@@ -102,6 +116,93 @@ Extract exactly 3 distinct insights that stand alone and immediately inform. Eac
 - Written in clear, direct, jargon-free language
 - Something a busy professional would find genuinely valuable
 - Not repetitive of each other or the summary's main point`;
+
+const SUMMARY_PROMPT_VARIANTS: readonly SummaryPromptVariant[] = [
+  {
+    name: 'surprising-fact-forward',
+    openingRule: 'Open with the single most surprising fact or tension in the piece. Start on the insight itself, not setup language.',
+    closingRule: 'Close on the strongest implication for what happens next, without sounding like a scripted sign-off.',
+    openingExample: 'Two out of three teams are now shipping faster with fewer releases. That sounds backwards, until you see what changed.',
+    closingExample: "If this pattern holds, next quarter's winners will be the teams that design for adaptability, not certainty.",
+  },
+  {
+    name: 'question-led',
+    openingRule: 'Start with one sharp question that frames the article stakes, then answer it immediately with a concrete point.',
+    closingRule: 'End with a provocative but grounded question tied to the article evidence.',
+    openingExample: 'What if your best growth channel is also the one quietly hurting retention? That is exactly what this data points to.',
+    closingExample: 'So the real question is not whether this trend continues, but who adapts before it becomes the default.',
+  },
+  {
+    name: 'bold-claim',
+    openingRule: "Begin with a confident, evidence-backed claim from the article's core argument. Keep it conversational, not theatrical.",
+    closingRule: 'End with a crisp key takeaway sentence that can stand on its own.',
+    openingExample: 'The old playbook for product launches is officially stale, and this case study makes that hard to ignore.',
+    closingExample: 'The takeaway is simple: durable advantage now comes from faster learning loops, not louder launches.',
+  },
+  {
+    name: 'drop-in-context',
+    openingRule: 'Drop listeners straight into a concrete scene, number, or decision moment from the article before expanding.',
+    closingRule: 'Finish naturally on a forward-looking thought without any meta-summary language.',
+    openingExample: 'At 8:07 on a Monday standup, one metric changed and the entire roadmap conversation flipped.',
+    closingExample: 'That shift is subtle now, but it is exactly the kind of signal that usually defines the next cycle.',
+  },
+];
+
+function selectSummaryPromptVariant(jobId: string): SummaryPromptVariant {
+  const hash = Array.from(jobId).reduce((acc, char) => ((acc * 31) + char.charCodeAt(0)) >>> 0, 0);
+  return SUMMARY_PROMPT_VARIANTS[hash % SUMMARY_PROMPT_VARIANTS.length]!;
+}
+
+function buildSummaryUserPrompt(args: {
+  title: string;
+  url: string;
+  author: string;
+  sourceName: string;
+  contentExcerpt: string;
+  variant: SummaryPromptVariant;
+}): string {
+  const {
+    title,
+    url,
+    author,
+    sourceName,
+    contentExcerpt,
+    variant,
+  } = args;
+  const attributionTarget = author !== 'Unknown' ? author : (sourceName !== 'Unknown' ? sourceName : 'the source');
+
+  return `Create a podcast-style audio summary for this article. Write for the ear, not the eye - this will be spoken aloud by a TTS system.
+
+Article Title: ${title}
+Article URL: ${url}
+Author: ${author}
+Source: ${sourceName}
+
+STYLE VARIANT (${variant.name}):
+- Opening: ${variant.openingRule}
+- Closing: ${variant.closingRule}
+
+Few-shot style cues (do not copy verbatim; mirror the style only):
+- Opening style example: "${variant.openingExample}"
+- Closing style example: "${variant.closingExample}"
+
+Critical anti-repetition rules:
+- Never open with generic phrases like "Let's dive into...", "Today we're looking at...", "Welcome back...", or "Here's your summary..."
+- Never close with generic phrases like "That's all for today", "Thanks for listening", "In conclusion", or "See you next time"
+- Start with the strongest insight from the article itself
+- End on a concrete implication, key insight, or forward-looking thought
+
+Article Content:
+${contentExcerpt}
+
+IMPORTANT REMINDERS:
+- Use contractions naturally throughout (it's, you'll, here's, don't)
+- Start with a hook, NOT the article title or "This article discusses..."
+- Include attribution to ${attributionTarget} at least twice
+- Vary sentence length for natural rhythm
+- Write like you're explaining this to a smart friend
+- Keep it 150-180 words total`;
+}
 
 // ─── TTS System Prompt ────────────────────────────────────────────────
 const TTS_SYSTEM_PROMPT = `You are a warm, engaging podcast host with a natural British-Australian accent. Think: smart friend explaining something fascinating they just learned.
@@ -178,11 +279,17 @@ async function retryWithBackoff<T>(
 }
 
 // ─── Job Status Helpers ───────────────────────────────────────────────
-async function markJobDone(jobId: string) {
-  const { error } = await sb.from('llm_jobs').update({
+async function markJobDone(jobId: string, processingTimeMs?: number) {
+  const updateData: Record<string, string | number> = {
     status: 'done',
     completed_at: new Date().toISOString(),
-  }).eq('id', jobId);
+  };
+
+  if (processingTimeMs !== undefined) {
+    updateData.processing_time_ms = processingTimeMs;
+  }
+
+  const { error } = await sb.from('llm_jobs').update(updateData).eq('id', jobId);
   if (error) {
     log.error(`Failed to mark job ${jobId} as done:`, error);
   }
@@ -251,6 +358,38 @@ async function markJobError(jobId: string, errorMessage: string, contentId: stri
       });
     }
   }
+}
+
+async function verifyDonePipelineWrites(contentId: string): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const { data: row, error } = await sb
+    .from('content_items')
+    .select('summary')
+    .eq('id', contentId)
+    .single();
+
+  if (error || !row) {
+    return { ok: false, reason: `Could not re-read content after save: ${error?.message ?? 'no row'}` };
+  }
+
+  const summaryValue = row.summary;
+  if (summaryValue == null || String(summaryValue).trim() === '') {
+    return { ok: false, reason: 'content_items.summary is still empty after update' };
+  }
+
+  const { count, error: afErr } = await sb
+    .from('audio_files')
+    .select('id', { count: 'exact', head: true })
+    .eq('content_id', contentId);
+
+  if (afErr) {
+    return { ok: false, reason: `audio_files check failed: ${afErr.message}` };
+  }
+
+  if (count == null || count < 1) {
+    return { ok: false, reason: 'No audio_files row found for content after insert' };
+  }
+
+  return { ok: true };
 }
 
 // ─── Scraper Utils ────────────────────────────────────────────────────
@@ -328,11 +467,26 @@ function validateSummaryQuality(summary: string, author: string, sourceName: str
     /^today we('re| are)/i,
     /^the article/i,
     /^this piece/i,
+    /^let'?s dive into/i,
+    /^today we'?re looking at/i,
+    /^welcome back/i,
+    /^here'?s your summary/i,
   ];
 
   for (const pattern of forbiddenOpenings) {
     if (pattern.test(summary.trim())) {
       issues.push('Summary starts with a forbidden phrase');
+    }
+  }
+
+  const forbiddenClosings = [
+    /that'?s all for today[.!,]?$/i,
+    /thanks for listening[.!,]?$/i,
+    /see you next time[.!,]?$/i,
+  ];
+  for (const pattern of forbiddenClosings) {
+    if (pattern.test(summary.trim())) {
+      issues.push('Summary ends with a generic sign-off');
     }
   }
 
@@ -436,6 +590,13 @@ async function processOneJob(job: { id: string; content_id: string; retry_count:
   let summary = '';
   let keyInsights: string[] = [];
   const chatStartTime = Date.now();
+  const promptVariant = selectSummaryPromptVariant(job.id);
+
+  log.debug('Selected summary prompt variant', {
+    jobId: job.id,
+    contentId: job.content_id,
+    variant: promptVariant.name,
+  });
 
   try {
     const { choices } = await retryWithBackoff(
@@ -449,23 +610,14 @@ async function processOneJob(job: { id: string; content_id: string; retry_count:
           },
           {
             role: 'user',
-            content: `Create a podcast-style audio summary for this article. Write for the ear, not the eye—this will be spoken aloud by a TTS system.
-
-Article Title: ${item.title}
-Article URL: ${item.url}
-Author: ${item.author || 'Unknown'}
-Source: ${sourceName || 'Unknown'}
-
-Article Content:
-${content.slice(0, 12000)}
-
-IMPORTANT REMINDERS:
-- Use contractions naturally throughout (it's, you'll, here's, don't)
-- Start with a hook, NOT the article title or "This article discusses..."
-- Include attribution to ${item.author || sourceName || 'the source'} at least twice
-- Vary sentence length for natural rhythm
-- Write like you're explaining this to a smart friend
-- Keep it 150-180 words total`,
+            content: buildSummaryUserPrompt({
+              title: item.title || 'Untitled',
+              url: item.url || 'Unknown',
+              author: item.author || 'Unknown',
+              sourceName: sourceName || 'Unknown',
+              contentExcerpt: content.slice(0, 12000),
+              variant: promptVariant,
+            }),
           },
         ],
       }),
@@ -648,10 +800,12 @@ Return only the query.`,
     return { success: false };
   }
 
-  // Save summary, insights, image, and audio
-  await sb
+  const audioDurationSeconds = Math.round((audioBuf.byteLength * 8) / TTS_BITRATE_BPS);
+
+  const { error: contentUpdateErr } = await sb
     .from('content_items')
     .update({
+      status: 'done',
       summary,
       key_insights: keyInsights,
       image_url: imageUrl,
@@ -659,14 +813,32 @@ Return only the query.`,
     })
     .eq('id', item.id);
 
-  await sb.from('audio_files').insert({
+  if (contentUpdateErr) {
+    await markJobError(job.id, `content_items update failed: ${contentUpdateErr.message}`, job.content_id, 'db_content_update');
+    return { success: false };
+  }
+
+  const { error: audioInsertErr } = await sb.from('audio_files').insert({
     content_id: item.id,
     file_url: urlData.publicUrl,
     format: 'mp3',
     type: 'summary',
+    duration: audioDurationSeconds,
   });
 
-  await markJobDone(job.id);
+  if (audioInsertErr) {
+    await markJobError(job.id, `audio_files insert failed: ${audioInsertErr.message}`, job.content_id, 'db_audio_insert');
+    return { success: false };
+  }
+
+  const verification = await verifyDonePipelineWrites(item.id);
+  if (!verification.ok) {
+    await markJobError(job.id, verification.reason, job.content_id, 'done_validation');
+    return { success: false };
+  }
+
+  const processingTimeMs = Date.now() - jobStartTime;
+  await markJobDone(job.id, processingTimeMs);
 
   const totalDuration = Date.now() - jobStartTime;
   log.success(`Job completed successfully in ${totalDuration}ms`, {
@@ -674,6 +846,8 @@ Return only the query.`,
     contentId: job.content_id,
     title: item.title,
     totalDuration,
+    processingTimeMs,
+    audioDurationSeconds,
     hasImage: !!imageUrl,
     wordCount: summary.split(/\s+/).length,
   });
