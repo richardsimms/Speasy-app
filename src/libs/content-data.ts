@@ -1,4 +1,5 @@
 import { unstable_cache } from 'next/cache';
+import { isContentId } from '@/libs/content-id';
 import { Env } from '@/libs/Env';
 import { logger } from '@/libs/Logger';
 import { getSupabaseAdmin } from '@/libs/Supabase';
@@ -168,6 +169,10 @@ export const fetchCategorisedContent: () => Promise<FetchContentResult> = unstab
 );
 
 async function fetchContentDetailUncached(id: string): Promise<ContentDetailItem | null> {
+  if (!isContentId(id)) {
+    return null;
+  }
+
   const hasSupabaseUrl = !!Env.SUPABASE_URL;
   const hasSupabaseKey = !!Env.SUPABASE_SERVICE_ROLE_KEY;
 
