@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { ContentDetailView } from '@/components/content-detail-view';
 import { Footer } from '@/components/footer';
 import { fetchContentDetail } from '@/libs/content-data';
+import { isContentId } from '@/libs/content-id';
 import { Env } from '@/libs/Env';
 
 export const revalidate = 300;
@@ -23,6 +24,10 @@ export async function generateMetadata(
   props: ContentDetailProps,
 ): Promise<Metadata> {
   const { id, locale } = await props.params;
+
+  if (!isContentId(id)) {
+    notFound();
+  }
 
   const hasSupabaseUrl = !!Env.SUPABASE_URL;
   const hasSupabaseKey = !!Env.SUPABASE_SERVICE_ROLE_KEY;
@@ -48,6 +53,10 @@ export async function generateMetadata(
 
 export default async function ContentDetail(props: ContentDetailProps) {
   const { id, locale } = await props.params;
+
+  if (!isContentId(id)) {
+    notFound();
+  }
 
   // Check if Supabase is configured
   const hasSupabaseUrl = !!Env.SUPABASE_URL;
