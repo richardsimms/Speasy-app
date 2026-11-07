@@ -28,10 +28,15 @@ async function fetchFeedDataUncached(userId: string, feedId: string): Promise<Fe
     feedQuery = feedQuery.ilike('feed_url', `%/${feedId}`);
   }
 
-  const { data: feed, error: feedError } = await feedQuery.single();
+  const { data: feed, error: feedError } = await feedQuery.maybeSingle();
 
-  if (feedError || !feed) {
+  if (feedError) {
     logger.error('Feed fetch error', { error: feedError, userId, feedId });
+    return null;
+  }
+
+  if (!feed) {
+    logger.debug('Feed not found', { userId, feedId });
     return null;
   }
 
